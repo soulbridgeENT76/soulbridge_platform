@@ -10,7 +10,28 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        // Body/UI: Latin falls to Archivo first; Hangul drops through to
+        // Pretendard. MaruBuri is reserved for the hero title only.
+        sans: ["var(--font-archivo)", "Pretendard", "sans-serif"],
+        display: ["var(--font-archivo)", "Archivo", "sans-serif"],
+        // Hero title: Latin/numerals use Archivo, Hangul uses MaruBuri.
+        maruburi: ["var(--font-archivo)", "MaruBuri", "serif"],
+      },
       colors: {
+        // Soul Bridge ENT brand palette (from the design doc)
+        ink: "#1A171C",
+        paper: "#F4F2EE",
+        mauve: {
+          DEFAULT: "#A493A9",
+          light: "#B7A9BC",
+        },
+        plum: {
+          DEFAULT: "#6E5F74",
+          muted: "#736D77",
+          deep: "#35303A",
+          dark: "#2B2530",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

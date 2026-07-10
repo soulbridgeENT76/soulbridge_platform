@@ -6,15 +6,9 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  // The public marketing site (home + ABOUT/CONTENTS/ARTISTS/NEWS/CONTACT) is
+  // open to everyone, so we only run the Supabase session/guard middleware on
+  // routes that actually require auth. Widen this matcher when more
+  // authenticated areas are added.
+  matcher: ["/protected/:path*"],
 };
