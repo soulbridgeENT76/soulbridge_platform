@@ -1,25 +1,39 @@
-import { Container, Eyebrow } from "@shared/ui";
 import { VISION } from "@entities/about";
+import { AboutSection } from "./about-section";
 
+/** Closing metric section — the 3-year "TOP 2" goal and key indicators. */
 export function VisionSection() {
   return (
-    <section className="bg-ink py-20 text-paper md:py-28">
-      <Container>
-        <Eyebrow className="text-mauve">{VISION.eyebrow}</Eyebrow>
-        <h2 className="mt-4 max-w-3xl whitespace-pre text-3xl font-bold leading-tight md:text-5xl">
+    <AboutSection index="05" eyebrow={VISION.eyebrow} tinted>
+      {/* Feature metric */}
+      <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
+        <span className="font-display text-[5.5rem] font-black leading-[0.8] text-plum md:text-[7rem]">
+          {VISION.metric}
+        </span>
+        <h3 className="pb-2 text-3xl font-bold leading-tight text-ink md:text-4xl">
           {VISION.headline}
-        </h2>
-        <ul className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-paper/15 bg-paper/15 sm:grid-cols-3">
-          {VISION.points.map((point) => (
-            <li
-              key={point}
-              className="bg-ink p-8 text-sm leading-relaxed text-paper/75 md:text-base"
-            >
+        </h3>
+      </div>
+
+      <p className="mt-8 text-lg font-semibold text-ink md:text-xl">
+        {VISION.subhead}
+      </p>
+      <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink/60 md:text-lg">
+        {VISION.body}
+      </p>
+
+      <ol className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-3">
+        {VISION.points.map((point, i) => (
+          <li key={point} className="border-t border-ink/20 pt-5">
+            <span className="font-display text-sm font-bold tracking-widest text-plum">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <p className="mt-3 text-sm leading-relaxed text-ink/75 md:text-base">
               {point}
-            </li>
-          ))}
-        </ul>
-      </Container>
-    </section>
+            </p>
+          </li>
+        ))}
+      </ol>
+    </AboutSection>
   );
 }

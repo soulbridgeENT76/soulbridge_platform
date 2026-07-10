@@ -2,6 +2,8 @@ import { PageShell } from "@widgets/page-shell";
 import { Container, PageHeading } from "@shared/ui";
 import { ABOUT } from "@entities/about";
 import { LeadershipSection } from "./ui/leadership-section";
+import { StrategySection } from "./ui/strategy-section";
+import { PortfolioSection } from "./ui/portfolio-section";
 import { RoadmapSection } from "./ui/roadmap-section";
 import { VisionSection } from "./ui/vision-section";
 
@@ -15,6 +17,8 @@ export function AboutView() {
         </p>
       </Container>
       <LeadershipSection />
+      <StrategySection />
+      <PortfolioSection />
       <RoadmapSection />
       <VisionSection />
     </PageShell>
