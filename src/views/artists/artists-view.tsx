@@ -1,6 +1,7 @@
 import { PageShell } from "@widgets/page-shell";
 import { Container, Eyebrow, PageHeading } from "@shared/ui";
-import { ARTISTS, ArtistCard } from "@entities/artist";
+import { ARTISTS } from "@entities/artist";
+import { ArtistGrid } from "./artist-grid";
 
 export function ArtistsView() {
   return (
@@ -8,6 +9,7 @@ export function ArtistsView() {
       <PageHeading
         eyebrow="ARTIST"
         title="이야기를 전하는 사람들"
+        description="방송인부터 배우, 크리에이터까지 — 소울브릿지ENT와 함께 진심을 전하는 아티스트를 소개합니다."
         aside={
           <Eyebrow className="text-ink/50">
             TOTAL {String(ARTISTS.length).padStart(2, "0")}
@@ -15,11 +17,7 @@ export function ArtistsView() {
         }
       />
       <Container className="py-16 md:py-24">
-        <div className="grid grid-cols-2 gap-x-8 gap-y-14 md:grid-cols-3 xl:grid-cols-4">
-          {ARTISTS.map((artist, i) => (
-            <ArtistCard key={artist.slug} artist={artist} index={i + 1} />
-          ))}
-        </div>
+        <ArtistGrid />
       </Container>
     </PageShell>
   );

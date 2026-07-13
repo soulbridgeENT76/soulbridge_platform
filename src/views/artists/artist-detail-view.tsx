@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { PageShell } from "@widgets/page-shell";
-import { Container, PlaceholderImage } from "@shared/ui";
+import { Container, PlaceholderImage, SocialLinks } from "@shared/ui";
 import type { Artist } from "@entities/artist";
 
 type ArtistDetailViewProps = {
@@ -47,23 +47,12 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
               )}
 
               {artist.socials && artist.socials.length > 0 && (
-                <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 border-t border-ink/10 pt-6">
-                  {artist.socials.map((social) => (
-                    <a
-                      key={social.label}
-                      href={social.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="group inline-flex items-center gap-1.5 font-display text-xs font-semibold uppercase tracking-[0.15em] text-ink/60 transition-colors hover:text-ink"
-                    >
-                      {social.label}
-                      <ArrowUpRight
-                        size={13}
-                        className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      />
-                    </a>
-                  ))}
-                </div>
+                <SocialLinks
+                  items={artist.socials}
+                  size={20}
+                  className="mt-8 border-t border-ink/10 pt-6"
+                  itemClassName="text-ink/50 hover:text-ink"
+                />
               )}
             </div>
           </div>

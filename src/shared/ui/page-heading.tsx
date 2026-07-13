@@ -22,7 +22,7 @@ export function PageHeading({ eyebrow, title, description, aside }: PageHeadingP
         {aside}
       </div>
       {description && (
-        <p className="mt-6 max-w-2xl whitespace-pre-line text-base leading-relaxed text-ink/60 md:text-lg">
+        <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-ink/60 md:text-lg">
           {description}
         </p>
       )}

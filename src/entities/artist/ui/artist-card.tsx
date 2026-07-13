@@ -31,13 +31,9 @@ export function ArtistCard({ artist, index }: ArtistCardProps) {
       </div>
       <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-ink/10 pt-4">
         <div>
-          <h3 className="flex items-center gap-2 text-lg font-bold text-ink">
-            {artist.nameKo}
-            <span
-              aria-hidden
-              className="translate-x-[-4px] text-sm text-plum opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
-            >
-              →
+          <h3 className="text-lg font-bold text-ink">
+            <span className="inline-block origin-left transition-transform duration-300 group-hover:scale-[1.06]">
+              {artist.nameKo}
             </span>
           </h3>
           <p className="font-display text-xs font-medium uppercase tracking-[0.18em] text-ink/45">

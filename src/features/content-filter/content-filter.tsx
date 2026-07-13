@@ -1,15 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { FilterTabs } from "@shared/ui";
+import { FilterTabs, Pagination } from "@shared/ui";
 import {
   CONTENTS,
   CONTENT_CATEGORIES,
   ContentCard,
   type ContentCategory,
 } from "@entities/content";
-import { cn } from "@shared/lib/cn";
 
 type Filter = "ALL" | ContentCategory;
 
@@ -31,10 +29,7 @@ export function ContentFilter() {
 
   const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
   const current = Math.min(page, totalPages);
-  const pageItems = items.slice(
-    (current - 1) * PAGE_SIZE,
-    current * PAGE_SIZE
-  );
+  const pageItems = items.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
   const changeFilter = (next: Filter) => {
     setFilter(next);
@@ -51,57 +46,12 @@ export function ContentFilter() {
         ))}
       </div>
 
-      <nav
-        aria-label="페이지"
-        className="mt-16 flex items-center justify-center gap-2"
-      >
-          <PageButton
-            aria-label="이전 페이지"
-            disabled={current === 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-          >
-            <ChevronLeft size={16} />
-          </PageButton>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-            <PageButton
-              key={n}
-              active={n === current}
-              aria-current={n === current}
-              onClick={() => setPage(n)}
-            >
-              {n}
-            </PageButton>
-          ))}
-
-          <PageButton
-            aria-label="다음 페이지"
-            disabled={current === totalPages}
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          >
-            <ChevronRight size={16} />
-          </PageButton>
-        </nav>
+      <Pagination
+        page={current}
+        totalPages={totalPages}
+        onChange={setPage}
+        className="mt-16"
+      />
     </div>
-  );
-}
-
-type PageButtonProps = React.ComponentProps<"button"> & {
-  active?: boolean;
-};
-
-function PageButton({ active, className, ...props }: PageButtonProps) {
-  return (
-    <button
-      type="button"
-      className={cn(
-        "flex h-10 min-w-10 items-center justify-center rounded-full px-3 font-display text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-30",
-        active
-          ? "bg-ink text-paper"
-          : "text-ink/60 hover:bg-ink/5 hover:text-ink",
-        className
-      )}
-      {...props}
-    />
   );
 }

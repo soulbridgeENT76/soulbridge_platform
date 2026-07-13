@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { NAV, SOCIALS, CONTACT } from "@shared/config/site";
-import { Container } from "@shared/ui";
+import { Container, SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 
 type SiteHeaderProps = {
@@ -168,18 +168,12 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
         </nav>
 
         <div className="mt-auto border-t border-paper/10 px-7 py-7">
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
-            {SOCIALS.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                className="font-display text-[11px] font-semibold uppercase tracking-[0.15em] text-paper/50 transition-colors hover:text-paper"
-              >
-                {s.label}
-              </a>
-            ))}
-          </div>
-          <p className="mt-4 text-[13px] tracking-wide text-paper/40">
+          <SocialLinks
+            items={SOCIALS}
+            size={20}
+            itemClassName="text-paper/50 hover:text-paper"
+          />
+          <p className="mt-5 text-[13px] tracking-wide text-paper/40">
             {CONTACT.email}
           </p>
         </div>

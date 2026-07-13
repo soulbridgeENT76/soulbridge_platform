@@ -1,13 +1,7 @@
 import type { CSSProperties } from "react";
-import { Instagram, Youtube, MessageSquare } from "lucide-react";
 import { SOCIALS } from "@shared/config/site";
+import { SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
-
-const SOCIAL_ICONS: Record<string, typeof Instagram> = {
-  INSTAGRAM: Instagram,
-  YOUTUBE: Youtube,
-  KAKAO: MessageSquare,
-};
 
 const WORDMARK_FONT: CSSProperties = {
   fontFamily: "var(--font-archivo), Archivo, sans-serif",
@@ -84,21 +78,12 @@ export function HeroWordmark() {
 /** Social links pinned to the bottom-left of the hero. */
 export function HeroSocials() {
   return (
-    <div className="absolute bottom-8 left-6 flex items-center gap-5 md:left-10 lg:left-16">
-      {SOCIALS.map((s) => {
-        const Icon = SOCIAL_ICONS[s.label] ?? MessageSquare;
-        return (
-          <a
-            key={s.label}
-            href={s.href}
-            aria-label={s.label}
-            className="text-ink/70 transition-colors hover:text-ink"
-          >
-            <Icon size={20} strokeWidth={1.75} />
-          </a>
-        );
-      })}
-    </div>
+    <SocialLinks
+      items={SOCIALS}
+      size={20}
+      className="absolute bottom-8 left-6 md:left-10 lg:left-16"
+      itemClassName="text-ink/70 hover:text-ink"
+    />
   );
 }
 
