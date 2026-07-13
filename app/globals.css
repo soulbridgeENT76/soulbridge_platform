@@ -170,6 +170,9 @@
     @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Off-canvas menu drawer sits beyond the right edge; prevent it from
+       adding a horizontal scroll / clipping content on mobile. */
+    overflow-x: hidden;
   }
   html {
     scroll-behavior: smooth;

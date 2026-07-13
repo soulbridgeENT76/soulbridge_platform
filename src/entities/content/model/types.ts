@@ -18,6 +18,10 @@ export type Content = {
   description?: string;
   /** Uppercase eyebrow for featured items, e.g. "YOUTUBE ORIGINAL". */
   badge?: string;
+  /** Longer synopsis shown on the detail page (falls back to description/note). */
+  synopsis?: string;
+  /** YouTube video ID — shows an embedded player + link on the detail page. */
+  youtubeId?: string;
 };
 
 /** Category filter order used on the contents page (ALL is prepended in UI). */

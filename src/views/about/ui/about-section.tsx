@@ -15,9 +15,8 @@ type AboutSectionProps = {
 };
 
 /**
- * Editorial two-column section: a sticky index + heading on the left, content
- * on the right. Keeps the whole ABOUT page reading as a designed spread rather
- * than a stacked list.
+ * Left-aligned editorial section: index + label + title stacked at the top,
+ * content below. A consistent left baseline keeps the page easy to scan.
  */
 export function AboutSection({
   index,
@@ -31,22 +30,20 @@ export function AboutSection({
       className={cn("border-t border-ink/10", tinted && "bg-plum/[0.035]")}
     >
       <Container className="py-16 md:py-24">
-        <div className="grid gap-x-12 gap-y-10 md:grid-cols-[minmax(0,17rem)_1fr] lg:gap-x-20">
-          <div className="md:sticky md:top-28 md:self-start">
-            <span className="font-display text-sm font-bold tracking-[0.2em] text-plum">
-              {index}
-            </span>
-            <p className="mt-3 font-display text-xs font-semibold uppercase tracking-[0.22em] text-ink/45">
-              {eyebrow}
-            </p>
-            {title && (
-              <h2 className="mt-4 text-2xl font-bold leading-snug text-ink md:text-3xl">
-                {title}
-              </h2>
-            )}
-          </div>
-          <div className="min-w-0">{children}</div>
+        <div className="max-w-2xl">
+          <span className="font-display text-sm font-bold tracking-[0.2em] text-plum">
+            {index}
+          </span>
+          <p className="mt-3 font-display text-xs font-semibold uppercase tracking-[0.22em] text-ink/45">
+            {eyebrow}
+          </p>
+          {title && (
+            <h2 className="mt-4 text-2xl font-bold leading-snug text-ink md:text-3xl">
+              {title}
+            </h2>
+          )}
         </div>
+        <div className="mt-12 md:mt-14">{children}</div>
       </Container>
     </section>
   );

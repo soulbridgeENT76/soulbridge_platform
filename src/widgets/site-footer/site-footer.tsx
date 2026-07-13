@@ -1,7 +1,6 @@
 import { Instagram, Youtube, MessageSquare } from "lucide-react";
 import { CONTACT, SITE, SOCIALS } from "@shared/config/site";
 import { Container } from "@shared/ui";
-import { FamilySiteSelect } from "./family-site-select";
 
 const SOCIAL_ICONS: Record<string, typeof Instagram> = {
   INSTAGRAM: Instagram,
@@ -41,30 +40,21 @@ export function SiteFooter() {
           </p>
         </div>
 
-        {/* Right: socials + family site */}
-        <div className="flex flex-col gap-6 lg:items-end">
-          <div className="flex items-center gap-5">
-            {SOCIALS.map((s) => {
-              const Icon = SOCIAL_ICONS[s.label] ?? MessageSquare;
-              return (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  aria-label={s.label}
-                  className="text-paper/70 transition-colors hover:text-paper"
-                >
-                  <Icon size={20} strokeWidth={1.75} />
-                </a>
-              );
-            })}
-          </div>
-
-          <div>
-            <p className="mb-2 font-display text-xs font-semibold uppercase tracking-[0.14em] text-paper/70">
-              FAMILY SITE
-            </p>
-            <FamilySiteSelect />
-          </div>
+        {/* Right: socials */}
+        <div className="flex items-center gap-5 lg:justify-end">
+          {SOCIALS.map((s) => {
+            const Icon = SOCIAL_ICONS[s.label] ?? MessageSquare;
+            return (
+              <a
+                key={s.label}
+                href={s.href}
+                aria-label={s.label}
+                className="text-paper/70 transition-colors hover:text-paper"
+              >
+                <Icon size={20} strokeWidth={1.75} />
+              </a>
+            );
+          })}
         </div>
       </Container>
     </footer>
