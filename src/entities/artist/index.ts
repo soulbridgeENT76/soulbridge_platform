@@ -1,3 +1,3 @@
-export type { Artist, ArtistRole } from "./model/types";
-export { ARTISTS, SPOTLIGHT_ARTIST } from "./model/artists";
+export type { Artist, ArtistRole, ArtistWork, ArtistSocial } from "./model/types";
+export { ARTISTS, SPOTLIGHT_ARTIST, getArtistBySlug } from "./model/artists";
 export { ArtistCard } from "./ui/artist-card";

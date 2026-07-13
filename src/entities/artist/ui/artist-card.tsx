@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PlaceholderImage } from "@shared/ui";
 import type { Artist } from "../model/types";
 
@@ -7,10 +8,10 @@ type ArtistCardProps = {
   index?: number;
 };
 
-/** Portrait card used in the artist grid. */
+/** Portrait card used in the artist grid; links to the detail page. */
 export function ArtistCard({ artist, index }: ArtistCardProps) {
   return (
-    <article className="group cursor-pointer">
+    <Link href={`/artists/${artist.slug}`} className="group block">
       <div className="relative overflow-hidden">
         <PlaceholderImage
           label={`${artist.nameKo} · 프로필`}
@@ -45,6 +46,6 @@ export function ArtistCard({ artist, index }: ArtistCardProps) {
         </div>
         <span className="shrink-0 text-sm text-plum">{artist.role}</span>
       </div>
-    </article>
+    </Link>
   );
 }
