@@ -1,35 +1,47 @@
 import { ROADMAP } from "@entities/roadmap";
-import { AboutSection } from "./about-section";
+import { Container } from "@shared/ui";
 
-/** 3-year growth roadmap as a vertical timeline. */
+/** 3-year growth roadmap as a full-width row of phase cards. */
 export function RoadmapSection() {
   return (
-    <AboutSection index="04" eyebrow="ROADMAP" title="3개년 성장 로드맵">
-      <ol className="relative flex flex-col gap-10 border-l border-ink/15 pl-8">
-        {ROADMAP.map((item) => (
-          <li key={item.phase} className="relative">
-            {/* Timeline node */}
-            <span
-              aria-hidden
-              className="absolute -left-[2.35rem] top-1.5 h-3 w-3 rounded-full bg-plum ring-4 ring-paper"
-            />
-            <div className="flex flex-wrap items-baseline gap-x-4">
-              <span className="font-display text-xs font-semibold tracking-widest text-plum">
-                {item.phase}
-              </span>
-              <span className="font-display text-xs font-semibold tracking-widest text-ink/45">
-                {item.period}
-              </span>
-            </div>
-            <h3 className="mt-2 text-xl font-bold text-ink md:text-2xl">
-              {item.title}
-            </h3>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink/60 md:text-base">
-              {item.description}
+    <section className="border-t border-ink/10">
+      <Container className="py-16 md:py-24">
+        {/* Header: index + label on the left, Korean title on the right */}
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="font-display text-sm font-bold tracking-[0.2em] text-plum">
+              03
+            </span>
+            <p className="mt-3 font-display text-xs font-semibold uppercase tracking-[0.22em] text-ink/45">
+              ROADMAP
             </p>
-          </li>
-        ))}
-      </ol>
-    </AboutSection>
+          </div>
+          <h2 className="text-2xl font-bold text-ink md:text-3xl">
+            3개년 성장 로드맵
+          </h2>
+        </div>
+
+        <ol className="mt-12 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          {ROADMAP.map((item) => (
+            <li key={item.phase} className="border-t border-ink/15 pt-5">
+              <div className="flex flex-wrap items-baseline gap-x-3">
+                <span className="font-display text-xs font-semibold tracking-widest text-plum">
+                  {item.phase}
+                </span>
+                <span className="font-display text-xs font-semibold tracking-widest text-ink/40">
+                  {item.period}
+                </span>
+              </div>
+              <h3 className="mt-3 text-lg font-bold text-ink md:text-xl">
+                {item.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink/60">
+                {item.description}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </Container>
+    </section>
   );
 }

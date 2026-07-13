@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PlaceholderImage, Tag } from "@shared/ui";
 import type { Content } from "../model/types";
 
@@ -5,10 +6,10 @@ type ContentCardProps = {
   content: Content;
 };
 
-/** Thumbnail card used in the contents grid. */
+/** Thumbnail card used in the contents grid; links to the detail page. */
 export function ContentCard({ content }: ContentCardProps) {
   return (
-    <article className="group cursor-pointer">
+    <Link href={`/contents/${content.slug}`} className="group block">
       <div className="relative overflow-hidden">
         <PlaceholderImage
           label="콘텐츠 썸네일"
@@ -39,6 +40,6 @@ export function ContentCard({ content }: ContentCardProps) {
         {content.title}
       </h3>
       <p className="mt-1 text-sm text-ink/55">{content.note}</p>
-    </article>
+    </Link>
   );
 }
