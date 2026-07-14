@@ -17,18 +17,9 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
   return (
     <PageShell>
       <Container className="pb-24 pt-16 md:pt-24">
-       <div className="mx-auto max-w-4xl">
-        {/* Back to list */}
-        <Link
-          href="/contents"
-          className="inline-flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.15em] text-ink/45 transition-colors hover:text-ink"
-        >
-          <ArrowLeft size={16} />
-          콘텐츠 목록
-        </Link>
-
+       <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <div className="mt-8 flex items-center gap-2 text-plum">
+        <div className="flex items-center gap-2 text-plum">
           <Tag>{content.category}</Tag>
           <span aria-hidden className="text-ink/20">
             ·
@@ -44,7 +35,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
 
         {isYoutube ? (
           /* Video content: player first, description below */
-          <div className="mt-10 max-w-3xl">
+          <div className="mt-10 max-w-5xl">
             <div className="aspect-video w-full overflow-hidden rounded-2xl bg-ink">
               {content.youtubeId ? (
                 <iframe
@@ -76,24 +67,38 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
               </a>
             )}
 
-            <p className="mt-10 max-w-3xl whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
+            <p className="mt-10 max-w-4xl whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
               {content.synopsis ?? content.description ?? content.note}
             </p>
           </div>
         ) : (
           /* Non-video IP: 16:9 image + description stacked */
           <>
-            <div className="mt-10 max-w-3xl">
+            <div className="mt-10 max-w-5xl">
               <PlaceholderImage
                 label="콘텐츠 대표 이미지"
                 ratio={CONTENT_THUMB_RATIO}
               />
             </div>
-            <p className="mt-10 max-w-3xl whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
+            <p className="mt-10 max-w-4xl whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
               {content.synopsis ?? content.description ?? content.note}
             </p>
           </>
         )}
+
+        {/* Back-to-list CTA */}
+        <div className="mt-16 flex justify-center border-t border-ink/10 pt-14">
+          <Link
+            href="/contents"
+            className="group inline-flex items-center gap-2.5 rounded-full bg-ink px-8 py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-paper transition-transform hover:scale-[1.03]"
+          >
+            <ArrowLeft
+              size={16}
+              className="transition-transform group-hover:-translate-x-0.5"
+            />
+            BACK TO CONTENTS
+          </Link>
+        </div>
        </div>
       </Container>
     </PageShell>

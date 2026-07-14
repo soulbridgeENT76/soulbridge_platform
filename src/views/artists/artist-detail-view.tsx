@@ -12,18 +12,9 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
   return (
     <PageShell>
       <Container className="pb-24 pt-16 md:pt-24">
-        <div className="mx-auto max-w-5xl">
-          {/* Back to list */}
-          <Link
-            href="/artists"
-            className="inline-flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.15em] text-ink/45 transition-colors hover:text-ink"
-          >
-            <ArrowLeft size={16} />
-            아티스트 목록
-          </Link>
-
+        <div className="mx-auto max-w-6xl">
           {/* Profile: image left, intro right */}
-          <div className="mt-10 grid gap-8 sm:grid-cols-[minmax(0,17rem)_1fr] sm:gap-12">
+          <div className="grid gap-8 sm:grid-cols-[minmax(0,17rem)_1fr] sm:gap-12">
             <PlaceholderImage
               label={`${artist.nameKo} · 프로필`}
               ratio="3 / 4"
@@ -82,6 +73,20 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
               </ul>
             </section>
           )}
+
+          {/* Back-to-list CTA */}
+          <div className="mt-16 flex justify-center border-t border-ink/10 pt-14">
+            <Link
+              href="/artists"
+              className="group inline-flex items-center gap-2.5 rounded-full bg-ink px-8 py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-paper transition-transform hover:scale-[1.03]"
+            >
+              <ArrowLeft
+                size={16}
+                className="transition-transform group-hover:-translate-x-0.5"
+              />
+              BACK TO ARTISTS
+            </Link>
+          </div>
         </div>
       </Container>
     </PageShell>
