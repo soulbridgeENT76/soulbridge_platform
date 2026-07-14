@@ -23,18 +23,9 @@ export function NewsDetailView({ item }: NewsDetailViewProps) {
             {item.title}
           </h1>
 
-          {/* Byline: author + date */}
-          <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/50">
-            <span>
-              작성자{" "}
-              <span className="text-ink/70">
-                {item.author ?? "소울브릿지ENT"}
-              </span>
-            </span>
-            <span aria-hidden className="text-ink/20">
-              ·
-            </span>
-            <span>작성일 {formatNewsDate(item.date)}</span>
+          {/* Byline: date */}
+          <div className="mt-5 text-sm text-ink/50">
+            작성일 {formatNewsDate(item.date)}
           </div>
 
           {/* Body */}
