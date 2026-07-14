@@ -1,14 +1,16 @@
 import { PageShell } from "@widgets/page-shell";
 import { Container, PageHeading } from "@shared/ui";
+import { PAGE_COPY } from "@shared/config/page-copy";
 import { NewsFilter } from "@features/news-filter";
 
 export function NewsView() {
+  const copy = PAGE_COPY.news;
   return (
     <PageShell>
       <PageHeading
-        eyebrow="VIEW ALL NEWS"
-        title="소울브릿지ENT의 새로운 소식"
-        description="보도자료부터 공지까지 — 소울브릿지ENT의 소식을 가장 먼저 전해드립니다."
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        description={copy.description}
       />
       <Container className="py-16 md:py-24">
         <NewsFilter />

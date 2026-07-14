@@ -16,51 +16,27 @@ type AboutCardsProps = {
 };
 
 /**
- * Numbered business cards (index + title + description).
- * Up to 4 items lay out as a static responsive grid; beyond that they turn
- * into a horizontal carousel with ‹ › controls, so the CMS can keep adding
- * items without breaking the layout.
+ * Numbered business cards. Always a horizontal, swipeable carousel on mobile
+ * (only ~1 card fits), and a full-width grid on desktop where the cards fill
+ * the row by count. When more cards than fit exist, the ‹ › controls appear.
+ *
+ * Card width per breakpoint is chosen so N (≤4) cards fill the row exactly;
+ * extra cards overflow and become scrollable.
  */
-export function AboutCards({ items }: AboutCardsProps) {
-  if (items.length <= 4) {
-    return (
-      <div className={cn("grid grid-cols-1 gap-8", GRID_COLS[items.length])}>
-        {items.map((card) => (
-          <Card key={card.no} card={card} />
-        ))}
-      </div>
-    );
-  }
-  return <AboutCardsCarousel items={items} />;
-}
-
-/** Column count follows the item count (1–4) so cards fill the row width
- *  instead of leaving a gap. Static strings so Tailwind can see them. */
-const GRID_COLS: Record<number, string> = {
-  1: "sm:grid-cols-1",
-  2: "sm:grid-cols-2",
-  3: "sm:grid-cols-2 lg:grid-cols-3",
-  4: "sm:grid-cols-2 lg:grid-cols-4",
+const CARD_WIDTH: Record<number, string> = {
+  1: "w-full",
+  2: "w-[82%] sm:w-[calc((100%-2rem)/2)]",
+  3: "w-[82%] sm:w-[calc((100%-2rem)/2)] lg:w-[calc((100%-4rem)/3)]",
+  4: "w-[82%] sm:w-[calc((100%-2rem)/2)] lg:w-[calc((100%-6rem)/4)]",
 };
 
-function Card({ card }: { card: AboutCard }) {
-  return (
-    <div className="border-t border-ink/15 pt-5">
-      <span className="font-display text-xs font-semibold tracking-widest text-plum">
-        {card.no}
-      </span>
-      <h3 className="mt-3 text-lg font-bold text-ink">{card.title}</h3>
-      <p className="mt-3 text-sm leading-relaxed text-ink/65">
-        {card.description}
-      </p>
-    </div>
-  );
-}
-
-function AboutCardsCarousel({ items }: AboutCardsProps) {
+export function AboutCards({ items }: AboutCardsProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
+
+  // 1–4 sets how wide each card is on desktop; 5+ reuse the 4-up width and scroll.
+  const columns = Math.min(Math.max(items.length, 1), 4);
 
   const sync = () => {
     const el = trackRef.current;
@@ -78,7 +54,6 @@ function AboutCardsCarousel({ items }: AboutCardsProps) {
   const step = (dir: 1 | -1) => {
     const el = trackRef.current;
     if (!el) return;
-    // Advance by roughly one viewport of cards.
     el.scrollBy({ left: el.clientWidth * 0.85 * dir, behavior: "smooth" });
   };
 
@@ -87,12 +62,12 @@ function AboutCardsCarousel({ items }: AboutCardsProps) {
       <div
         ref={trackRef}
         onScroll={sync}
-        className="flex gap-8 overflow-x-auto scroll-smooth pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-8 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {items.map((card) => (
           <div
             key={card.no}
-            className="w-[78%] shrink-0 sm:w-[calc((100%-2rem)/2)] lg:w-[calc((100%-3*2rem)/4)]"
+            className={cn("shrink-0 snap-start", CARD_WIDTH[columns])}
           >
             <Card card={card} />
           </div>
@@ -101,6 +76,20 @@ function AboutCardsCarousel({ items }: AboutCardsProps) {
 
       <NavButton side="left" hidden={atStart} onClick={() => step(-1)} />
       <NavButton side="right" hidden={atEnd} onClick={() => step(1)} />
+    </div>
+  );
+}
+
+function Card({ card }: { card: AboutCard }) {
+  return (
+    <div className="border-t border-ink/15 pt-5">
+      <span className="font-display text-xs font-semibold tracking-widest text-plum">
+        {card.no}
+      </span>
+      <h3 className="mt-3 text-lg font-bold text-ink">{card.title}</h3>
+      <p className="mt-3 text-sm leading-relaxed text-ink/65">
+        {card.description}
+      </p>
     </div>
   );
 }

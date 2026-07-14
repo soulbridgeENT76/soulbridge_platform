@@ -1,7 +1,15 @@
 import { CONTACT, SITE, SOCIALS } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 
-export function SiteFooter() {
+// Cache Component: reading the current time is allowed inside `"use cache"`,
+// so the copyright year prerenders cleanly (updates on each build/deploy).
+async function getCurrentYear() {
+  "use cache";
+  return new Date().getFullYear();
+}
+
+export async function SiteFooter() {
+  const year = await getCurrentYear();
   return (
     <footer className="bg-ink text-paper">
       <Container className="flex flex-col gap-10 py-12 lg:flex-row lg:items-start lg:justify-between">
@@ -9,15 +17,15 @@ export function SiteFooter() {
         <div>
           <div className="flex items-baseline gap-4">
             <span className="font-display text-2xl font-black tracking-tight">
-              Soul Bridge ENT
+              {SITE.name}
             </span>
             <span className="hidden text-sm text-paper/50 sm:inline">
-              영혼과 영혼을 잇는 미래 엔터테인먼트
+              {SITE.intro}
             </span>
           </div>
 
           <p className="mt-6 font-display text-sm font-bold uppercase tracking-[0.12em]">
-            SOUL BRIDGE ENT
+            {SITE.name}
           </p>
           <p className="mt-2 text-sm text-paper/50">{CONTACT.address}</p>
           <p className="mt-1 text-sm text-paper/50">
@@ -27,7 +35,7 @@ export function SiteFooter() {
           </p>
 
           <p className="mt-5 font-display text-[11px] uppercase tracking-[0.14em] text-paper/40">
-            {SITE.copyright}
+            © {year} {SITE.copyright}
             <span className="mx-2 text-paper/20">|</span>
             CREATED BY SOUL BRIDGE ENT
           </p>
