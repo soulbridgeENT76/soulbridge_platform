@@ -15,7 +15,13 @@
   --color-mauve: #a493a9;
   --color-mauve-light: #b7a9bc;
 
-  --color-plum: #6e5f74;
+  /* Official brand color. Single source of truth. */
+  --color-brand: #4a3663;
+  --color-brand-soft: #7a57a3; /* brighter, clearly-purple tone for text accents on light bg */
+
+  /* `plum` is the site-wide accent (eyebrows, tags, card hovers). It points
+     at the brand color so every accent reads on-brand from one place. */
+  --color-plum: var(--color-brand);
   --color-plum-muted: #736d77;
   --color-plum-deep: #35303a;
   --color-plum-dark: #2b2530;

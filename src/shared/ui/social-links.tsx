@@ -10,6 +10,12 @@ const BRAND_PATHS: Record<string, string> = {
     "M12 0C5.373 0 0 4.226 0 9.44c0 3.353 2.192 6.298 5.49 7.977-.243.859-.877 3.113-.994 3.598-.145.602.22.594.463.432.19-.128 3.005-2.04 4.232-2.87.588.086 1.19.13 1.809.13 6.627 0 12-4.225 12-9.44C24 4.226 18.627 0 12 0",
 };
 
+/** Optical size tweak: some glyphs fill the 24×24 box less, so they read
+ *  smaller at the same px size. Nudge those up to match the others. */
+const OPTICAL_SCALE: Record<string, number> = {
+  YOUTUBE: 1.15,
+};
+
 type SocialItem = { label: string; href: string };
 
 type SocialLinksProps = {
@@ -34,6 +40,7 @@ export function SocialLinks({
       {items.map((social) => {
         const path = BRAND_PATHS[social.label];
         if (!path) return null;
+        const glyphSize = size * (OPTICAL_SCALE[social.label] ?? 1);
         return (
           <a
             key={social.label}
@@ -48,8 +55,8 @@ export function SocialLinks({
           >
             <svg
               viewBox="0 0 24 24"
-              width={size}
-              height={size}
+              width={glyphSize}
+              height={glyphSize}
               fill="currentColor"
               aria-hidden
             >

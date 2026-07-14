@@ -1,63 +1,81 @@
+import { MapPin } from "lucide-react";
 import { PageShell } from "@widgets/page-shell";
-import { Container, PageHeading, PlaceholderImage } from "@shared/ui";
-import { CONTACT, SOCIALS } from "@shared/config/site";
-
-function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1 border-t border-ink/10 py-5 sm:flex-row sm:gap-8">
-      <dt className="w-28 shrink-0 font-display text-xs font-semibold uppercase tracking-[0.18em] text-plum">
-        {label}
-      </dt>
-      <dd className="text-base text-ink/80">{children}</dd>
-    </div>
-  );
-}
+import { Container, Eyebrow, SocialLinks } from "@shared/ui";
+import { CONTACT, SITE, SOCIALS } from "@shared/config/site";
 
 export function ContactView() {
   return (
     <PageShell>
-      <PageHeading eyebrow="CONTACT" title="찾아오시는 길" description={CONTACT.email} />
-      <Container className="py-16 md:py-24">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-          <dl>
-            <InfoRow label="ADDRESS">{CONTACT.address}</InfoRow>
-            <InfoRow label="TEL">{CONTACT.tel}</InfoRow>
-            <InfoRow label="HOURS">{CONTACT.hours}</InfoRow>
-            <InfoRow label="SOCIAL">
-              <span className="flex flex-wrap gap-4">
-                {SOCIALS.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    className="font-display text-xs font-semibold uppercase tracking-[0.15em] transition-opacity hover:opacity-60"
-                  >
-                    {s.label} ↗
-                  </a>
-                ))}
-              </span>
-            </InfoRow>
-            <p className="mt-8 text-sm leading-relaxed text-ink/55">
-              {CONTACT.directions}
-            </p>
-          </dl>
+      {/* Top: message + address / socials */}
+      <Container className="pb-16 pt-16 md:pt-24">
+        <Eyebrow className="text-plum">CONTACT US</Eyebrow>
+        <h1 className="mt-6 text-4xl font-bold tracking-tight text-ink md:text-5xl">
+          찾아오시는 길
+        </h1>
+        <p className="mt-6 text-base leading-relaxed text-ink/55 md:text-lg">
+          협업·제휴·출연 문의를 환영합니다. 아래 연락처로 편하게 연락 주시고, 방문 시 위치는 지도를 참고해 주세요.
+        </p>
 
+        <div className="mt-14 grid gap-10 border-t border-ink/10 pt-10 sm:grid-cols-2">
+          {/* Address */}
           <div>
-            <PlaceholderImage label="지도 이미지 (네이버 / 카카오맵)" ratio="4 / 3" />
-            <div className="mt-4 flex gap-4">
-              <a
-                href={CONTACT.maps.naver}
-                className="font-display text-xs font-semibold uppercase tracking-[0.15em] transition-opacity hover:opacity-60"
-              >
-                네이버 지도 ↗
-              </a>
-              <a
-                href={CONTACT.maps.kakao}
-                className="font-display text-xs font-semibold uppercase tracking-[0.15em] transition-opacity hover:opacity-60"
-              >
-                카카오맵 ↗
-              </a>
-            </div>
+            <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-plum">
+              ADDRESS
+            </p>
+            <p className="mt-4 flex items-start gap-2 text-lg text-ink/80">
+              <MapPin size={18} className="mt-1 shrink-0 text-ink/40" />
+              {CONTACT.address}
+            </p>
+            <p className="mt-4 text-sm text-ink/55">
+              TEL {CONTACT.tel}
+              <span className="mx-2 text-ink/20">·</span>
+              {CONTACT.email}
+            </p>
           </div>
+
+          {/* Follow */}
+          <div className="sm:text-right">
+            <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-plum">
+              FOLLOW {SITE.name.toUpperCase()}
+            </p>
+            <SocialLinks
+              items={SOCIALS}
+              size={20}
+              className="mt-4 sm:justify-end"
+              itemClassName="text-ink/60 hover:text-ink"
+            />
+          </div>
+        </div>
+      </Container>
+
+      {/* Bottom: map */}
+      <Container className="pb-24">
+        <div className="overflow-hidden rounded-2xl border border-ink/10">
+          <iframe
+            src={CONTACT.maps.embed}
+            title={`${SITE.name} 위치 지도`}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="block h-[320px] w-full md:h-[440px]"
+          />
+        </div>
+        <div className="mt-4 flex gap-5">
+          <a
+            href={CONTACT.maps.naver}
+            target="_blank"
+            rel="noreferrer"
+            className="font-display text-xs font-semibold uppercase tracking-[0.15em] text-ink/60 transition-colors hover:text-ink"
+          >
+            네이버 지도 ↗
+          </a>
+          <a
+            href={CONTACT.maps.kakao}
+            target="_blank"
+            rel="noreferrer"
+            className="font-display text-xs font-semibold uppercase tracking-[0.15em] text-ink/60 transition-colors hover:text-ink"
+          >
+            카카오맵 ↗
+          </a>
         </div>
       </Container>
     </PageShell>

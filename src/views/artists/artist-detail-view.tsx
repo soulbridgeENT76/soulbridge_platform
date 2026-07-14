@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PageShell } from "@widgets/page-shell";
 import { Container, PlaceholderImage, SocialLinks } from "@shared/ui";
+import { PORTRAIT_RATIO } from "@shared/config/media";
 import type { Artist } from "@entities/artist";
 
 type ArtistDetailViewProps = {
@@ -17,7 +18,7 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
           <div className="grid gap-8 sm:grid-cols-[minmax(0,17rem)_1fr] sm:gap-12">
             <PlaceholderImage
               label={`${artist.nameKo} · 프로필`}
-              ratio="3 / 4"
+              ratio={PORTRAIT_RATIO}
             />
 
             <div>
@@ -78,7 +79,7 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
           <div className="mt-16 flex justify-center border-t border-ink/10 pt-14">
             <Link
               href="/artists"
-              className="group inline-flex items-center gap-2.5 rounded-full bg-ink px-8 py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-paper transition-transform hover:scale-[1.03]"
+              className="group inline-flex items-center gap-2.5 rounded-full bg-brand px-8 py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-paper transition-transform hover:scale-[1.03]"
             >
               <ArrowLeft
                 size={16}

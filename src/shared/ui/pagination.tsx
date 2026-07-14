@@ -64,8 +64,8 @@ function PageButton({ active, className, ...props }: PageButtonProps) {
       className={cn(
         "flex h-10 min-w-10 items-center justify-center rounded-full px-3 font-display text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-30",
         active
-          ? "bg-ink text-paper"
-          : "text-ink/60 hover:bg-ink/5 hover:text-ink",
+          ? "bg-brand text-paper"
+          : "text-ink/60 hover:bg-brand/10 hover:text-brand",
         className
       )}
       {...props}

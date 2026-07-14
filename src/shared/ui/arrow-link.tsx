@@ -21,7 +21,7 @@ export function ArrowLink({
       className={cn(
         "group inline-flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-[0.15em] transition-colors",
         variant === "solid" &&
-          "rounded-full bg-ink px-6 py-3 text-paper hover:bg-plum-deep",
+          "rounded-full bg-brand px-6 py-3 text-paper hover:bg-brand-soft",
         variant === "text" && "hover:opacity-60",
         className
       )}
