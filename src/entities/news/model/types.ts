@@ -1,4 +1,4 @@
-export type NewsCategory = "PRESS" | "NOTICE";
+export type NewsCategory = "NEWS" | "NOTICE";
 
 export type NewsItem = {
   slug: string;
@@ -6,6 +6,8 @@ export type NewsItem = {
   date: string;
   category: NewsCategory;
   title: string;
+  /** Full body shown on the detail page (multiline free text, CMS-editable). */
+  body?: string;
 };
 
-export const NEWS_CATEGORIES: NewsCategory[] = ["PRESS", "NOTICE"];
+export const NEWS_CATEGORIES: NewsCategory[] = ["NEWS", "NOTICE"];
