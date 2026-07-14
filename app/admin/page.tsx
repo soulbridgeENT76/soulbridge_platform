@@ -27,7 +27,7 @@ export default function AdminDashboardPage() {
   return (
     <div>
       <AdminPageHeader
-        title="대시보드"
+        title="DASHBOARD"
         description="소울브릿지ENT 콘텐츠·아티스트·뉴스를 이곳에서 관리합니다."
       />
 

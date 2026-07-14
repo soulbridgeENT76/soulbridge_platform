@@ -5,7 +5,7 @@ export default function AdminAboutPage() {
   return (
     <div>
       <AdminPageHeader
-        title="회사소개"
+        title="ABOUT"
         description="ABOUT 페이지의 문구와 섹션을 관리합니다."
       />
       <div className="mt-8">

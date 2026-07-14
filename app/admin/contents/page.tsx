@@ -14,7 +14,7 @@ export default function AdminContentsPage() {
   return (
     <div>
       <AdminPageHeader
-        title="콘텐츠"
+        title="CONTENTS"
         description={`총 ${CONTENTS.length}개`}
         action={
           <AdminLinkButton href="/admin/contents/new" variant="solid">

@@ -13,7 +13,7 @@ export default function AdminNewsPage() {
   return (
     <div>
       <AdminPageHeader
-        title="뉴스"
+        title="NEWS"
         description={`총 ${NEWS.length}개`}
         action={
           <AdminLinkButton href="/admin/news/new" variant="solid">

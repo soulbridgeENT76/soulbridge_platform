@@ -17,15 +17,15 @@ import {
 import { cn } from "@shared/lib/cn";
 
 const NAV = [
-  { label: "대시보드", href: "/admin", icon: LayoutDashboard },
-  { label: "브랜드", href: "/admin/brand", icon: Sparkles },
-  { label: "홈", href: "/admin/home", icon: Home },
-  { label: "회사소개", href: "/admin/about", icon: Building2 },
-  { label: "콘텐츠", href: "/admin/contents", icon: Film },
-  { label: "아티스트", href: "/admin/artists", icon: Users },
-  { label: "뉴스", href: "/admin/news", icon: Newspaper },
-  { label: "연락처", href: "/admin/contact", icon: MapPin },
-  { label: "푸터", href: "/admin/footer", icon: PanelBottom },
+  { label: "DASHBOARD", href: "/admin", icon: LayoutDashboard },
+  { label: "BRAND", href: "/admin/brand", icon: Sparkles },
+  { label: "HOME", href: "/admin/home", icon: Home },
+  { label: "ABOUT", href: "/admin/about", icon: Building2 },
+  { label: "CONTENTS", href: "/admin/contents", icon: Film },
+  { label: "ARTISTS", href: "/admin/artists", icon: Users },
+  { label: "NEWS", href: "/admin/news", icon: Newspaper },
+  { label: "CONTACT", href: "/admin/contact", icon: MapPin },
+  { label: "FOOTER", href: "/admin/footer", icon: PanelBottom },
 ] as const;
 
 export function AdminSidebar() {
