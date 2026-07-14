@@ -6,7 +6,7 @@ type TagProps = {
   children: ReactNode;
 };
 
-/** Small category/status label (e.g. "YOUTUBE ORIGINAL", "PRESS"). */
+/** Small category/status label (e.g. "YOUTUBE ORIGINAL", "NEWS"). */
 export function Tag({ className, children }: TagProps) {
   return (
     <span

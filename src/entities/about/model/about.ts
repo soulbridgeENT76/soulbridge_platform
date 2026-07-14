@@ -1,7 +1,7 @@
 /** Static ABOUT-page content, reconstructed from the business-plan deck. */
 
 export const ABOUT = {
-  eyebrow: "ABOUT US",
+  eyebrow: "OUR STORY",
   title: "영혼과 영혼을 잇는\n미래 엔터테인먼트",
   body: "소울브릿지ENT는 단순한 에이전시를 넘어,\n깊이 있는 메시지를 전하는 오리지널 콘텐츠 제작 역량과\n독점적인 원천 IP 확장을 기반으로 지속 가능한 미디어 성장을 지향합니다.",
 } as const;
@@ -59,25 +59,42 @@ export const STRATEGY_PILLARS: StrategyPillar[] = [
 ];
 
 export type PortfolioArea = {
+  no: string;
   title: string;
-  body: string;
-  points: string[];
+  description: string;
 };
 
 /** PART II — diversified business portfolio. */
 export const PORTFOLIO: PortfolioArea[] = [
   {
+    no: "01",
     title: "유튜브 & 오리지널 콘텐츠",
-    body: "대중성과 신뢰성을 결합한 오리지널 포맷의 유튜브 예능·교양 시리즈를 매 시즌 기획하여 고정 시청자층과 강력한 미디어 팬덤을 조기에 확보합니다. 자체 유통 채널 기반의 디지털 다이렉트 수익(광고·협찬·멤버십)을 극대화해 조기 현금 흐름 창출과 생태계 안정을 달성합니다.",
-    points: ["독자적 미디어 포맷 및 시즌제 설계", "타겟별 디지털 광고 연계 극대화"],
+    description:
+      "대중성과 신뢰성을 결합한 오리지널 포맷의 유튜브 예능·교양 시리즈를 매 시즌 기획하여 고정 시청자층과 강력한 미디어 팬덤을 조기에 확보합니다. 자체 유통 채널 기반의 디지털 다이렉트 수익(광고·협찬·멤버십)을 극대화해 조기 현금 흐름 창출과 생태계 안정을 달성합니다.",
   },
   {
+    no: "02",
     title: "방송·OTT 및 IP 트랜스미디어",
-    body: "파트너사 '로크미디어'의 검증된 웹툰·웹소설 메가 히트 IP 라이브러리를 활용해 원천 서사의 미디어 확장 사업을 전방위로 가동합니다. 원천 스토리 IP를 고퀄리티 드라마·영화, 극장 및 글로벌 OTT용 웰메이드 콘텐츠로 가공·생산하여 고부가가치 라이선싱을 실현합니다.",
-    points: [
-      "원천 IP 공동 각색 및 프리프로덕션",
-      "글로벌 대형 플랫폼 공동 유통 구조 확보",
-    ],
+    description:
+      "파트너사 '로크미디어'의 검증된 웹툰·웹소설 메가 히트 IP 라이브러리를 활용해 원천 서사의 미디어 확장 사업을 전방위로 가동합니다. 원천 스토리 IP를 고퀄리티 드라마·영화, 극장 및 글로벌 OTT용 웰메이드 콘텐츠로 가공·생산하여 고부가가치 라이선싱을 실현합니다.",
+  },
+  {
+    no: "03",
+    title: "더미 카드 A",
+    description:
+      "동작 확인용 더미 데이터입니다. 실제 콘텐츠 확정 시 교체하거나 삭제하면 됩니다.",
+  },
+  {
+    no: "04",
+    title: "더미 카드 B",
+    description:
+      "동작 확인용 더미 데이터입니다. 실제 콘텐츠 확정 시 교체하거나 삭제하면 됩니다.",
+  },
+  {
+    no: "05",
+    title: "더미 카드 C",
+    description:
+      "동작 확인용 더미 데이터입니다. 실제 콘텐츠 확정 시 교체하거나 삭제하면 됩니다.",
   },
 ];
 

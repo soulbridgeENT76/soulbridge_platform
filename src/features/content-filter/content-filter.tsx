@@ -19,13 +19,16 @@ export function ContentFilter() {
   const [filter, setFilter] = useState<Filter>("ALL");
   const [page, setPage] = useState(1);
 
-  const items = useMemo(
-    () =>
+  const items = useMemo(() => {
+    const filtered =
       filter === "ALL"
         ? CONTENTS
-        : CONTENTS.filter((c) => c.category === filter),
-    [filter]
-  );
+        : CONTENTS.filter((c) => c.category === filter);
+    // Newest first — sort by the leading year in the `year` string.
+    return [...filtered].sort(
+      (a, b) => parseInt(b.year, 10) - parseInt(a.year, 10)
+    );
+  }, [filter]);
 
   const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
   const current = Math.min(page, totalPages);
