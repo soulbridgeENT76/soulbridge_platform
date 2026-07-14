@@ -6,4 +6,6 @@ export { PlaceholderImage } from "./placeholder-image";
 export { Tag } from "./tag";
 export { PageHeading } from "./page-heading";
 export { FilterTabs } from "./filter-tabs";
+export { Pagination } from "./pagination";
+export { SocialLinks } from "./social-links";
 export { PaperTexture } from "./paper-texture";

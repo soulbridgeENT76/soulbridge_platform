@@ -24,6 +24,13 @@ export type Content = {
   youtubeId?: string;
 };
 
+/**
+ * Single source of truth for the content thumbnail aspect ratio, shared by the
+ * list card and the detail page. Keep list/detail in sync and make it easy to
+ * feed one target size to an image-resizing server later.
+ */
+export const CONTENT_THUMB_RATIO = "16 / 9";
+
 /** Category filter order used on the contents page (ALL is prepended in UI). */
 export const CONTENT_CATEGORIES: ContentCategory[] = [
   "YOUTUBE",

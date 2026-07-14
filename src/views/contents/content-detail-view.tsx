@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { PageShell } from "@widgets/page-shell";
 import { Container, PlaceholderImage, Tag } from "@shared/ui";
-import type { Content } from "@entities/content";
+import { CONTENT_THUMB_RATIO, type Content } from "@entities/content";
 
 type ContentDetailViewProps = {
   content: Content;
@@ -17,6 +17,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
   return (
     <PageShell>
       <Container className="pb-24 pt-16 md:pt-24">
+       <div className="mx-auto max-w-4xl">
         {/* Back to list */}
         <Link
           href="/contents"
@@ -41,24 +42,10 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
         </h1>
         <p className="mt-3 text-lg text-ink/55">{content.note}</p>
 
-        {/* Hero image */}
-        <div className="mt-10 max-w-4xl">
-          <PlaceholderImage label="콘텐츠 대표 이미지" ratio="16 / 9" />
-        </div>
-
-        {/* Synopsis */}
-        <p className="mt-10 max-w-2xl text-base leading-relaxed text-ink/70 md:text-lg">
-          {content.synopsis ?? content.description ?? content.note}
-        </p>
-
-        {/* YouTube player + link (video content only) */}
-        {isYoutube && (
-          <div className="mt-16 max-w-4xl border-t border-ink/10 pt-12">
-            <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-plum">
-              WATCH
-            </p>
-
-            <div className="mt-6 aspect-video w-full overflow-hidden rounded-2xl bg-ink">
+        {isYoutube ? (
+          /* Video content: player first, description below */
+          <div className="mt-10 max-w-3xl">
+            <div className="aspect-video w-full overflow-hidden rounded-2xl bg-ink">
               {content.youtubeId ? (
                 <iframe
                   className="h-full w-full"
@@ -88,8 +75,26 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
                 />
               </a>
             )}
+
+            <p className="mt-10 max-w-3xl whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
+              {content.synopsis ?? content.description ?? content.note}
+            </p>
           </div>
+        ) : (
+          /* Non-video IP: 16:9 image + description stacked */
+          <>
+            <div className="mt-10 max-w-3xl">
+              <PlaceholderImage
+                label="콘텐츠 대표 이미지"
+                ratio={CONTENT_THUMB_RATIO}
+              />
+            </div>
+            <p className="mt-10 max-w-3xl whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
+              {content.synopsis ?? content.description ?? content.note}
+            </p>
+          </>
         )}
+       </div>
       </Container>
     </PageShell>
   );
