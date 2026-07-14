@@ -22,7 +22,7 @@ export function HeroWordmark() {
     >
       <svg
         viewBox="-580 0 1500 600"
-        className="h-auto w-[68rem] lg:w-[90rem]"
+        className="h-auto w-272 lg:w-360"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>

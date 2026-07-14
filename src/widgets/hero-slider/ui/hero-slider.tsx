@@ -108,7 +108,7 @@ export function HeroSlider() {
             }}
             style={{ backgroundColor: slide.bg }}
             className={cn(
-              "hero-section relative flex min-h-[100svh] items-center overflow-hidden",
+              "hero-section relative flex min-h-svh items-center overflow-hidden",
               dark ? "text-ink" : "text-paper"
             )}
           >
@@ -116,7 +116,7 @@ export function HeroSlider() {
                 as it drifts). Ready to hold a CMS image later. */}
             <div
               data-parallax
-              className="pointer-events-none absolute inset-x-0 -top-[8%] h-[116%] will-change-transform"
+              className="pointer-events-none absolute inset-x-0 top-[-8%] h-[116%] will-change-transform"
             >
               <PaperTexture />
               {i === 0 && <HeroWordmark />}
@@ -126,11 +126,11 @@ export function HeroSlider() {
                 className={cn(
                   // Each child reveals with a gentle upward fade as the slide
                   // becomes active; staggered so the block eases in top-to-bottom.
-                  "max-w-3xl [&>*]:transition-all [&>*]:duration-700 [&>*]:ease-out",
+                  "max-w-3xl *:transition-all *:duration-700 *:ease-out",
                   "[&>*:nth-child(2)]:delay-100 [&>*:nth-child(3)]:delay-200 [&>*:nth-child(4)]:delay-300 [&>*:nth-child(5)]:delay-500",
                   i === active
-                    ? "[&>*]:translate-y-0 [&>*]:opacity-100"
-                    : "[&>*]:translate-y-8 [&>*]:opacity-0"
+                    ? "*:translate-y-0 *:opacity-100"
+                    : "*:translate-y-8 *:opacity-0"
                 )}
               >
                 <p
@@ -152,7 +152,7 @@ export function HeroSlider() {
                   {slide.titleKo.split("\n").map((line, li) => (
                     <span
                       key={li}
-                      className="block [&:not(:first-child)]:mt-4 md:[&:not(:first-child)]:mt-6"
+                      className="block not-first:mt-4 md:not-first:mt-6"
                     >
                       {line}
                     </span>

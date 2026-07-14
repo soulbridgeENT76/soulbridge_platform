@@ -28,8 +28,8 @@ export function PlaceholderImage({
       className={cn(
         "group/ph relative flex items-center justify-center overflow-hidden",
         tone === "light"
-          ? "bg-gradient-to-br from-mauve/30 via-mauve/20 to-plum/15 text-ink/45"
-          : "bg-gradient-to-br from-white/10 to-white/[0.03] text-paper/45",
+          ? "bg-linear-to-br from-mauve/30 via-mauve/20 to-plum/15 text-ink/45"
+          : "bg-linear-to-br from-white/10 to-white/3 text-paper/45",
         className
       )}
     >

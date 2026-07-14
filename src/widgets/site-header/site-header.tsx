@@ -51,7 +51,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
           "fixed inset-x-0 top-0 z-40 text-ink transition-colors duration-300",
           transparent
             ? "bg-transparent"
-            : "border-b border-ink/10 bg-paper/90 backdrop-blur"
+            : "border-b border-ink/10 bg-paper/90 backdrop-blur-sm"
         )}
       >
         <Container className="relative flex h-24 max-w-none items-center justify-between md:h-28">
@@ -105,7 +105,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
         aria-hidden
         onClick={() => setMenuOpen(false)}
         className={cn(
-          "fixed inset-0 z-40 bg-ink/50 backdrop-blur-sm transition-opacity duration-300",
+          "fixed inset-0 z-40 bg-ink/50 backdrop-blur-xs transition-opacity duration-300",
           menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
         )}
       />
