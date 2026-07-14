@@ -32,13 +32,18 @@ export const NAV: NavItem[] = [
 
 export const CONTACT = {
   email: "soulbridgeent@gmail.com",
-  address: "서울특별시 마포구 (주소 추후 기재)",
+  address: "서울특별시 000 주소 추후 기재",
   tel: "02-000-0000",
   hours: "평일 10:00 – 18:00",
   directions: "지하철 이용 시 가까운 역·출구 안내를 이곳에 기재합니다.",
   maps: {
-    naver: "#",
-    kakao: "#",
+    /** 임베드는 API 키가 필요 없는 구글맵을 사용하고, 길찾기는 국내 앱으로 연결. */
+    embed:
+      "https://maps.google.com/maps?q=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%20%EB%A7%88%ED%8F%AC%EA%B5%AC%20%EC%84%B1%EC%95%94%EB%A1%9C%20330%20DMC%EC%B2%A8%EB%8B%A8%EC%82%B0%EC%97%85%EC%84%BC%ED%84%B0&z=17&output=embed",
+    naver:
+      "https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%20%EB%A7%88%ED%8F%AC%EA%B5%AC%20%EC%84%B1%EC%95%94%EB%A1%9C%20330",
+    kakao:
+      "https://map.kakao.com/?q=%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%20%EB%A7%88%ED%8F%AC%EA%B5%AC%20%EC%84%B1%EC%95%94%EB%A1%9C%20330",
   },
 } as const;
 
