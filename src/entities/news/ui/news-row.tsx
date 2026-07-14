@@ -12,7 +12,7 @@ export function NewsRow({ item }: NewsRowProps) {
   return (
     <Link
       href={`/news/${item.slug}`}
-      className="group flex items-center gap-6 border-t border-ink/10 py-6 transition-colors hover:bg-ink/[0.03] md:gap-10"
+      className="group flex items-center gap-6 border-t border-ink/10 py-6 transition-colors hover:bg-ink/3 md:gap-10"
     >
       <time className="w-24 shrink-0 font-display text-sm font-medium tracking-wide text-ink/45">
         {formatNewsDate(item.date)}

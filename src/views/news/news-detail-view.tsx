@@ -29,7 +29,7 @@ export function NewsDetailView({ item }: NewsDetailViewProps) {
               {formatNewsDate(item.date)}
             </time>
           </div>
-          <h1 className="mt-5 whitespace-pre-line text-3xl/[1.3] font-bold tracking-tight text-ink md:text-4xl/[1.25]">
+          <h1 className="mt-5 whitespace-pre-line text-3xl/[1.3] font-bold tracking-tight text-ink md:text-4xl/tight">
             {item.title}
           </h1>
 
