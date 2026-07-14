@@ -8,7 +8,7 @@ export function ContactView() {
     <PageShell>
       {/* Top: message + address / socials */}
       <Container className="pb-16 pt-16 md:pt-24">
-        <Eyebrow className="text-plum">CONTACT</Eyebrow>
+        <Eyebrow className="text-plum">CONTACT US</Eyebrow>
         <h1 className="mt-6 text-4xl font-bold tracking-tight text-ink md:text-5xl">
           찾아오시는 길
         </h1>

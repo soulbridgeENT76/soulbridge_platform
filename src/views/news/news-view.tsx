@@ -6,7 +6,7 @@ export function NewsView() {
   return (
     <PageShell>
       <PageHeading
-        eyebrow="NEWS"
+        eyebrow="VIEW ALL NEWS"
         title="소울브릿지ENT의 새로운 소식"
         description="보도자료부터 공지까지 — 소울브릿지ENT의 소식을 가장 먼저 전해드립니다."
       />

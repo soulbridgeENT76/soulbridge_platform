@@ -90,7 +90,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
         <div className="mt-16 flex justify-center border-t border-ink/10 pt-14">
           <Link
             href="/contents"
-            className="group inline-flex items-center gap-2.5 rounded-full bg-ink px-8 py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-paper transition-transform hover:scale-[1.03]"
+            className="group inline-flex items-center gap-2.5 rounded-full bg-brand px-8 py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-paper transition-transform hover:scale-[1.03]"
           >
             <ArrowLeft
               size={16}
