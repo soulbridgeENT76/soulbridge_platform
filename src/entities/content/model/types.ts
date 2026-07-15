@@ -1,3 +1,5 @@
+import { LANDSCAPE_RATIO } from "@shared/config/media";
+
 export type ContentCategory =
   | "YOUTUBE"
   | "DRAMA · OTT"
@@ -29,7 +31,7 @@ export type Content = {
  * list card and the detail page. Keep list/detail in sync and make it easy to
  * feed one target size to an image-resizing server later.
  */
-export const CONTENT_THUMB_RATIO = "16 / 9";
+export const CONTENT_THUMB_RATIO = LANDSCAPE_RATIO;
 
 /** Category filter order used on the contents page (ALL is prepended in UI). */
 export const CONTENT_CATEGORIES: ContentCategory[] = [

@@ -1,20 +1,16 @@
 import { PageShell } from "@widgets/page-shell";
-import { Container, Eyebrow, PageHeading } from "@shared/ui";
-import { ARTISTS } from "@entities/artist";
+import { Container, PageHeading } from "@shared/ui";
+import { PAGE_COPY } from "@shared/config/page-copy";
 import { ArtistGrid } from "./artist-grid";
 
 export function ArtistsView() {
+  const copy = PAGE_COPY.artists;
   return (
     <PageShell>
       <PageHeading
-        eyebrow="ARTIST"
-        title="이야기를 전하는 사람들"
-        description="방송인부터 배우, 크리에이터까지 — 소울브릿지ENT와 함께 진심을 전하는 아티스트를 소개합니다."
-        aside={
-          <Eyebrow className="text-ink/50">
-            TOTAL {String(ARTISTS.length).padStart(2, "0")}
-          </Eyebrow>
-        }
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        description={copy.description}
       />
       <Container className="py-16 md:py-24">
         <ArtistGrid />

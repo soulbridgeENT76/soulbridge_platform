@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { NAV, SOCIALS, CONTACT } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
@@ -77,8 +77,9 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "font-display text-sm font-semibold uppercase tracking-[0.16em] transition-opacity hover:opacity-60",
-                    active && "underline decoration-1 underline-offset-8"
+                    "font-display text-sm font-semibold uppercase tracking-[0.16em] transition-colors hover:text-brand",
+                    active &&
+                      "text-brand underline decoration-brand decoration-2 underline-offset-8"
                   )}
                 >
                   {item.label}
@@ -116,19 +117,19 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
         aria-modal="true"
         aria-label="메뉴"
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-[80vw] max-w-[360px] flex-col bg-ink text-paper transition-transform duration-500 ease-out",
+          "fixed inset-y-0 right-0 z-50 flex w-[80vw] max-w-[360px] flex-col bg-paper text-ink transition-transform duration-500 ease-out",
           menuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         <div className="flex h-24 items-center justify-between px-7 md:h-28">
-          <span className="font-display text-[11px] font-semibold uppercase tracking-[0.3em] text-paper/40">
+          <span className="font-display text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/40">
             MENU
           </span>
           <button
             type="button"
             aria-label="메뉴 닫기"
             onClick={() => setMenuOpen(false)}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-paper/70 transition-colors hover:bg-paper/10 hover:text-paper"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-ink/70 transition-colors hover:bg-ink/5 hover:text-ink"
           >
             <X size={18} />
           </button>
@@ -143,14 +144,14 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
                 className={cn(
-                  "group flex items-center justify-between border-t border-paper/10 py-4 transition-colors",
-                  active ? "text-paper" : "text-paper/60 hover:text-paper"
+                  "group flex items-center justify-between border-t border-ink/10 py-4 transition-colors",
+                  active ? "text-brand-soft" : "text-ink/45 hover:text-brand-soft"
                 )}
               >
                 <span className="flex items-center gap-3">
                   <span
                     className={cn(
-                      "h-4 w-px bg-paper transition-opacity",
+                      "h-4 w-0.5 bg-brand-soft transition-opacity",
                       active ? "opacity-100" : "opacity-0"
                     )}
                   />
@@ -158,22 +159,18 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
                     {item.label}
                   </span>
                 </span>
-                <ArrowUpRight
-                  size={16}
-                  className="opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-60"
-                />
               </Link>
             );
           })}
         </nav>
 
-        <div className="mt-auto border-t border-paper/10 px-7 py-7">
+        <div className="mt-auto border-t border-ink/10 px-7 py-7">
           <SocialLinks
             items={SOCIALS}
             size={20}
-            itemClassName="text-paper/50 hover:text-paper"
+            itemClassName="text-ink/50 hover:text-ink"
           />
-          <p className="mt-5 text-[13px] tracking-wide text-paper/40">
+          <p className="mt-5 text-[13px] tracking-wide text-ink/45">
             {CONTACT.email}
           </p>
         </div>

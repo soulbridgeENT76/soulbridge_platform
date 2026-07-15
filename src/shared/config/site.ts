@@ -13,13 +13,16 @@ export type NavItem = {
 export const SITE = {
   name: "Soul Bridge ENT",
   nameKo: "소울브릿지 ENT",
+  /** One-line company intro shown next to the footer logo. */
+  intro: "영혼과 영혼을 잇는 미래 엔터테인먼트",
   tagline: {
     en: "CONNECTING SOULS, INSPIRING LIVES.",
     ko: "사람과 사람을 잇는 이야기,\n소울브릿지 ENT",
   },
   description:
     " 한 사람의 진심 어린 이야기가\n 누군가에게 다시 나아갈 힘이 되기를.\n 우리는 그 이야기를 가장 따뜻하고 깊이 있게 담아냅니다.",
-  copyright: "© 2026 SOUL BRIDGE ENT. ALL RIGHTS RESERVED.",
+  /** Copyright notice WITHOUT the year — the year is prepended automatically. */
+  copyright: "SOUL BRIDGE ENT. ALL RIGHTS RESERVED.",
 } as const;
 
 export const NAV: NavItem[] = [
@@ -32,14 +35,16 @@ export const NAV: NavItem[] = [
 
 export const CONTACT = {
   email: "soulbridgeent@gmail.com",
-  address: "서울특별시 마포구 (주소 추후 기재)",
+  address: "서울특별시 000 주소 추후 기재",
   tel: "02-000-0000",
   hours: "평일 10:00 – 18:00",
   directions: "지하철 이용 시 가까운 역·출구 안내를 이곳에 기재합니다.",
-  maps: {
-    naver: "#",
-    kakao: "#",
-  },
+  /**
+   * Searchable address for the map. The Google embed + Naver/Kakao links are
+   * derived from this string via `buildMapLinks` — no embed URLs to paste.
+   * Can differ from the display `address` above.
+   */
+  mapAddress: "서울특별시 마포구 성암로 330 DMC첨단산업센터",
 } as const;
 
 export type SocialLink = { label: string; href: string };
@@ -47,5 +52,5 @@ export type SocialLink = { label: string; href: string };
 export const SOCIALS: SocialLink[] = [
   { label: "INSTAGRAM", href: "#" },
   { label: "YOUTUBE", href: "#" },
-  { label: "KAKAO", href: "#" },
+  { label: "MESSENGER", href: "#" },
 ];

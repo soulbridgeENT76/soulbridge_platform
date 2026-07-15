@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PlaceholderImage } from "@shared/ui";
+import { PORTRAIT_RATIO } from "@shared/config/media";
 import type { Artist } from "../model/types";
 
 type ArtistCardProps = {
@@ -15,7 +16,7 @@ export function ArtistCard({ artist, index }: ArtistCardProps) {
       <div className="relative overflow-hidden">
         <PlaceholderImage
           label={`${artist.nameKo} · 프로필`}
-          ratio="3 / 4"
+          ratio={PORTRAIT_RATIO}
           className="transition-transform duration-700 ease-out group-hover:scale-[1.04]"
         />
         {index != null && (

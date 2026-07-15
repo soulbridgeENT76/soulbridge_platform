@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlaceholderImage, Tag } from "@shared/ui";
+import { PlaceholderImage } from "@shared/ui";
 import type { Content } from "../model/types";
 import { CONTENT_THUMB_RATIO } from "../model/types";
 
@@ -18,11 +18,7 @@ export function ContentCard({ content }: ContentCardProps) {
           className="w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]"
         />
       </div>
-      <div className="mt-4 flex items-center gap-2 text-plum">
-        <Tag>{content.category}</Tag>
-        <span aria-hidden className="text-ink/20">
-          ·
-        </span>
+      <div className="mt-4">
         <span className="font-display text-[11px] font-medium uppercase tracking-[0.15em] text-ink/45">
           {content.year}
         </span>

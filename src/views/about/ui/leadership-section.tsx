@@ -1,12 +1,13 @@
 import { PlaceholderImage } from "@shared/ui";
+import { PORTRAIT_RATIO } from "@shared/config/media";
 import { LEADERSHIP } from "@entities/about";
 import { AboutSection } from "./about-section";
 
 export function LeadershipSection() {
   return (
     <AboutSection index="01" eyebrow="LEADERSHIP">
-      <div className="grid max-w-4xl gap-8 sm:grid-cols-[minmax(0,13rem)_1fr] sm:gap-10">
-        <PlaceholderImage label="대표 프로필 이미지" ratio="4 / 5" />
+      <div className="grid max-w-5xl gap-8 sm:grid-cols-[minmax(0,18rem)_1fr] sm:gap-12">
+        <PlaceholderImage label="대표 프로필 이미지" ratio={PORTRAIT_RATIO} />
         <div>
           <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-plum">
             {LEADERSHIP.role}
