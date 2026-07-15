@@ -7,6 +7,7 @@ import {
   AdminTextarea,
   AdminImageUpload,
   AdminFormActions,
+  AdminReferenceCard,
 } from "@widgets/admin-shell";
 import { HERO_SLIDES } from "@widgets/hero-slider/model/slides";
 import { SOCIALS } from "@shared/config/site";
@@ -17,9 +18,6 @@ import { SOCIALS } from "@shared/config/site";
  * TODO(backend): persist on save.
  */
 export function HomeEditor() {
-  const socialHref = (label: string) =>
-    SOCIALS.find((s) => s.label === label)?.href ?? "";
-
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): collect all slide values and save.
@@ -66,34 +64,17 @@ export function HomeEditor() {
               <AdminInput defaultValue={slide.cta.label} className="max-w-md" />
             </AdminField>
 
-            {/* SNS — first slide only */}
+            {/* SNS — first slide only; managed on the Brand page */}
             {i === 0 && (
-              <div className="rounded-xl border border-ink/10 p-4">
-                <span className="text-sm font-semibold text-ink">SNS 링크</span>
-                <p className="mt-0.5 text-xs text-ink/50">
-                  첫 화면 하단에 표시됩니다.
-                </p>
-                <div className="mt-4 flex flex-col gap-4">
-                  <AdminField label="인스타그램 (선택)">
-                    <AdminInput
-                      defaultValue={socialHref("INSTAGRAM")}
-                      placeholder="https://instagram.com/..."
-                    />
-                  </AdminField>
-                  <AdminField label="유튜브 (선택)">
-                    <AdminInput
-                      defaultValue={socialHref("YOUTUBE")}
-                      placeholder="https://youtube.com/@..."
-                    />
-                  </AdminField>
-                  <AdminField label="기타 메신저 (선택)">
-                    <AdminInput
-                      defaultValue={socialHref("MESSENGER")}
-                      placeholder="카카오톡·텔레그램 등 링크"
-                    />
-                  </AdminField>
-                </div>
-              </div>
+              <AdminReferenceCard
+                title="SNS 링크"
+                caption="첫 화면 하단에 표시됩니다. 브랜드 페이지에서 관리해요."
+                href="/admin/brand"
+                hrefLabel="브랜드에서 편집"
+                rows={[
+                  { label: "SNS", value: SOCIALS.map((s) => s.label).join(" · ") },
+                ]}
+              />
             )}
           </div>
         </section>

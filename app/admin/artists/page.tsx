@@ -13,7 +13,7 @@ export default function AdminArtistsPage() {
   return (
     <div>
       <AdminPageHeader
-        title="아티스트"
+        title="ARTISTS"
         description={`총 ${ARTISTS.length}명`}
         action={
           <AdminLinkButton href="/admin/artists/new" variant="solid">

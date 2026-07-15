@@ -7,7 +7,7 @@ import {
   AdminImageUpload,
   AdminFormActions,
 } from "@widgets/admin-shell";
-import { SITE } from "@shared/config/site";
+import { SITE, SOCIALS } from "@shared/config/site";
 
 /**
  * Brand editor — global identity used across the header, footer, and metadata.
@@ -15,9 +15,12 @@ import { SITE } from "@shared/config/site";
  * wordmark ({SITE.name}).
  */
 export function BrandEditor() {
+  const socialHref = (label: string) =>
+    SOCIALS.find((s) => s.label === label)?.href ?? "";
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // TODO(backend): save logo + brand text.
+    // TODO(backend): save logo + brand text + socials.
   };
 
   return (
@@ -54,6 +57,39 @@ export function BrandEditor() {
           </AdminField>
           <AdminField label="회사 한줄소개" htmlFor="intro">
             <AdminInput id="intro" name="intro" defaultValue={SITE.intro} />
+          </AdminField>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-ink/10 bg-white p-5">
+        <p className="text-sm font-semibold text-ink">회사 SNS 링크</p>
+        <p className="mt-0.5 text-xs text-ink/50">
+          선택 입력 · 헤더·푸터·홈·연락처에 공통으로 표시됩니다.
+        </p>
+        <div className="mt-5 flex flex-col gap-5">
+          <AdminField label="인스타그램 (선택)" htmlFor="instagram">
+            <AdminInput
+              id="instagram"
+              name="instagram"
+              defaultValue={socialHref("INSTAGRAM")}
+              placeholder="https://instagram.com/..."
+            />
+          </AdminField>
+          <AdminField label="유튜브 (선택)" htmlFor="youtube">
+            <AdminInput
+              id="youtube"
+              name="youtube"
+              defaultValue={socialHref("YOUTUBE")}
+              placeholder="https://youtube.com/@..."
+            />
+          </AdminField>
+          <AdminField label="기타 메신저 (선택)" htmlFor="messenger">
+            <AdminInput
+              id="messenger"
+              name="messenger"
+              defaultValue={socialHref("MESSENGER")}
+              placeholder="카카오톡·텔레그램 등 링크"
+            />
           </AdminField>
         </div>
       </section>
