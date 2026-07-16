@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { CONTACT, SITE, SOCIALS } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 
@@ -15,18 +16,17 @@ export async function SiteFooter() {
       <Container className="flex flex-col gap-10 py-12 lg:flex-row lg:items-start lg:justify-between">
         {/* Left: brand + legal */}
         <div>
-          <div className="flex items-baseline gap-4">
-            <span className="font-display text-2xl font-black tracking-tight">
-              {SITE.name}
-            </span>
-            <span className="hidden text-sm text-paper/50 sm:inline">
-              {SITE.intro}
-            </span>
-          </div>
+          {/* Same black wordmark, flipped to white for the dark footer. */}
+          <Image
+            src={SITE.logo.src}
+            alt={SITE.name}
+            width={SITE.logo.width}
+            height={SITE.logo.height}
+            className="h-12 w-auto brightness-0 invert"
+          />
 
-          <p className="mt-6 font-display text-sm font-bold uppercase tracking-[0.12em]">
-            {SITE.name}
-          </p>
+          {/* Company intro sits where the duplicated name line used to be. */}
+          <p className="mt-6 text-sm text-paper/50">{SITE.intro}</p>
           <p className="mt-2 text-sm text-paper/50">{CONTACT.address}</p>
           <p className="mt-1 text-sm text-paper/50">
             TEL {CONTACT.tel}
@@ -36,8 +36,6 @@ export async function SiteFooter() {
 
           <p className="mt-5 font-display text-[11px] uppercase tracking-[0.14em] text-paper/40">
             © {year} {SITE.copyright}
-            <span className="mx-2 text-paper/20">|</span>
-            CREATED BY SOUL BRIDGE ENT
           </p>
         </div>
 

@@ -87,7 +87,7 @@ function Card({ card }: { card: AboutCard }) {
         {card.no}
       </span>
       <h3 className="mt-3 text-lg font-bold text-ink">{card.title}</h3>
-      <p className="mt-3 text-sm leading-relaxed text-ink/65">
+      <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink/65">
         {card.description}
       </p>
     </div>

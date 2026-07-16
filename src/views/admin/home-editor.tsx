@@ -1,6 +1,6 @@
 "use client";
 
-import type { FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 import {
   AdminField,
   AdminInput,
@@ -11,31 +11,54 @@ import {
 } from "@widgets/admin-shell";
 import { HERO_SLIDES } from "@widgets/hero-slider/model/slides";
 import { SOCIALS } from "@shared/config/site";
+import { cn } from "@shared/lib/cn";
 
 /**
- * Home hero editor — one card per full-screen slide.
- * The CTA label doubles as the destination page's top eyebrow.
- * TODO(backend): persist on save.
+ * Home hero editor — pick a slide (1–5) from the tabs and edit just that one.
+ * Each slide saves independently, so there's no long scroll or all-or-nothing
+ * submit. The CTA label doubles as the destination page's top eyebrow.
+ * TODO(backend): persist the active slide on save.
  */
 export function HomeEditor() {
+  const [active, setActive] = useState(0);
+  const slide = HERO_SLIDES[active];
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // TODO(backend): collect all slide values and save.
+    // TODO(backend): save ONLY this slide (HERO_SLIDES[active]).
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-5">
-      {HERO_SLIDES.map((slide, i) => (
-        <section
-          key={slide.id}
-          className="rounded-2xl border border-ink/10 bg-white p-5"
-        >
+    <div>
+      {/* Slide picker */}
+      <div className="flex flex-wrap gap-2">
+        {HERO_SLIDES.map((s, i) => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => setActive(i)}
+            aria-current={i === active}
+            className={cn(
+              "rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
+              i === active
+                ? "bg-brand text-paper"
+                : "border border-ink/15 text-ink/55 hover:border-brand/40 hover:text-brand"
+            )}
+          >
+            {i + 1}화면
+          </button>
+        ))}
+      </div>
+
+      {/* Active slide only. `key` resets the inputs when switching slides. */}
+      <form key={slide.id} onSubmit={onSubmit} className="mt-5">
+        <section className="rounded-2xl border border-ink/10 bg-white p-5">
           <div className="flex items-center gap-3">
             <span className="font-display text-xl font-black leading-none text-brand">
-              {String(i + 1).padStart(2, "0")}
+              {String(active + 1).padStart(2, "0")}
             </span>
             <div>
-              <p className="text-sm font-semibold text-ink">{i + 1}화면</p>
+              <p className="text-sm font-semibold text-ink">{active + 1}화면</p>
               <p className="mt-0.5 text-xs text-ink/50">이동: {slide.cta.href}</p>
             </div>
           </div>
@@ -65,7 +88,7 @@ export function HomeEditor() {
             </AdminField>
 
             {/* SNS — first slide only; managed on the Brand page */}
-            {i === 0 && (
+            {active === 0 && (
               <AdminReferenceCard
                 title="SNS 링크"
                 caption="첫 화면 하단에 표시됩니다. 브랜드 페이지에서 관리해요."
@@ -78,9 +101,12 @@ export function HomeEditor() {
             )}
           </div>
         </section>
-      ))}
 
-      <AdminFormActions cancelHref="/admin" />
-    </form>
+        <AdminFormActions
+          cancelHref="/admin"
+          submitLabel={`${active + 1}화면 저장`}
+        />
+      </form>
+    </div>
   );
 }

@@ -48,6 +48,8 @@ const SEED_SECTIONS: Omit<Section, "key">[] = [
  */
 export function AboutEditor() {
   const [points, setPoints] = useState<string[]>([...LEADERSHIP.points]);
+  // Section label drives the card heading, so editing it renames the section.
+  const [leaderLabel, setLeaderLabel] = useState("LEADERSHIP");
 
   const keyRef = useRef(SEED_SECTIONS.length);
   const [sections, setSections] = useState<Section[]>(
@@ -62,6 +64,9 @@ export function AboutEditor() {
   };
   const removeSection = (key: number) =>
     setSections((s) => s.filter((x) => x.key !== key));
+  /** Patch a section field (e.g. label) so the card heading follows it. */
+  const patchSection = (key: number, patch: Partial<Section>) =>
+    setSections((s) => s.map((x) => (x.key === key ? { ...x, ...patch } : x)));
   const addItem = (key: number) =>
     setSections((s) =>
       s.map((x) =>
@@ -106,12 +111,13 @@ export function AboutEditor() {
       </Card>
 
       {/* 01 — Leadership (fixed) */}
-      <Card index="01" title="Leadership">
+      <Card index="01" title={leaderLabel || "새 섹션"}>
         <AdminField label="섹션 라벨" htmlFor="leaderLabel">
           <AdminInput
             id="leaderLabel"
             name="leaderLabel"
-            defaultValue="LEADERSHIP"
+            value={leaderLabel}
+            onChange={(e) => setLeaderLabel(e.target.value)}
             className="max-w-xs"
           />
         </AdminField>
@@ -183,7 +189,10 @@ export function AboutEditor() {
         >
           <AdminField label="섹션 라벨" hint="예: PORTFOLIO, STRATEGY">
             <AdminInput
-              defaultValue={section.label}
+              value={section.label}
+              onChange={(e) =>
+                patchSection(section.key, { label: e.target.value })
+              }
               placeholder="영문 라벨"
               className="max-w-xs"
             />

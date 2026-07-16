@@ -3,6 +3,7 @@ import {
   AdminPageHeader,
   AdminLinkButton,
   DeleteButton,
+  AdminStatusToggle,
 } from "@widgets/admin-shell";
 import { PageCopyEditor } from "@views/admin";
 import { PAGE_COPY } from "@shared/config/page-copy";
@@ -30,25 +31,34 @@ export default function AdminNewsPage() {
       </div>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-ink/10 bg-white">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-center text-sm">
           <thead className="border-b border-ink/10 text-xs uppercase tracking-wider text-ink/45">
             <tr>
+              <th className="px-5 py-3.5 font-semibold">상태</th>
               <th className="px-5 py-3.5 font-semibold">제목</th>
               <th className="px-5 py-3.5 font-semibold">분류</th>
               <th className="px-5 py-3.5 font-semibold">작성일</th>
-              <th className="px-5 py-3.5 text-right font-semibold">관리</th>
+              <th className="px-5 py-3.5 font-semibold">관리</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-ink/[0.06]">
             {NEWS.map((item) => (
               <tr key={item.slug} className="hover:bg-ink/[0.015]">
+                <td className="px-5 py-4">
+                  <div className="flex justify-center">
+                    <AdminStatusToggle
+                      initial={item.active === true}
+                      itemName={item.title}
+                    />
+                  </div>
+                </td>
                 <td className="px-5 py-4 font-medium text-ink">{item.title}</td>
                 <td className="px-5 py-4 text-ink/60">{item.category}</td>
                 <td className="px-5 py-4 text-ink/60">
                   {formatNewsDate(item.date)}
                 </td>
                 <td className="px-5 py-4">
-                  <div className="flex justify-end gap-1">
+                  <div className="flex justify-center gap-1">
                     <AdminLinkButton
                       href={`/admin/news/${item.slug}`}
                       variant="ghost"

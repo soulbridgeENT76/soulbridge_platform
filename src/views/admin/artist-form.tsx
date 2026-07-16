@@ -68,10 +68,10 @@ export function ArtistForm({ initial }: ArtistFormProps) {
           <AdminTextarea id="bio" name="bio" defaultValue={initial?.bio} />
         </AdminField>
 
-        {/* Works — repeatable (year + title) */}
+        {/* Career — repeatable (year + title) */}
         <RepeatableSection
-          label="작품활동"
-          addLabel="작품 추가"
+          label="활동 이력"
+          addLabel="이력 추가"
           onAdd={() => setWorks((w) => [...w, { year: "", title: "" }])}
         >
           {works.map((work, i) => (

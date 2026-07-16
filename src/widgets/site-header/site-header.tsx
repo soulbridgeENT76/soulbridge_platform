@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { NAV, SOCIALS, CONTACT } from "@shared/config/site";
+import { NAV, SOCIALS, CONTACT, SITE } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 
@@ -55,17 +56,16 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
         )}
       >
         <Container className="relative flex h-24 max-w-none items-center justify-between md:h-28">
-          {/* Stacked wordmark logo */}
-          <Link
-            href="/"
-            onClick={() => setMenuOpen(false)}
-            className="font-display text-2xl font-black leading-[0.85] tracking-tight md:text-[1.7rem]"
-          >
-            <span className="block">Soul</span>
-            <span className="block">Bridge</span>
-            <span className="block text-[0.55em] font-bold tracking-[0.35em]">
-              ENT
-            </span>
+          {/* Wordmark logo (black artwork; header sits on the light paper bg) */}
+          <Link href="/" onClick={() => setMenuOpen(false)} aria-label={SITE.name}>
+            <Image
+              src={SITE.logo.src}
+              alt={SITE.name}
+              width={SITE.logo.width}
+              height={SITE.logo.height}
+              priority
+              className="h-11 w-auto md:h-12"
+            />
           </Link>
 
           {/* Center nav (desktop) */}
@@ -164,15 +164,28 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
           })}
         </nav>
 
-        <div className="mt-auto border-t border-ink/10 px-7 py-7">
-          <SocialLinks
-            items={SOCIALS}
-            size={20}
-            itemClassName="text-ink/50 hover:text-ink"
+        {/* Brand mark sits in the footer block rather than the header slot, so
+            the "MENU" label keeps doing its job up top. Socials + email sit
+            beside it; the email truncates rather than pushing the row wide. */}
+        <div className="mt-auto flex items-center gap-4 border-t border-ink/10 px-7 py-7">
+          <Image
+            src={SITE.logo.src}
+            alt={SITE.name}
+            width={SITE.logo.width}
+            height={SITE.logo.height}
+            className="h-10 w-auto shrink-0"
           />
-          <p className="mt-5 text-[13px] tracking-wide text-ink/45">
-            {CONTACT.email}
-          </p>
+          <div className="min-w-0 flex-1">
+            <SocialLinks
+              items={SOCIALS}
+              size={18}
+              className="justify-end gap-4"
+              itemClassName="text-ink/50 hover:text-ink"
+            />
+            <p className="mt-2.5 truncate text-right text-[12px] tracking-wide text-ink/45">
+              {CONTACT.email}
+            </p>
+          </div>
         </div>
       </aside>
     </>

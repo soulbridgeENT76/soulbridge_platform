@@ -1,18 +1,34 @@
 import type { CSSProperties } from "react";
-import { SOCIALS } from "@shared/config/site";
+import { SITE, SOCIALS } from "@shared/config/site";
 import { SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 
-const WORDMARK_FONT: CSSProperties = {
-  fontFamily: "var(--font-archivo), Archivo, sans-serif",
-  fontWeight: 900,
-  letterSpacing: "-0.03em",
+/** Extrusion depth: how many offset copies build the 3D side wall. */
+const DEPTH = 9;
+/** Per-layer offset in px. Straight down (no sideways drift) reads as a slab
+ *  lit head-on rather than raked from one corner. */
+const STEP_X = 0;
+const STEP_Y = 2;
+
+/** Masks a layer to the real logo artwork, so letter spacing and lockup match
+ *  the official file exactly instead of being re-typeset by hand. */
+const LOGO_MASK: CSSProperties = {
+  maskImage: `url(${SITE.logo.src})`,
+  maskSize: "contain",
+  maskRepeat: "no-repeat",
+  maskPosition: "center",
+  WebkitMaskImage: `url(${SITE.logo.src})`,
+  WebkitMaskSize: "contain",
+  WebkitMaskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
 };
 
 /**
- * Large brand wordmark with a wet spot-UV varnish look, produced entirely with
- * an SVG lighting filter (feSpecularLighting) — real specular highlights on a
- * dark tone-on-tone fill, no external image needed.
+ * Large brand wordmark, extruded. Every layer is the actual logo artwork used
+ * as a CSS mask — the lockup is therefore pixel-identical to the brand file.
+ * Depth comes from offset copies in a darkening lavender ramp; the face stays
+ * the same tone as the hero background and is lit head-on, so the letters read
+ * as 3D purely through shading and the cast shadow.
  */
 export function HeroWordmark() {
   return (
@@ -20,57 +36,43 @@ export function HeroWordmark() {
       aria-hidden
       className="pointer-events-none absolute inset-y-0 right-0 hidden select-none items-center pr-16 md:flex lg:pr-28"
     >
-      <svg
-        viewBox="-580 0 1500 600"
-        className="h-auto w-272 lg:w-360"
-        xmlns="http://www.w3.org/2000/svg"
+      <div
+        className="relative w-200 lg:w-264"
+        style={{
+          aspectRatio: `${SITE.logo.width} / ${SITE.logo.height}`,
+          filter: "drop-shadow(0 9px 11px rgba(74, 54, 99, 0.2))",
+        }}
       >
-        <defs>
-          <filter id="wm-wet" x="-15%" y="-15%" width="130%" height="130%">
-            {/* Height map from the glyph alpha */}
-            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
-            {/* Thin glossy edge highlights (clear-varnish catching light) */}
-            <feSpecularLighting
-              in="blur"
-              surfaceScale="6"
-              specularConstant="1.25"
-              specularExponent="30"
-              lightingColor="#ffffff"
-              result="spec"
-            >
-              <fePointLight x="180" y="-120" z="140" />
-            </feSpecularLighting>
-            <feComposite
-              in="spec"
-              in2="SourceAlpha"
-              operator="in"
-              result="specClip"
+        {/* Side wall — darkest at the back, easing up toward the face. */}
+        {Array.from({ length: DEPTH }, (_, i) => {
+          const t = i / (DEPTH - 1);
+          const r = 174 + Math.round(t * 30);
+          const g = 162 + Math.round(t * 31);
+          const b = 200 + Math.round(t * 22);
+          return (
+            <div
+              key={i}
+              className="absolute inset-0"
+              style={{
+                ...LOGO_MASK,
+                backgroundColor: `rgb(${r}, ${g}, ${b})`,
+                transform: `translate(${(DEPTH - i) * STEP_X}px, ${
+                  (DEPTH - i) * STEP_Y
+                }px)`,
+              }}
             />
-            {/* Faint tone-on-tone glyph + glossy edges on top */}
-            <feComposite
-              in="specClip"
-              in2="SourceGraphic"
-              operator="arithmetic"
-              k1="0"
-              k2="1"
-              k3="1"
-              k4="0"
-            />
-          </filter>
-        </defs>
-        {/* Fill barely darker than the mauve paper so the grain shows through */}
-        <g filter="url(#wm-wet)" fill="#1A171C" fillOpacity="0.16">
-          <text x="910" y="250" textAnchor="end" fontSize="300" style={WORDMARK_FONT}>
-            Soul
-          </text>
-          <text x="910" y="540" textAnchor="end" fontSize="300" style={WORDMARK_FONT}>
-            Bridge
-            <tspan fontSize="150" dx="12">
-              ENT
-            </tspan>
-          </text>
-        </g>
-      </svg>
+          );
+        })}
+        {/* Lit face on top — same lavender family as the background. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            ...LOGO_MASK,
+            background:
+              "radial-gradient(70% 75% at 50% 45%, #E9E1F6 0%, #D8CDE9 100%)",
+          }}
+        />
+      </div>
     </div>
   );
 }
