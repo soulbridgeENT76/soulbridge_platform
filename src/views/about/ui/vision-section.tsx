@@ -4,7 +4,7 @@ import { AboutSection } from "./about-section";
 /** Closing metric section — the 3-year "TOP 2" goal and key indicators. */
 export function VisionSection() {
   return (
-    <AboutSection index="05" eyebrow={VISION.eyebrow} tinted>
+    <AboutSection index="05" eyebrow={VISION.eyebrow}>
       {/* Feature metric */}
       <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
         <span className="font-display text-[5.5rem] font-black leading-[0.8] text-plum md:text-[7rem]">

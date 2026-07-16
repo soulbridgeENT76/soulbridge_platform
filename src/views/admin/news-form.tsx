@@ -9,6 +9,7 @@ import {
   AdminFormGrid,
   AdminFormActions,
   AdminPageHeader,
+  AdminStatusToggle,
 } from "@widgets/admin-shell";
 import { NEWS_CATEGORIES, type NewsItem } from "@entities/news";
 
@@ -66,6 +67,24 @@ export function NewsForm({ initial }: NewsFormProps) {
             />
           </AdminField>
         </AdminFormGrid>
+
+        {/* Publish switch — new items start inactive. */}
+        <div className="rounded-xl border border-ink/10 p-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-ink">공개 상태</p>
+              <p className="mt-0.5 text-xs text-ink/50">
+                비활성이면 저장해도 사이트에 노출되지 않습니다. 새 글은 기본이
+                비활성이에요.
+              </p>
+            </div>
+            <AdminStatusToggle
+              name="active"
+              initial={initial?.active ?? false}
+              itemName={initial?.title ?? "새 뉴스"}
+            />
+          </div>
+        </div>
 
         <AdminField label="본문" htmlFor="body" hint="줄바꿈 그대로 반영">
           <AdminTextarea
