@@ -166,11 +166,11 @@ export function HeroSlider() {
                   </p>
                 )}
 
-                <h2 className="mt-4 font-maruburi text-3xl font-light leading-tight tracking-tight break-keep md:text-5xl lg:text-6xl">
+                <h2 className="mt-10 font-maruburi text-3xl font-light leading-tight tracking-tight break-keep md:mt-14 md:text-5xl lg:text-6xl">
                   {slide.titleKo.split("\n").map((line, li) => (
                     <span
                       key={li}
-                      className="block not-first:mt-4 md:not-first:mt-6"
+                      className="block not-first:mt-2 md:not-first:mt-3.5"
                     >
                       {line}
                     </span>
@@ -180,7 +180,7 @@ export function HeroSlider() {
                 {slide.body && (
                   <p
                     className={cn(
-                      "mt-6 whitespace-pre-line break-keep text-base font-medium leading-relaxed md:text-lg",
+                      "mt-10 whitespace-pre-line break-keep text-base font-medium leading-relaxed md:mt-14 md:text-lg",
                       dark ? "text-ink/70" : "text-paper/70"
                     )}
                   >
@@ -189,7 +189,7 @@ export function HeroSlider() {
                 )}
 
                 {slide.pills && (
-                  <ul className="mt-8 flex flex-wrap gap-3">
+                  <ul className="mt-10 flex flex-wrap gap-3 md:mt-14">
                     {slide.pills.map((pill) => (
                       <li
                         key={pill}
@@ -207,7 +207,7 @@ export function HeroSlider() {
                 {slide.news && (
                   <ul
                     className={cn(
-                      "mt-8 max-w-xl border-t",
+                      "mt-10 max-w-xl border-t md:mt-14",
                       dark ? "border-ink/15" : "border-paper/15"
                     )}
                   >
@@ -248,7 +248,10 @@ export function HeroSlider() {
                   </ul>
                 )}
 
-                <Link href={slide.cta.href} className="group mt-10 inline-flex flex-col">
+                <Link
+                  href={slide.cta.href}
+                  className="group mt-14 inline-flex flex-col md:mt-20"
+                >
                   <span className="flex origin-left items-center gap-3 font-display text-sm font-semibold uppercase tracking-[0.18em] transition-transform duration-300 group-hover:scale-105">
                     {slide.cta.label}
                     <ArrowRight
@@ -282,7 +285,9 @@ export function HeroSlider() {
           aria-hidden
           className={cn(
             "mb-2 h-14 w-0.5",
-            activeScheme === "dark" ? "bg-ink/80" : "bg-paper/80"
+            // Brand purple over the light banners; falls back to paper on a
+            // dark slide, where purple would disappear.
+            activeScheme === "dark" ? "bg-brand" : "bg-paper/80"
           )}
         />
         {HERO_SLIDES.map((slide, i) => (
@@ -294,7 +299,7 @@ export function HeroSlider() {
             onClick={() => scrollTo(i)}
             className={cn(
               "font-display text-xs font-semibold tracking-widest transition-all",
-              activeScheme === "dark" ? "text-ink" : "text-paper",
+              activeScheme === "dark" ? "text-brand" : "text-paper",
               i === active
                 ? "opacity-100"
                 : "opacity-40 hover:opacity-70"

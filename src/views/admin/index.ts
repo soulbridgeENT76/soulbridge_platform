@@ -8,3 +8,4 @@ export { ContactEditor } from "./contact-editor";
 export { HomeEditor } from "./home-editor";
 export { FooterEditor } from "./footer-editor";
 export { BrandEditor } from "./brand-editor";
+export { LoginForm } from "./login-form";
