@@ -4,6 +4,11 @@ import { useRef, useState } from "react";
 import { ImagePlus, X, TriangleAlert } from "lucide-react";
 import { cn } from "@shared/lib/cn";
 import { formatSize, type UploadSize } from "@shared/config/media";
+import {
+  imageToWebp,
+  type WebpTarget,
+  WEBP_QUALITY_LOGO,
+} from "@shared/lib/image-to-webp";
 
 type AdminImageUploadProps = {
   /** CSS aspect-ratio, e.g. "16 / 9", "3 / 4". */
@@ -23,6 +28,11 @@ type AdminImageUploadProps = {
   requireTransparent?: boolean;
   /** Accept SVG and skip the raster checks (vectors scale to any size). */
   allowSvg?: boolean;
+  /**
+   * Fit the accepted image into this box and re-encode as WebP, replacing the
+   * form field's file. The stored asset is then always this exact size/format.
+   */
+  output?: WebpTarget;
   className?: string;
 };
 
@@ -86,6 +96,7 @@ export function AdminImageUpload({
   minWidth,
   requireTransparent,
   allowSvg,
+  output,
   className,
 }: AdminImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -97,6 +108,26 @@ export function AdminImageUpload({
     setPreview(null);
     if (url) URL.revokeObjectURL(url);
     if (inputRef.current) inputRef.current.value = "";
+  };
+
+  /**
+   * Accept a validated file. With `output`, re-encode it to a fixed-size WebP
+   * and swap it into the file input, so the form submits the processed asset
+   * rather than the raw upload.
+   */
+  const accept = async (file: File, url: string) => {
+    if (output && inputRef.current) {
+      try {
+        const blob = await imageToWebp(file, WEBP_QUALITY_LOGO, output);
+        const dt = new DataTransfer();
+        dt.items.add(new File([blob], "image.webp", { type: "image/webp" }));
+        inputRef.current.files = dt.files;
+      } catch {
+        reject("이미지를 변환하지 못했습니다.", url);
+        return;
+      }
+    }
+    setPreview(url);
   };
 
   const pick = (file?: File) => {
@@ -115,7 +146,7 @@ export function AdminImageUpload({
 
     // Vectors scale to any size and keep transparency — nothing to check.
     if (file.type === "image/svg+xml") {
-      if (allowSvg) setPreview(url);
+      if (allowSvg) accept(file, url);
       else reject("SVG는 등록할 수 없습니다. PNG로 올려주세요.", url);
       return;
     }
@@ -128,7 +159,7 @@ export function AdminImageUpload({
     }
 
     if (!requiredSize && !minWidth && !requireTransparent) {
-      setPreview(url);
+      accept(file, url);
       return;
     }
 
@@ -179,7 +210,7 @@ export function AdminImageUpload({
           }
         }
       }
-      setPreview(url);
+      accept(file, url);
     };
     probe.onerror = () => reject("이미지를 읽을 수 없는 파일입니다.", url);
     probe.src = url;

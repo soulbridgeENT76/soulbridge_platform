@@ -32,11 +32,21 @@ export const UPLOAD_SIZE = {
 export const formatSize = (s: UploadSize) => `${s.width} × ${s.height}`;
 
 /**
- * The logo has no fixed size — CSS scales it at every use. The largest is the
- * header/footer wordmark at 106px, so 106 × 3 (dense mobile) ≈ 318 → 512 with
- * headroom. Small enough that it needs no resizing pipeline at all.
+ * Minimum width accepted at upload. 106px (largest on-screen use) × 3 for dense
+ * mobile ≈ 318 → 512 with headroom, so the source has pixels to downscale from.
  *
- * It must stay transparent + monochrome: the footer flips it to white with a
- * CSS filter, which breaks on an opaque or multi-colour file.
+ * The logo must stay transparent + monochrome: the footer flips it to white
+ * with a CSS filter, which breaks on an opaque or multi-colour file.
  */
 export const LOGO_MIN_WIDTH = 512;
+
+/**
+ * Fixed output box the logo is fitted into on upload (1.5:1 = 3:2), so every
+ * stored logo is a predictable size and next/image gets stable dimensions
+ * without a resizing pipeline. `contain` letterboxes onto a transparent canvas
+ * — a wordmark must be fitted, never cropped. 512 × round(512 × 2/3) = 512 × 341.
+ */
+export const LOGO_OUTPUT = {
+  width: 512,
+  height: Math.round((512 * 2) / 3),
+} as const satisfies UploadSize;

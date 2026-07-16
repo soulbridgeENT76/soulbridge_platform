@@ -10,5 +10,8 @@ export const config = {
   // open to everyone, so we only run the Supabase session/guard middleware on
   // routes that actually require auth. Widen this matcher when more
   // authenticated areas are added.
-  matcher: ["/protected/:path*"],
+  //
+  // /admin/login is matched on purpose: the proxy lets it through, and running
+  // here is what keeps the session cookie refreshed across the admin area.
+  matcher: ["/protected/:path*", "/admin/:path*"],
 };
