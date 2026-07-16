@@ -12,6 +12,7 @@ import {
   AdminPageHeader,
   AdminButton,
 } from "@widgets/admin-shell";
+import { PORTRAIT_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import type { Artist } from "@entities/artist";
 
 type WorkRow = { year: string; title: string };
@@ -42,8 +43,16 @@ export function ArtistForm({ initial }: ArtistFormProps) {
       />
 
       <div className="mt-8 flex flex-col gap-6">
-        <AdminField label="프로필 이미지" hint="세로형 3:4 이미지">
-          <AdminImageUpload ratio="3 / 4" name="profile" className="max-w-[15rem]" />
+        <AdminField
+          label="프로필 이미지"
+          hint="세로형 3:4"
+        >
+          <AdminImageUpload
+            ratio={PORTRAIT_RATIO}
+            name="profile"
+            requiredSize={UPLOAD_SIZE.portrait}
+            className="w-60"
+          />
         </AdminField>
 
         <AdminFormGrid>

@@ -77,9 +77,15 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "font-display text-sm font-semibold uppercase tracking-[0.16em] transition-colors hover:text-brand",
-                    active &&
-                      "text-brand underline decoration-brand decoration-2 underline-offset-8"
+                    "relative font-display text-sm font-semibold uppercase tracking-[0.16em] transition-colors",
+                    // Underline bar drives both states, so the active mark and
+                    // the hover mark sit on exactly the same baseline.
+                    "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:origin-left after:transition-transform after:duration-300 after:ease-out",
+                    active
+                      ? "text-brand after:scale-x-100 after:bg-brand"
+                      : // brand-soft (brighter) — plain `brand` is so close to
+                        // ink that the hover barely reads as a change.
+                        "after:scale-x-0 after:bg-brand-soft hover:text-brand-soft hover:after:scale-x-100"
                   )}
                 >
                   {item.label}

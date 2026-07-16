@@ -15,7 +15,8 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
       <Container className="pb-24 pt-16 md:pt-24">
         <div className="mx-auto max-w-6xl">
           {/* Profile: image left, intro right */}
-          <div className="grid gap-8 sm:grid-cols-[minmax(0,17rem)_1fr] sm:gap-12">
+          {/* Image column matches the About → Leadership profile (18rem). */}
+          <div className="grid gap-8 sm:grid-cols-[minmax(0,18rem)_1fr] sm:gap-12">
             <PlaceholderImage
               label={`${artist.nameKo} · 프로필`}
               ratio={PORTRAIT_RATIO}

@@ -11,6 +11,7 @@ import {
   AdminButton,
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
+import { PORTRAIT_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import {
   ABOUT,
   LEADERSHIP,
@@ -122,8 +123,15 @@ export function AboutEditor() {
           />
         </AdminField>
 
-        <AdminField label="프로필 이미지" hint="세로형 3:4 이미지">
-          <AdminImageUpload ratio="3 / 4" className="max-w-[13rem]" />
+        <AdminField
+          label="프로필 이미지"
+          hint="세로형 3:4"
+        >
+          <AdminImageUpload
+            ratio={PORTRAIT_RATIO}
+            requiredSize={UPLOAD_SIZE.portrait}
+            className="w-52"
+          />
         </AdminField>
 
         <AdminField label="역할" htmlFor="leaderRole">

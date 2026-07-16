@@ -11,6 +11,7 @@ import {
 } from "@widgets/admin-shell";
 import { HERO_SLIDES } from "@widgets/hero-slider/model/slides";
 import { SOCIALS } from "@shared/config/site";
+import { LANDSCAPE_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import { cn } from "@shared/lib/cn";
 
 /**
@@ -64,9 +65,34 @@ export function HomeEditor() {
           </div>
 
           <div className="mt-5 flex flex-col gap-5">
-            <AdminField label="배너 이미지" hint="가로형 16:9 이미지">
-              <AdminImageUpload ratio="16 / 9" />
-            </AdminField>
+            {/* Desktop + mobile banners are two separate compositions, so they
+                sit side by side. Widths are picked so both boxes end up the
+                same height (24rem ÷ 16:9 ≈ 7.6rem ÷ 9:16 ≈ 13.5rem). */}
+            <div>
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+                <AdminField label="배너 이미지 (데스크톱)" hint="가로형 16:9">
+                  <AdminImageUpload
+                    ratio={LANDSCAPE_RATIO}
+                    name="bannerDesktop"
+                    requiredSize={UPLOAD_SIZE.bannerDesktop}
+                    className="w-full sm:w-96"
+                  />
+                </AdminField>
+
+                <AdminField label="배너 이미지 (모바일)" hint="세로형 9:16">
+                  <AdminImageUpload
+                    ratio="9 / 16"
+                    name="bannerMobile"
+                    requiredSize={UPLOAD_SIZE.bannerMobile}
+                    className="w-40 sm:w-[7.6rem]"
+                  />
+                </AdminField>
+              </div>
+              <p className="mt-3 text-xs text-ink/45">
+                모바일 배너는 데스크톱을 자른 게 아니라 세로 구도로 새로 잡은
+                이미지여야 합니다.
+              </p>
+            </div>
 
             <AdminField label="영문 소제목" hint="상단 작은 영문 라벨">
               <AdminInput defaultValue={slide.eyebrow} className="max-w-md" />

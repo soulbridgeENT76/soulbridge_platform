@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -15,6 +16,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { cn } from "@shared/lib/cn";
+import { SITE } from "@shared/config/site";
 
 const NAV = [
   { label: "DASHBOARD", href: "/admin", icon: LayoutDashboard },
@@ -33,12 +35,16 @@ export function AdminSidebar() {
 
   return (
     <aside className="flex w-60 shrink-0 flex-col bg-ink text-paper">
-      {/* Wordmark */}
-      <Link href="/admin" className="block px-6 py-7">
-        <span className="font-display text-lg font-black leading-[0.9] tracking-tight">
-          Soul Bridge
-        </span>
-        <span className="mt-1 block font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-brand-soft">
+      {/* Wordmark — black artwork flipped to white for the dark sidebar. */}
+      <Link href="/admin" className="block px-6 py-7" aria-label={SITE.name}>
+        <Image
+          src={SITE.logo.src}
+          alt={SITE.name}
+          width={SITE.logo.width}
+          height={SITE.logo.height}
+          className="h-9 w-auto brightness-0 invert"
+        />
+        <span className="mt-2.5 block font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-brand-soft">
           Admin
         </span>
       </Link>

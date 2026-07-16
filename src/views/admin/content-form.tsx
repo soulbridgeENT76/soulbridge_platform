@@ -12,6 +12,7 @@ import {
   AdminPageHeader,
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
+import { LANDSCAPE_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import { CONTENT_CATEGORIES, type Content } from "@entities/content";
 
 type ContentFormProps = {
@@ -111,7 +112,14 @@ export function ContentForm({ initial }: ContentFormProps) {
 
           <div className="mt-4">
             {mediaType === "image" ? (
-              <AdminImageUpload ratio="16 / 9" name="image" />
+              <div>
+                <AdminImageUpload
+                  ratio={LANDSCAPE_RATIO}
+                  name="image"
+                  requiredSize={UPLOAD_SIZE.landscape}
+                />
+                <p className="mt-2 text-xs text-ink/45">가로형 16:9</p>
+              </div>
             ) : (
               <AdminInput
                 name="youtubeUrl"
