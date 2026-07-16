@@ -15,6 +15,11 @@ export const SITE = {
   nameKo: "소울브릿지 ENT",
   /** One-line company intro shown next to the footer logo. */
   intro: "영혼과 영혼을 잇는 미래 엔터테인먼트",
+  /**
+   * Wordmark lockup. Monochrome black on transparent, so the footer can flip
+   * it to white with a CSS filter. Set to null to fall back to the text logo.
+   */
+  logo: { src: "/logo.png", width: 826, height: 373 },
   tagline: {
     en: "CONNECTING SOULS, INSPIRING LIVES.",
     ko: "사람과 사람을 잇는 이야기,\n소울브릿지 ENT",

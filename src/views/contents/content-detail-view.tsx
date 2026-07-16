@@ -35,7 +35,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
 
         {isYoutube ? (
           /* Video content: player first, description below */
-          <div className="mt-10 max-w-5xl">
+          <div className="mx-auto mt-10 max-w-5xl">
             <div className="aspect-video w-full overflow-hidden rounded-2xl bg-ink">
               {content.youtubeId ? (
                 <iframe
@@ -67,20 +67,20 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
               </a>
             )}
 
-            <p className="mt-10 max-w-4xl whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
+            <p className="mt-10 whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
               {content.synopsis ?? content.description ?? content.note}
             </p>
           </div>
         ) : (
           /* Non-video IP: 16:9 image + description stacked */
           <>
-            <div className="mt-10 max-w-5xl">
+            <div className="mx-auto mt-10 max-w-5xl">
               <PlaceholderImage
                 label="콘텐츠 대표 이미지"
                 ratio={CONTENT_THUMB_RATIO}
               />
             </div>
-            <p className="mt-10 max-w-4xl whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
+            <p className="mt-10 whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
               {content.synopsis ?? content.description ?? content.note}
             </p>
           </>

@@ -83,7 +83,7 @@ export function ContactEditor() {
         <AdminField
           label="지도 표시 주소"
           htmlFor="mapAddress"
-          hint="이 주소로 구글맵이 표시되고, 네이버·카카오 길찾기 링크가 자동 연결됩니다. (표기용 주소와 달라도 됩니다)"
+          hint="이 주소로 구글맵이 표시되고, 네이버·카카오 길찾기 링크가 자동 연결됩니다."
         >
           <AdminInput
             id="mapAddress"

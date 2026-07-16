@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { formatNewsDate } from "@entities/news";
 import { Container, PaperTexture } from "@shared/ui";
@@ -113,13 +114,30 @@ export function HeroSlider() {
             )}
           >
             {/* Parallax background layer (oversized so it never reveals edges
-                as it drifts). Ready to hold a CMS image later. */}
+                as it drifts). Holds the banner image when the slide has one,
+                otherwise falls back to the paper texture + decorative wordmark
+                over the slide's flat brand colour. */}
             <div
               data-parallax
               className="pointer-events-none absolute inset-x-0 top-[-8%] h-[116%] will-change-transform"
             >
-              <PaperTexture />
-              {i === 0 && <HeroWordmark />}
+              {slide.image ? (
+                <Image
+                  src={slide.image}
+                  alt=""
+                  fill
+                  // The banner is decorative and sits behind the copy.
+                  aria-hidden
+                  priority={i === 0}
+                  sizes="100vw"
+                  className="object-cover object-right"
+                />
+              ) : (
+                <>
+                  <PaperTexture />
+                  {i === 0 && <HeroWordmark />}
+                </>
+              )}
             </div>
             <Container className="relative z-10 w-full py-24">
               <div
@@ -148,7 +166,7 @@ export function HeroSlider() {
                   </p>
                 )}
 
-                <h2 className="mt-4 font-maruburi text-3xl font-light leading-tight tracking-tight md:text-5xl lg:text-6xl">
+                <h2 className="mt-4 font-maruburi text-3xl font-light leading-tight tracking-tight break-keep md:text-5xl lg:text-6xl">
                   {slide.titleKo.split("\n").map((line, li) => (
                     <span
                       key={li}
@@ -162,7 +180,7 @@ export function HeroSlider() {
                 {slide.body && (
                   <p
                     className={cn(
-                      "mt-6 whitespace-pre text-base font-medium leading-relaxed md:text-lg",
+                      "mt-6 whitespace-pre-line break-keep text-base font-medium leading-relaxed md:text-lg",
                       dark ? "text-ink/70" : "text-paper/70"
                     )}
                   >

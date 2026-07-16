@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { FilterTabs, Pagination } from "@shared/ui";
 import {
-  NEWS,
+  PUBLISHED_NEWS,
   NEWS_CATEGORIES,
   NewsRow,
   type NewsCategory,
@@ -20,7 +20,10 @@ export function NewsFilter() {
   const [page, setPage] = useState(1);
 
   const items = useMemo(
-    () => (filter === "ALL" ? NEWS : NEWS.filter((n) => n.category === filter)),
+    () =>
+      filter === "ALL"
+        ? PUBLISHED_NEWS
+        : PUBLISHED_NEWS.filter((n) => n.category === filter),
     [filter]
   );
 

@@ -1,10 +1,14 @@
 import { SITE } from "@shared/config/site";
-import { NEWS, type NewsItem } from "@entities/news";
+import { PUBLISHED_NEWS, type NewsItem } from "@entities/news";
 
 export type HeroSlide = {
   id: string;
-  /** Background color (from the brand palette). */
+  /** Background color (from the brand palette). Also the base/fallback shown
+   *  while `image` loads, or when a slide has no image at all. */
   bg: string;
+  /** Full-bleed banner image. When set it replaces the paper texture and the
+   *  decorative wordmark. */
+  image?: string;
   /** Text scheme over the background. */
   scheme: "light" | "dark";
   eyebrow: string;
@@ -22,7 +26,7 @@ export type HeroSlide = {
 export const HERO_SLIDES: HeroSlide[] = [
   {
     id: "slogan",
-    bg: "#A695AB",
+    bg: "#DCD2EC",
     scheme: "dark",
     eyebrow: SITE.tagline.en,
     titleKo: SITE.tagline.ko,
@@ -53,7 +57,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     scheme: "dark",
     eyebrow: "LATEST NEWS",
     titleKo: "소울브릿지ENT의\n새로운 소식",
-    news: NEWS.slice(0, 3),
+    news: PUBLISHED_NEWS.slice(0, 3),
     cta: { label: "VIEW ALL NEWS", href: "/news" },
   },
   {

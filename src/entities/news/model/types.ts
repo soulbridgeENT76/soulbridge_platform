@@ -10,6 +10,11 @@ export type NewsItem = {
   author?: string;
   /** Full body shown on the detail page (multiline free text, CMS-editable). */
   body?: string;
+  /**
+   * Publish switch. Only `true` shows on the public site; new items start
+   * inactive so registering does not publish immediately.
+   */
+  active?: boolean;
 };
 
 export const NEWS_CATEGORIES: NewsCategory[] = ["NEWS", "NOTICE"];

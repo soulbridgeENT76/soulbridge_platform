@@ -31,7 +31,7 @@ export function NewsDetailView({ item }: NewsDetailViewProps) {
           {/* Body */}
           {item.body && (
             <div className="mt-10 border-t border-ink/10 pt-10">
-              <p className="max-w-4xl whitespace-pre-line text-base leading-[2] text-ink/70 md:text-lg">
+              <p className="whitespace-pre-line text-base leading-[2] text-ink/70 md:text-lg">
                 {item.body}
               </p>
             </div>

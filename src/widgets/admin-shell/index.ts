@@ -12,3 +12,4 @@ export { AdminImageUpload } from "./ui/admin-image-upload";
 export { AdminFormActions } from "./ui/admin-form-actions";
 export { DeleteButton } from "./ui/delete-button";
 export { AdminReferenceCard } from "./ui/admin-reference-card";
+export { AdminStatusToggle } from "./ui/admin-status-toggle";
