@@ -9,10 +9,8 @@ create table public.news (
     title text not null,
     content text not null default '',
     category_id bigint references public.news_categories (id) on delete restrict,
-    author_id uuid references public.profiles (id) on delete set null,
-    -- 발행 시각. null=미발행(초안), 값 있으면 발행됨.
-    published_at timestamptz,
-    -- TODO: 상세 뉴스 페이지 기획에 따라 추가
+    is_active boolean not null default false,
+    published_at timestamptz, -- 발행 시각. null=미발행(초안), 값 있으면 발행됨.
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
@@ -48,10 +46,16 @@ create policy "public can read news_categories"
     on public.news_categories for select to anon, authenticated
     using (true);
 
--- 조회(공개): 비로그인은 발행된(발행 시각이 지난) 뉴스만.
+-- 조회(공개): 비로그인은 활성(is_active) 상태이면서 발행 시각이 지난 뉴스만.
+-- 두 조건 모두 충족해야 한다. 활성이어도 예약 시각 전이면 안 보이고,
+-- 시각이 지났어도 비활성이면 안 보인다.
 create policy "public can read news"
     on public.news for select to anon
-    using (published_at is not null and published_at <= now());
+    using (
+        is_active
+        and published_at is not null
+        and published_at <= now()
+    );
 
 -- 조회(관리자): 로그인 관리자는 발행 여부·작성자와 무관하게 전체 조회 가능.
 -- (생성/수정/삭제는 아래 정책에서 여전히 소유권으로 제한된다.)

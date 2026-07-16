@@ -9,8 +9,8 @@ create table public.artists (
 create table public.artist_links (
     id bigint primary key generated always as identity,
     artist_id uuid not null references public.artists (id) on delete cascade,
-    label text not null, -- ???
-    url text not null, -- 관련 url
+    label text not null, -- react-icons 라벨
+    href text not null, -- 관련 url
     created_at timestamptz not null default now()
 );
 

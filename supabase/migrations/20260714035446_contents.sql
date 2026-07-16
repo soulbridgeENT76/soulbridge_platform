@@ -32,6 +32,10 @@ create trigger contents_set_updated_at
     for each row execute function public.handle_updated_at();
 
 -- #### RLS
+-- 조회는 누구나(비로그인 anon 포함), 생성/수정/삭제는 로그인 관리자만.
+-- anon도 읽으려면 테이블 GRANT와 RLS 정책 양쪽에 anon이 포함돼야 한다.
+grant select on public.content_categories to anon;
+grant select on public.contents to anon;
 grant select, insert, update, delete on public.content_categories to authenticated;
 grant select, insert, update, delete on public.contents to authenticated;
 
@@ -43,6 +47,18 @@ create policy "authenticated full access"
     on public.content_categories for all to authenticated
     using (true)
     with check (true);
+
+-- 조회(공개): 비로그인도 전체 조회 가능. 콘텐츠에는 뉴스의 is_active/published_at 같은
+-- 공개 게이트가 없으므로, 등록되는 즉시 공개된다.
+-- (authenticated의 조회는 위 "authenticated full access"가 이미 커버하므로 여기선 anon만
+--  지정한다. anon, authenticated를 함께 쓰면 SELECT 정책이 중복 평가된다.)
+create policy "public can read content_categories"
+    on public.content_categories for select to anon
+    using (true);
+
+create policy "public can read contents"
+    on public.contents for select to anon
+    using (true);
 
 -- 조회: 로그인 유저 모두
 create policy "authenticated can read contents"
