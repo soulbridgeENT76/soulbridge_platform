@@ -166,7 +166,7 @@ export function HeroSlider() {
                   </p>
                 )}
 
-                <h2 className="mt-10 font-maruburi text-3xl font-light leading-tight tracking-tight break-keep md:mt-14 md:text-5xl lg:text-6xl">
+                <h2 className="mt-10 font-sans text-3xl font-semibold leading-tight tracking-tight break-keep md:mt-14 md:text-5xl lg:text-6xl">
                   {slide.titleKo.split("\n").map((line, li) => (
                     <span
                       key={li}
