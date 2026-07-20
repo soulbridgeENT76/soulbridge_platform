@@ -48,6 +48,9 @@ export function SiteHeader({ variant = "solid", logo }: SiteHeaderProps) {
   // Transparent only while at the top of an overlay-mode page (the light hero).
   const transparent = variant === "overlay" && !scrolled && !menuOpen;
 
+  // Deactivated sections drop out of the nav (route stays reachable by URL).
+  const visibleNav = NAV.filter((item) => item.active !== false);
+
   return (
     <>
       <header
@@ -73,7 +76,7 @@ export function SiteHeader({ variant = "solid", logo }: SiteHeaderProps) {
 
           {/* Center nav (desktop) */}
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex lg:gap-14">
-            {NAV.map((item) => {
+            {visibleNav.map((item) => {
               const active = pathname.startsWith(item.href);
               return (
                 <Link
@@ -145,7 +148,7 @@ export function SiteHeader({ variant = "solid", logo }: SiteHeaderProps) {
         </div>
 
         <nav className="flex flex-col px-7">
-          {NAV.map((item) => {
+          {visibleNav.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link

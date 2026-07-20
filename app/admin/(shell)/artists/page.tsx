@@ -3,6 +3,7 @@ import {
   AdminPageHeader,
   AdminLinkButton,
   DeleteButton,
+  SectionVisibilityToggle,
 } from "@widgets/admin-shell";
 import { PageCopyEditor } from "@views/admin";
 import { PAGE_COPY } from "@shared/config/page-copy";
@@ -23,6 +24,10 @@ export default function AdminArtistsPage() {
       />
 
       <div className="mt-8">
+        <SectionVisibilityToggle href="/artists" />
+      </div>
+
+      <div className="mt-6">
         <PageCopyEditor
           initial={PAGE_COPY.artists}
           caption="아티스트 페이지 상단에 표시되는 제목·소제목입니다."

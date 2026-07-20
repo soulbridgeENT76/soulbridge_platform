@@ -1,4 +1,4 @@
-import { SITE } from "@shared/config/site";
+import { NAV, SITE } from "@shared/config/site";
 import { PUBLISHED_NEWS, type NewsItem } from "@entities/news";
 
 export type HeroSlide = {
@@ -20,6 +20,12 @@ export type HeroSlide = {
   pills?: readonly string[];
   /** Optional latest-news preview (news slide). */
   news?: readonly NewsItem[];
+  /**
+   * Nav route this slide represents (e.g. "/artists"). When that section's
+   * menu is turned off, the slide is hidden from home too. Slides without a
+   * `section` (the brand slogan) always show.
+   */
+  section?: string;
 };
 
 /** The five full-screen home slides, composed from the entity layer. */
@@ -41,6 +47,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     titleKo: "이야기를 담아내는\n모든 방식",
     body: "유튜브 오리지널부터 드라마, 웹툰·웹소설 IP까지.\n소울브릿지ENT가 만드는 이야기.",
     cta: { label: "VIEW CONTENTS", href: "/contents" },
+    section: "/contents",
   },
   {
     id: "artists",
@@ -50,15 +57,17 @@ export const HERO_SLIDES: HeroSlide[] = [
     titleKo: "이야기를 전하는\n사람들",
     body: "방송인, 배우, 크리에이터.\n각자의 목소리로 이야기를 전하는 사람들.",
     cta: { label: "MEET OUR ARTISTS", href: "/artists" },
+    section: "/artists",
   },
   {
     id: "news",
     bg: "#E5E2DC",
     scheme: "dark",
-    eyebrow: "LATEST NEWS",
+    eyebrow: "LATEST NOTICE",
     titleKo: "소울브릿지ENT의\n새로운 소식",
     news: PUBLISHED_NEWS.slice(0, 3),
-    cta: { label: "VIEW ALL NEWS", href: "/news" },
+    cta: { label: "VIEW ALL NOTICE", href: "/notice" },
+    section: "/notice",
   },
   {
     id: "contact",
@@ -68,5 +77,18 @@ export const HERO_SLIDES: HeroSlide[] = [
     titleKo: "당신의 이야기를\n들려주세요",
     body: "제휴·캐스팅·미디어 협업 문의를 기다립니다.\n소울브릿지ENT와 함께 새로운 이야기를 만들어가요.",
     cta: { label: "CONTACT US", href: "/contact" },
+    section: "/contact",
   },
 ];
+
+/**
+ * Home slides actually shown to visitors: a slide whose `section` menu is
+ * turned off is dropped here too, so home stays in sync with the nav. The
+ * brand slogan slide has no `section`, so it always shows. The admin home
+ * editor keeps using the full `HERO_SLIDES` list.
+ */
+export const VISIBLE_HERO_SLIDES: HeroSlide[] = HERO_SLIDES.filter((slide) => {
+  if (!slide.section) return true;
+  const nav = NAV.find((n) => n.href === slide.section);
+  return !nav || nav.active !== false;
+});

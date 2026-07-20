@@ -1,6 +1,7 @@
 "use client";
 
-import type { FormEvent } from "react";
+import { type FormEvent, useState } from "react";
+import { FileText, Link2 } from "lucide-react";
 import {
   AdminField,
   AdminInput,
@@ -11,7 +12,12 @@ import {
   AdminPageHeader,
   AdminStatusToggle,
 } from "@widgets/admin-shell";
-import { NEWS_CATEGORIES, type NewsItem } from "@entities/news";
+import { cn } from "@shared/lib/cn";
+import {
+  NEWS_CATEGORIES,
+  type NewsItem,
+  type NewsLinkType,
+} from "@entities/news";
 
 type NewsFormProps = {
   initial?: NewsItem;
@@ -20,6 +26,10 @@ type NewsFormProps = {
 // NOTE(backend): slug/id are generated on the server, so they are not shown here.
 export function NewsForm({ initial }: NewsFormProps) {
   const editing = Boolean(initial);
+  const [linkType, setLinkType] = useState<NewsLinkType>(
+    initial?.linkType ?? "article"
+  );
+  const external = linkType === "external";
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -86,18 +96,101 @@ export function NewsForm({ initial }: NewsFormProps) {
           </div>
         </div>
 
-        <AdminField label="본문" htmlFor="body" hint="줄바꿈 그대로 반영">
-          <AdminTextarea
-            id="body"
-            name="body"
-            defaultValue={initial?.body}
-            className="min-h-64"
-            placeholder="소식 본문을 작성하세요."
-          />
+        {/* Display mode: in-site article OR jump straight to an external link. */}
+        <AdminField
+          label="표시 방식"
+          hint="본문형은 사이트 안 상세 페이지로, 링크형은 클릭 시 외부 주소로 바로 이동합니다."
+        >
+          <div className="inline-flex rounded-lg border border-ink/15 p-1">
+            <ModeTab
+              active={!external}
+              onClick={() => setLinkType("article")}
+              icon={<FileText size={15} />}
+              label="본문형"
+            />
+            <ModeTab
+              active={external}
+              onClick={() => setLinkType("external")}
+              icon={<Link2 size={15} />}
+              label="링크형"
+            />
+          </div>
+          <input type="hidden" name="linkType" value={linkType} />
         </AdminField>
+
+        {external ? (
+          /* Link mode — the row jumps straight to this URL. */
+          <AdminField
+            label="외부 링크 URL"
+            htmlFor="externalUrl"
+            required
+            hint="클릭 시 새 탭에서 이 주소로 바로 이동합니다."
+          >
+            <AdminInput
+              id="externalUrl"
+              name="externalUrl"
+              type="url"
+              defaultValue={initial?.externalUrl}
+              placeholder="https://..."
+            />
+          </AdminField>
+        ) : (
+          /* Article mode — body plus an optional attached source link. */
+          <>
+            <AdminField label="본문" htmlFor="body" hint="줄바꿈 그대로 반영">
+              <AdminTextarea
+                id="body"
+                name="body"
+                defaultValue={initial?.body}
+                className="min-h-64"
+                placeholder="소식 본문을 작성하세요."
+              />
+            </AdminField>
+
+            <AdminField
+              label="첨부 링크 (선택)"
+              htmlFor="externalUrl"
+              hint="입력하면 상세 페이지에 '원문 보기' 버튼으로 표시됩니다."
+            >
+              <AdminInput
+                id="externalUrl"
+                name="externalUrl"
+                type="url"
+                defaultValue={initial?.externalUrl}
+                placeholder="https://... (선택)"
+              />
+            </AdminField>
+          </>
+        )}
       </div>
 
-      <AdminFormActions cancelHref="/admin/news" />
+      <AdminFormActions cancelHref="/admin/notice" />
     </form>
+  );
+}
+
+function ModeTab({
+  active,
+  onClick,
+  icon,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-semibold transition-colors",
+        active ? "bg-brand text-paper" : "text-ink/55 hover:text-ink"
+      )}
+    >
+      {icon}
+      {label}
+    </button>
   );
 }

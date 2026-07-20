@@ -20,7 +20,7 @@ const STATS = [
     count: ARTISTS.length,
     icon: Users,
   },
-  { label: "뉴스", href: "/admin/news", count: NEWS.length, icon: Newspaper },
+  { label: "뉴스", href: "/admin/notice", count: NEWS.length, icon: Newspaper },
 ];
 
 export default function AdminDashboardPage() {
