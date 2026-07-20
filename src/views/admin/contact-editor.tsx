@@ -1,6 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
+import { showToast } from "@shared/ui/toast";
 import {
   AdminField,
   AdminInput,
@@ -23,6 +24,7 @@ export function ContactEditor() {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): save contact info.
+    showToast("저장되었습니다");
   };
 
   return (

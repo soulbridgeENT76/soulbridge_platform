@@ -2,6 +2,7 @@
 
 import { type FormEvent, useRef, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { showToast } from "@shared/ui/toast";
 import {
   AdminField,
   AdminInput,
@@ -88,6 +89,7 @@ export function AboutEditor() {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): collect all values and save the About page.
+    showToast("저장되었습니다");
   };
 
   return (

@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { showToast } from "@shared/ui/toast";
 import {
   AdminField,
   AdminInput,
@@ -33,6 +34,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): collect values (incl. works/socials) and save.
+    showToast("저장되었습니다");
   };
 
   return (
