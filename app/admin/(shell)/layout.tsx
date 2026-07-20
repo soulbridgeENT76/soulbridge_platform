@@ -1,6 +1,7 @@
 import { type ReactNode, Suspense } from "react";
 import { redirect } from "next/navigation";
 import { AdminSidebarSlot } from "@widgets/admin-shell/ui/admin-sidebar-slot";
+import { Toaster } from "@shared/ui/toast";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -41,6 +42,7 @@ export default function AdminShellLayout({ children }: { children: ReactNode }) 
           </Suspense>
         </div>
       </main>
+      <Toaster />
     </div>
   );
 }

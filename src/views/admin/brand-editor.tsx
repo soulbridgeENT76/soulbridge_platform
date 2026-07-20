@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { TriangleAlert } from "lucide-react";
+import { showToast } from "@shared/ui/toast";
 import {
   AdminField,
   AdminInput,
@@ -23,6 +24,17 @@ export function BrandEditor({ initial }: BrandEditorProps) {
   const [brandInfo, setBrandInfo] = useState(initial.brand.intro);
   const [state, formAction] = useActionState(saveBrand, { ok: true });
 
+  // Toast only after a real save. `useActionState` returns a brand-new object
+  // each time the action resolves, so a change of identity from the initial
+  // value means the server actually responded. Comparing against the captured
+  // initial (rather than a first-render flag) also stays correct under React
+  // StrictMode's double-mount, which would otherwise fire a toast on load.
+  const initialState = useRef(state);
+  useEffect(() => {
+    if (state === initialState.current) return;
+    if (state.ok && !state.error) showToast("저장되었습니다");
+  }, [state]);
+
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <section className="rounded-2xl border border-ink/10 bg-white p-5">
@@ -30,6 +42,24 @@ export function BrandEditor({ initial }: BrandEditorProps) {
         <p className="mt-0.5 text-xs text-ink/50">
           헤더·푸터·메뉴에 사용됩니다. 제거하면 기본 로고로 돌아갑니다.
         </p>
+
+        {/* Padding is THE cause of an undersized logo — call it out loudest. */}
+        <div className="mt-3 flex items-start gap-2 rounded-lg border border-brand/30 bg-brand/[0.06] px-3 py-2.5">
+          <TriangleAlert size={15} className="mt-0.5 shrink-0 text-brand" />
+          <div>
+            <p className="text-xs font-bold text-ink">
+              로고 주변 여백(빈 공간)을 꼭 없애 주세요
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-ink/60">
+              로고가{" "}
+              <b className="font-semibold text-ink/80">
+                캔버스 상·하·좌·우 끝에 딱 닿도록
+              </b>{" "}
+              꽉 차게 잘라 주세요. 위아래에 투명 여백이 있으면 그만큼 사이트에서{" "}
+              <b className="font-semibold text-ink/80">작게 표시됩니다.</b>
+            </p>
+          </div>
+        </div>
 
         <ul className="mt-3 flex flex-col gap-1 text-xs text-ink/55">
           <li>

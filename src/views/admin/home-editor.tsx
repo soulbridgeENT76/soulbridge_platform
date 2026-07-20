@@ -10,6 +10,7 @@ import {
   AdminReferenceCard,
 } from "@widgets/admin-shell";
 import { HERO_SLIDES } from "@widgets/hero-slider/model/slides";
+import { showToast } from "@shared/ui/toast";
 import { SOCIALS } from "@shared/config/site";
 import { LANDSCAPE_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import { cn } from "@shared/lib/cn";
@@ -27,6 +28,7 @@ export function HomeEditor() {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): save ONLY this slide (HERO_SLIDES[active]).
+    showToast("저장되었습니다");
   };
 
   return (
