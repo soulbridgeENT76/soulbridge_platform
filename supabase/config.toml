@@ -117,12 +117,15 @@ enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
-# Uncomment to configure local storage buckets
-# [storage.buckets.images]
-# public = false
-# file_size_limit = "50MiB"
-# allowed_mime_types = ["image/png", "image/jpeg"]
-# objects_path = "./images"
+# 로고·썸네일·프로필 이미지 버킷. 마이그레이션(storage_images.sql)이 같은 값으로
+# upsert 하므로 둘 중 어느 쪽이 먼저 돌아도 결과는 같다.
+# public: 헤더 로고가 비로그인 방문자에게도 보여야 한다.
+# webp만: 업로더가 모든 원본을 webp로 재인코딩해서 보낸다.
+# objects_path 는 두지 않는다 — 시드용 supabase/images/ 디렉터리가 없어 start 가 실패한다.
+[storage.buckets.images]
+public = true
+file_size_limit = "50MiB"
+allowed_mime_types = ["image/webp"]
 
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]

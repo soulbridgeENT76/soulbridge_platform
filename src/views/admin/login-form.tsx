@@ -2,26 +2,42 @@
 
 import { type FormEvent, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { TriangleAlert } from "lucide-react";
 import { AdminField, AdminInput, AdminButton } from "@widgets/admin-shell";
 import { SITE } from "@shared/config/site";
+import { createClient } from "@/lib/supabase/client";
+import type { SiteLogo } from "@entities/brand";
 
-/**
- * Admin sign-in. Rendered outside the sidebar shell.
- * TODO(backend): authenticate against Supabase (see lib/supabase/client.ts),
- * then redirect to /admin. Show `error` on failure.
- */
-export function LoginForm() {
+/** Admin sign-in. Rendered outside the sidebar shell. */
+export function LoginForm({ logo }: { logo: SiteLogo }) {
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setPending(true);
-    // TODO(backend): sign in, then router.push("/admin").
-    // On failure: setError("이메일 또는 비밀번호가 올바르지 않습니다.")
-    setPending(false);
+
+    const form = new FormData(e.currentTarget);
+    const supabase = createClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: String(form.get("email") ?? ""),
+      password: String(form.get("password") ?? ""),
+    });
+
+    if (signInError) {
+      // Deliberately vague — saying which half was wrong tells an attacker
+      // which accounts exist.
+      setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      setPending(false);
+      return;
+    }
+
+    // refresh() so the server components re-render with the new session cookie.
+    router.push("/admin");
+    router.refresh();
   };
 
   return (
@@ -30,10 +46,10 @@ export function LoginForm() {
         {/* Brand */}
         <div className="flex flex-col items-center">
           <Image
-            src={SITE.logo.src}
+            src={logo.src}
             alt={SITE.name}
-            width={SITE.logo.width}
-            height={SITE.logo.height}
+            width={logo.width}
+            height={logo.height}
             priority
             className="h-12 w-auto"
           />

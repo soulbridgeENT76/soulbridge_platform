@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@shared/lib/cn";
 import { SITE } from "@shared/config/site";
+import type { SiteLogo } from "@entities/brand";
 
 const NAV = [
   { label: "DASHBOARD", href: "/admin", icon: LayoutDashboard },
@@ -30,7 +31,7 @@ const NAV = [
   { label: "FOOTER", href: "/admin/footer", icon: PanelBottom },
 ] as const;
 
-export function AdminSidebar() {
+export function AdminSidebar({ logo }: { logo: SiteLogo }) {
   const pathname = usePathname();
 
   return (
@@ -38,10 +39,10 @@ export function AdminSidebar() {
       {/* Wordmark — black artwork flipped to white for the dark sidebar. */}
       <Link href="/admin" className="block px-6 py-7" aria-label={SITE.name}>
         <Image
-          src={SITE.logo.src}
+          src={logo.src}
           alt={SITE.name}
-          width={SITE.logo.width}
-          height={SITE.logo.height}
+          width={logo.width}
+          height={logo.height}
           className="h-9 w-auto brightness-0 invert"
         />
         <span className="mt-2.5 block font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-brand-soft">

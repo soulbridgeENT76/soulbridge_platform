@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { CONTACT, SITE, SOCIALS } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
+import type { SiteLogo } from "@entities/brand";
 
 // Cache Component: reading the current time is allowed inside `"use cache"`,
 // so the copyright year prerenders cleanly (updates on each build/deploy).
@@ -9,7 +10,7 @@ async function getCurrentYear() {
   return new Date().getFullYear();
 }
 
-export async function SiteFooter() {
+export async function SiteFooter({ logo }: { logo: SiteLogo }) {
   const year = await getCurrentYear();
   return (
     <footer className="bg-ink text-paper">
@@ -18,10 +19,10 @@ export async function SiteFooter() {
         <div>
           {/* Same black wordmark, flipped to white for the dark footer. */}
           <Image
-            src={SITE.logo.src}
+            src={logo.src}
             alt={SITE.name}
-            width={SITE.logo.width}
-            height={SITE.logo.height}
+            width={logo.width}
+            height={logo.height}
             className="h-12 w-auto brightness-0 invert"
           />
 

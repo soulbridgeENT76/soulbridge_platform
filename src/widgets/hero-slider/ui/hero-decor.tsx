@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
-import { SITE, SOCIALS } from "@shared/config/site";
+import { SOCIALS } from "@shared/config/site";
 import { SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
+import type { SiteLogo } from "@entities/brand";
 
 /** Extrusion depth: how many offset copies build the 3D side wall. */
 const DEPTH = 9;
@@ -11,17 +12,21 @@ const STEP_X = 0;
 const STEP_Y = 2;
 
 /** Masks a layer to the real logo artwork, so letter spacing and lockup match
- *  the official file exactly instead of being re-typeset by hand. */
-const LOGO_MASK: CSSProperties = {
-  maskImage: `url(${SITE.logo.src})`,
-  maskSize: "contain",
-  maskRepeat: "no-repeat",
-  maskPosition: "center",
-  WebkitMaskImage: `url(${SITE.logo.src})`,
-  WebkitMaskSize: "contain",
-  WebkitMaskRepeat: "no-repeat",
-  WebkitMaskPosition: "center",
-};
+ *  the official file exactly instead of being re-typeset by hand. Built per
+ *  render rather than once at module scope: the artwork now comes from the CMS.
+ *  The URL is quoted because an uploaded path is not guaranteed to be bare. */
+function logoMask(src: string): CSSProperties {
+  return {
+    maskImage: `url("${src}")`,
+    maskSize: "contain",
+    maskRepeat: "no-repeat",
+    maskPosition: "center",
+    WebkitMaskImage: `url("${src}")`,
+    WebkitMaskSize: "contain",
+    WebkitMaskRepeat: "no-repeat",
+    WebkitMaskPosition: "center",
+  };
+}
 
 /**
  * Large brand wordmark, extruded. Every layer is the actual logo artwork used
@@ -30,7 +35,9 @@ const LOGO_MASK: CSSProperties = {
  * the same tone as the hero background and is lit head-on, so the letters read
  * as 3D purely through shading and the cast shadow.
  */
-export function HeroWordmark() {
+export function HeroWordmark({ logo }: { logo: SiteLogo }) {
+  const mask = logoMask(logo.src);
+
   return (
     <div
       aria-hidden
@@ -39,7 +46,7 @@ export function HeroWordmark() {
       <div
         className="relative w-200 lg:w-264"
         style={{
-          aspectRatio: `${SITE.logo.width} / ${SITE.logo.height}`,
+          aspectRatio: `${logo.width} / ${logo.height}`,
           filter: "drop-shadow(0 9px 11px rgba(74, 54, 99, 0.2))",
         }}
       >
@@ -54,7 +61,7 @@ export function HeroWordmark() {
               key={i}
               className="absolute inset-0"
               style={{
-                ...LOGO_MASK,
+                ...mask,
                 backgroundColor: `rgb(${r}, ${g}, ${b})`,
                 transform: `translate(${(DEPTH - i) * STEP_X}px, ${
                   (DEPTH - i) * STEP_Y
@@ -67,7 +74,7 @@ export function HeroWordmark() {
         <div
           className="absolute inset-0"
           style={{
-            ...LOGO_MASK,
+            ...mask,
             background:
               "radial-gradient(70% 75% at 50% 45%, #E9E1F6 0%, #D8CDE9 100%)",
           }}

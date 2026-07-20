@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { formatNewsDate } from "@entities/news";
+import type { SiteLogo } from "@entities/brand";
 import { Container, PaperTexture } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 import { HERO_SLIDES } from "../model/slides";
@@ -16,7 +17,7 @@ import { HeroWordmark, HeroSocials, ScrollMouse } from "./hero-decor";
  * click. Scroll-snap (scoped via `.hero-scroll` in globals.css) makes each
  * banner settle into view.
  */
-export function HeroSlider() {
+export function HeroSlider({ logo }: { logo: SiteLogo }) {
   const [active, setActive] = useState(0);
   // The scroll hint shows only while the view is settled on a slide; it fades
   // out the moment scrolling starts and fades back in once it stops.
@@ -135,7 +136,7 @@ export function HeroSlider() {
               ) : (
                 <>
                   <PaperTexture />
-                  {i === 0 && <HeroWordmark />}
+                  {i === 0 && <HeroWordmark logo={logo} />}
                 </>
               )}
             </div>

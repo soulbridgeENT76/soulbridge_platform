@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 import { NAV, SOCIALS, CONTACT, SITE } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
+import type { SiteLogo } from "@entities/brand";
 
 type SiteHeaderProps = {
   /**
@@ -15,9 +16,11 @@ type SiteHeaderProps = {
    * scroll. "solid" is always the paper bar (used on interior pages).
    */
   variant?: "overlay" | "solid";
+  /** Resolved by the server parent — the CMS logo, or the bundled default. */
+  logo: SiteLogo;
 };
 
-export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
+export function SiteHeader({ variant = "solid", logo }: SiteHeaderProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -59,10 +62,10 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
           {/* Wordmark logo (black artwork; header sits on the light paper bg) */}
           <Link href="/" onClick={() => setMenuOpen(false)} aria-label={SITE.name}>
             <Image
-              src={SITE.logo.src}
+              src={logo.src}
               alt={SITE.name}
-              width={SITE.logo.width}
-              height={SITE.logo.height}
+              width={logo.width}
+              height={logo.height}
               priority
               className="h-11 w-auto md:h-12"
             />
@@ -175,10 +178,10 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
             beside it; the email truncates rather than pushing the row wide. */}
         <div className="mt-auto flex items-center gap-4 border-t border-ink/10 px-7 py-7">
           <Image
-            src={SITE.logo.src}
+            src={logo.src}
             alt={SITE.name}
-            width={SITE.logo.width}
-            height={SITE.logo.height}
+            width={logo.width}
+            height={logo.height}
             className="h-10 w-auto shrink-0"
           />
           <div className="min-w-0 flex-1">
