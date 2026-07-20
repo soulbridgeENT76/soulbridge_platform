@@ -7,7 +7,7 @@ import { formatSize, type UploadSize } from "@shared/config/media";
 import {
   imageToWebp,
   type WebpTarget,
-  WEBP_QUALITY_LOGO,
+  WEBP_QUALITY_PHOTO,
 } from "@shared/lib/image-to-webp";
 
 type AdminImageUploadProps = {
@@ -43,6 +43,12 @@ type AdminImageUploadProps = {
    * form field's file. The stored asset is then always this exact size/format.
    */
   output?: WebpTarget;
+  /**
+   * WebP quality for `output`. Flat artwork (the logo) needs lossless or its
+   * edges bruise; photographs do not, and at banner sizes the saving is large.
+   * Pass WEBP_QUALITY_LOGO or WEBP_QUALITY_PHOTO.
+   */
+  outputQuality?: number;
   className?: string;
 };
 
@@ -86,6 +92,7 @@ export function AdminImageUpload({
   requireTransparent,
   allowSvg,
   output,
+  outputQuality = WEBP_QUALITY_PHOTO,
   initialUrl,
   className,
 }: AdminImageUploadProps) {
@@ -113,7 +120,7 @@ export function AdminImageUpload({
   const accept = async (file: File, url: string) => {
     if (output && inputRef.current) {
       try {
-        const encoded = await imageToWebp(file, WEBP_QUALITY_LOGO, output);
+        const encoded = await imageToWebp(file, outputQuality, output);
         const dt = new DataTransfer();
         dt.items.add(
           new File([encoded.blob], "image.webp", { type: "image/webp" }),
