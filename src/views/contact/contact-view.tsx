@@ -14,10 +14,10 @@ export function ContactView() {
       {/* Top: message + address / socials */}
       <Container className="pb-16 pt-16 md:pt-24">
         <Eyebrow className="text-plum">{copy.eyebrow}</Eyebrow>
-        <h1 className="mt-6 text-4xl font-bold tracking-tight text-ink md:text-5xl">
+        <h1 className="mt-6 max-w-3xl whitespace-pre-line text-3xl/[1.25] font-bold tracking-tight text-ink md:text-4xl/[1.25] lg:text-5xl/[1.25]">
           {copy.title}
         </h1>
-        <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-ink/55 md:text-lg">
+        <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-ink/60 md:text-lg">
           {copy.description}
         </p>
 

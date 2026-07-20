@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { showToast } from "@shared/ui/toast";
 import {
   AdminField,
   AdminInput,
@@ -12,6 +13,7 @@ import {
   AdminPageHeader,
   AdminButton,
 } from "@widgets/admin-shell";
+import { PORTRAIT_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import type { Artist } from "@entities/artist";
 
 type WorkRow = { year: string; title: string };
@@ -32,6 +34,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): collect values (incl. works/socials) and save.
+    showToast("저장되었습니다");
   };
 
   return (
@@ -42,8 +45,16 @@ export function ArtistForm({ initial }: ArtistFormProps) {
       />
 
       <div className="mt-8 flex flex-col gap-6">
-        <AdminField label="프로필 이미지" hint="세로형 3:4 이미지">
-          <AdminImageUpload ratio="3 / 4" name="profile" className="max-w-[15rem]" />
+        <AdminField
+          label="프로필 이미지"
+          hint="세로형 3:4"
+        >
+          <AdminImageUpload
+            ratio={PORTRAIT_RATIO}
+            name="profile"
+            requiredSize={UPLOAD_SIZE.portrait}
+            className="w-60"
+          />
         </AdminField>
 
         <AdminFormGrid>
@@ -68,10 +79,10 @@ export function ArtistForm({ initial }: ArtistFormProps) {
           <AdminTextarea id="bio" name="bio" defaultValue={initial?.bio} />
         </AdminField>
 
-        {/* Works — repeatable (year + title) */}
+        {/* Career — repeatable (year + title) */}
         <RepeatableSection
-          label="작품활동"
-          addLabel="작품 추가"
+          label="활동 이력"
+          addLabel="이력 추가"
           onAdd={() => setWorks((w) => [...w, { year: "", title: "" }])}
         >
           {works.map((work, i) => (

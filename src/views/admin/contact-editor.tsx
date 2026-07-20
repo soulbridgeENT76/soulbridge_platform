@@ -1,28 +1,30 @@
 "use client";
 
 import type { FormEvent } from "react";
+import { showToast } from "@shared/ui/toast";
 import {
   AdminField,
   AdminInput,
   AdminTextarea,
   AdminFormGrid,
   AdminFormActions,
+  AdminReferenceCard,
 } from "@widgets/admin-shell";
 import { CONTACT, SOCIALS } from "@shared/config/site";
 import { PAGE_COPY } from "@shared/config/page-copy";
 
 /**
- * CONTACT page editor — heading copy, contact details, socials, and map links.
+ * CONTACT page editor — heading copy, contact details, and map location.
+ * SNS links are managed on the Brand page.
  * TODO(backend): persist on save.
  */
 export function ContactEditor() {
   const copy = PAGE_COPY.contact;
-  const socialHref = (label: string) =>
-    SOCIALS.find((s) => s.label === label)?.href ?? "";
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): save contact info.
+    showToast("저장되었습니다");
   };
 
   return (
@@ -66,33 +68,14 @@ export function ContactEditor() {
         </AdminFormGrid>
       </Card>
 
-      {/* Socials */}
-      <Card title="SNS" caption="선택 입력 · 비우면 표시되지 않습니다.">
-        <AdminField label="인스타그램 (선택)" htmlFor="instagram">
-          <AdminInput
-            id="instagram"
-            name="instagram"
-            defaultValue={socialHref("INSTAGRAM")}
-            placeholder="https://instagram.com/..."
-          />
-        </AdminField>
-        <AdminField label="유튜브 (선택)" htmlFor="youtube">
-          <AdminInput
-            id="youtube"
-            name="youtube"
-            defaultValue={socialHref("YOUTUBE")}
-            placeholder="https://youtube.com/@..."
-          />
-        </AdminField>
-        <AdminField label="기타 메신저 (선택)" htmlFor="messenger">
-          <AdminInput
-            id="messenger"
-            name="messenger"
-            defaultValue={socialHref("MESSENGER")}
-            placeholder="카카오톡·텔레그램 등 링크"
-          />
-        </AdminField>
-      </Card>
+      {/* Socials — managed on the Brand page */}
+      <AdminReferenceCard
+        title="회사 SNS 링크"
+        caption="브랜드 페이지에서 관리하는 SNS가 이 페이지 하단에도 표시됩니다."
+        href="/admin/brand"
+        hrefLabel="브랜드에서 편집"
+        rows={[{ label: "SNS", value: SOCIALS.map((s) => s.label).join(" · ") }]}
+      />
 
       {/* Map — address only; URLs are derived automatically */}
       <Card
@@ -102,7 +85,7 @@ export function ContactEditor() {
         <AdminField
           label="지도 표시 주소"
           htmlFor="mapAddress"
-          hint="이 주소로 구글맵이 표시되고, 네이버·카카오 길찾기 링크가 자동 연결됩니다. (표기용 주소와 달라도 됩니다)"
+          hint="이 주소로 구글맵이 표시되고, 네이버·카카오 길찾기 링크가 자동 연결됩니다."
         >
           <AdminInput
             id="mapAddress"

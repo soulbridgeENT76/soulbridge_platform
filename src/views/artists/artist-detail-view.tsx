@@ -15,7 +15,8 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
       <Container className="pb-24 pt-16 md:pt-24">
         <div className="mx-auto max-w-6xl">
           {/* Profile: image left, intro right */}
-          <div className="grid gap-8 sm:grid-cols-[minmax(0,17rem)_1fr] sm:gap-12">
+          {/* Image column matches the About → Leadership profile (18rem). */}
+          <div className="grid gap-8 sm:grid-cols-[minmax(0,18rem)_1fr] sm:gap-12">
             <PlaceholderImage
               label={`${artist.nameKo} · 프로필`}
               ratio={PORTRAIT_RATIO}
@@ -53,9 +54,9 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
           {artist.works && artist.works.length > 0 && (
             <section className="mt-16 border-t border-ink/10 pt-10">
               <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-plum">
-                WORKS
+                CAREER
               </p>
-              <h2 className="mt-3 text-2xl font-bold text-ink">작품활동</h2>
+              <h2 className="mt-3 text-2xl font-bold text-ink">활동 이력</h2>
 
               <ul className="mt-8 flex flex-col divide-y divide-ink/10">
                 {artist.works.map((work) => (

@@ -9,3 +9,6 @@ export { FilterTabs } from "./filter-tabs";
 export { Pagination } from "./pagination";
 export { SocialLinks } from "./social-links";
 export { PaperTexture } from "./paper-texture";
+// Toaster/showToast are intentionally NOT re-exported here: this barrel is
+// imported by server components, and a client-only module should be imported
+// directly from "@shared/ui/toast" so it never gets pulled into their graph.

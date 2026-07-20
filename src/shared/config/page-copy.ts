@@ -27,7 +27,7 @@ export const PAGE_COPY: Record<
       "방송인부터 배우, 크리에이터까지 — 소울브릿지ENT와 함께 진심을 전하는 아티스트를 소개합니다.",
   },
   news: {
-    eyebrow: "VIEW ALL NEWS",
+    eyebrow: "VIEW ALL NOTICE",
     title: "소울브릿지ENT의 새로운 소식",
     description:
       "보도자료부터 공지까지 — 소울브릿지ENT의 소식을 가장 먼저 전해드립니다.",

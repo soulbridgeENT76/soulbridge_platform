@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { NAV, SOCIALS, CONTACT } from "@shared/config/site";
+import { NAV, SOCIALS, CONTACT, SITE } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
+import type { SiteLogo } from "@entities/brand";
 
 type SiteHeaderProps = {
   /**
@@ -14,9 +16,11 @@ type SiteHeaderProps = {
    * scroll. "solid" is always the paper bar (used on interior pages).
    */
   variant?: "overlay" | "solid";
+  /** Resolved by the server parent — the CMS logo, or the bundled default. */
+  logo: SiteLogo;
 };
 
-export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
+export function SiteHeader({ variant = "solid", logo }: SiteHeaderProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -44,6 +48,9 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
   // Transparent only while at the top of an overlay-mode page (the light hero).
   const transparent = variant === "overlay" && !scrolled && !menuOpen;
 
+  // Deactivated sections drop out of the nav (route stays reachable by URL).
+  const visibleNav = NAV.filter((item) => item.active !== false);
+
   return (
     <>
       <header
@@ -55,31 +62,36 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
         )}
       >
         <Container className="relative flex h-24 max-w-none items-center justify-between md:h-28">
-          {/* Stacked wordmark logo */}
-          <Link
-            href="/"
-            onClick={() => setMenuOpen(false)}
-            className="font-display text-2xl font-black leading-[0.85] tracking-tight md:text-[1.7rem]"
-          >
-            <span className="block">Soul</span>
-            <span className="block">Bridge</span>
-            <span className="block text-[0.55em] font-bold tracking-[0.35em]">
-              ENT
-            </span>
+          {/* Wordmark logo (black artwork; header sits on the light paper bg) */}
+          <Link href="/" onClick={() => setMenuOpen(false)} aria-label={SITE.name}>
+            <Image
+              src={logo.src}
+              alt={SITE.name}
+              width={logo.width}
+              height={logo.height}
+              priority
+              className="h-11 w-auto md:h-12"
+            />
           </Link>
 
           {/* Center nav (desktop) */}
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex lg:gap-14">
-            {NAV.map((item) => {
+            {visibleNav.map((item) => {
               const active = pathname.startsWith(item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "font-display text-sm font-semibold uppercase tracking-[0.16em] transition-colors hover:text-brand",
-                    active &&
-                      "text-brand underline decoration-brand decoration-2 underline-offset-8"
+                    "relative font-display text-sm font-semibold uppercase tracking-[0.16em] transition-colors",
+                    // Underline bar drives both states, so the active mark and
+                    // the hover mark sit on exactly the same baseline.
+                    "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:origin-left after:transition-transform after:duration-300 after:ease-out",
+                    active
+                      ? "text-brand after:scale-x-100 after:bg-brand"
+                      : // brand-soft (brighter) — plain `brand` is so close to
+                        // ink that the hover barely reads as a change.
+                        "after:scale-x-0 after:bg-brand-soft hover:text-brand-soft hover:after:scale-x-100"
                   )}
                 >
                   {item.label}
@@ -136,7 +148,7 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
         </div>
 
         <nav className="flex flex-col px-7">
-          {NAV.map((item) => {
+          {visibleNav.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link
@@ -164,15 +176,28 @@ export function SiteHeader({ variant = "solid" }: SiteHeaderProps) {
           })}
         </nav>
 
-        <div className="mt-auto border-t border-ink/10 px-7 py-7">
-          <SocialLinks
-            items={SOCIALS}
-            size={20}
-            itemClassName="text-ink/50 hover:text-ink"
+        {/* Brand mark sits in the footer block rather than the header slot, so
+            the "MENU" label keeps doing its job up top. Socials + email sit
+            beside it; the email truncates rather than pushing the row wide. */}
+        <div className="mt-auto flex items-center gap-4 border-t border-ink/10 px-7 py-7">
+          <Image
+            src={logo.src}
+            alt={SITE.name}
+            width={logo.width}
+            height={logo.height}
+            className="h-10 w-auto shrink-0"
           />
-          <p className="mt-5 text-[13px] tracking-wide text-ink/45">
-            {CONTACT.email}
-          </p>
+          <div className="min-w-0 flex-1">
+            <SocialLinks
+              items={SOCIALS}
+              size={18}
+              className="justify-end gap-4"
+              itemClassName="text-ink/50 hover:text-ink"
+            />
+            <p className="mt-2.5 truncate text-right text-[12px] tracking-wide text-ink/45">
+              {CONTACT.email}
+            </p>
+          </div>
         </div>
       </aside>
     </>

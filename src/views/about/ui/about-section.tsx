@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { Container } from "@shared/ui";
-import { cn } from "@shared/lib/cn";
 
 type AboutSectionProps = {
   /** Section index, e.g. "01". */
@@ -9,26 +8,25 @@ type AboutSectionProps = {
   eyebrow: string;
   /** Optional Korean section title shown under the label. */
   title?: string;
-  /** Subtle background band for rhythm (never dark). */
-  tinted?: boolean;
   children: ReactNode;
 };
 
 /**
  * Left-aligned editorial section: index + label + title stacked at the top,
  * content below. A consistent left baseline keeps the page easy to scan.
+ *
+ * Every 2nd section on the page gets a subtle tinted band. This is keyed off
+ * DOM position (`nth-of-type`), not the `index` label, so adding or reordering
+ * sections keeps the stripe rhythm with no props to maintain.
  */
 export function AboutSection({
   index,
   eyebrow,
   title,
-  tinted,
   children,
 }: AboutSectionProps) {
   return (
-    <section
-      className={cn("border-t border-ink/10", tinted && "bg-plum/[0.035]")}
-    >
+    <section className="border-t border-ink/10 [&:nth-of-type(even)]:bg-plum/[0.035]">
       <Container className="py-16 md:py-24">
         <div className="max-w-2xl">
           <div className="flex items-center gap-3">

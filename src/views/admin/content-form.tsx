@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import { Image as ImageIcon, Video } from "lucide-react";
+import { showToast } from "@shared/ui/toast";
 import {
   AdminField,
   AdminInput,
@@ -12,6 +13,7 @@ import {
   AdminPageHeader,
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
+import { LANDSCAPE_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import { CONTENT_CATEGORIES, type Content } from "@entities/content";
 
 type ContentFormProps = {
@@ -34,6 +36,7 @@ export function ContentForm({ initial }: ContentFormProps) {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): collect values and create/update the content record.
+    showToast("저장되었습니다");
   };
 
   return (
@@ -111,7 +114,14 @@ export function ContentForm({ initial }: ContentFormProps) {
 
           <div className="mt-4">
             {mediaType === "image" ? (
-              <AdminImageUpload ratio="16 / 9" name="image" />
+              <div>
+                <AdminImageUpload
+                  ratio={LANDSCAPE_RATIO}
+                  name="image"
+                  requiredSize={UPLOAD_SIZE.landscape}
+                />
+                <p className="mt-2 text-xs text-ink/45">가로형 16:9</p>
+              </div>
             ) : (
               <AdminInput
                 name="youtubeUrl"

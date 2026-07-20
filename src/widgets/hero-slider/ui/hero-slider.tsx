@@ -2,20 +2,29 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { formatNewsDate } from "@entities/news";
+import { formatNewsDate, PUBLISHED_NEWS } from "@entities/news";
+import type { SiteLogo } from "@entities/brand";
+import type { HomeSlide } from "@entities/page-content";
 import { Container, PaperTexture } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
-import { HERO_SLIDES } from "../model/slides";
+import { slideBg } from "../model/slide-bg";
 import { HeroWordmark, HeroSocials, ScrollMouse } from "./hero-decor";
 
+type HeroSliderProps = {
+  logo: SiteLogo;
+  /** Ordered and already filtered by section visibility. */
+  slides: HomeSlide[];
+};
+
 /**
- * Five full-screen banners stacked vertically. Scrolling reveals slide 1 → 5;
- * the fixed index on the right tracks the active banner and jumps to it on
- * click. Scroll-snap (scoped via `.hero-scroll` in globals.css) makes each
- * banner settle into view.
+ * Full-screen banners stacked vertically. Scrolling reveals them in order; the
+ * fixed index on the right tracks the active banner and jumps to it on click.
+ * Scroll-snap (scoped via `.hero-scroll` in globals.css) makes each banner
+ * settle into view.
  */
-export function HeroSlider() {
+export function HeroSlider({ logo, slides }: HeroSliderProps) {
   const [active, setActive] = useState(0);
   // The scroll hint shows only while the view is settled on a slide; it fades
   // out the moment scrolling starts and fades back in once it stops.
@@ -93,11 +102,16 @@ export function HeroSlider() {
     sectionRefs.current[index]?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const activeScheme = HERO_SLIDES[active].scheme;
+  // Empty only when every section is hidden or the database is unreachable.
+  // Header and footer still render; there is nothing sensible to stand in for
+  // banners we do not have.
+  if (slides.length === 0) return null;
+
+  const activeScheme = slides[active]?.scheme ?? "dark";
 
   return (
     <div className="hero-scroll relative">
-      {HERO_SLIDES.map((slide, i) => {
+      {slides.map((slide, i) => {
         const dark = slide.scheme === "dark";
         return (
           <section
@@ -106,20 +120,56 @@ export function HeroSlider() {
             ref={(el) => {
               sectionRefs.current[i] = el;
             }}
-            style={{ backgroundColor: slide.bg }}
+            style={{ backgroundColor: slideBg(slide.id) }}
             className={cn(
               "hero-section relative flex min-h-svh items-center overflow-hidden",
               dark ? "text-ink" : "text-paper"
             )}
           >
             {/* Parallax background layer (oversized so it never reveals edges
-                as it drifts). Ready to hold a CMS image later. */}
+                as it drifts). Holds the banner image when the slide has one,
+                otherwise falls back to the paper texture + decorative wordmark
+                over the slide's flat brand colour. */}
             <div
               data-parallax
               className="pointer-events-none absolute inset-x-0 top-[-8%] h-[116%] will-change-transform"
             >
-              <PaperTexture />
-              {i === 0 && <HeroWordmark />}
+              {slide.banner.desktop || slide.banner.mobile ? (
+                <>
+                  {/* Two separate compositions rather than one image re-cropped:
+                      the mobile banner is framed portrait. Each is hidden at the
+                      other's breakpoint; whichever is missing simply leaves the
+                      flat colour showing at that size. */}
+                  {slide.banner.desktop && (
+                    <Image
+                      src={slide.banner.desktop}
+                      alt=""
+                      fill
+                      // The banner is decorative and sits behind the copy.
+                      aria-hidden
+                      priority={i === 0}
+                      sizes="100vw"
+                      className="hidden object-cover object-right md:block"
+                    />
+                  )}
+                  {slide.banner.mobile && (
+                    <Image
+                      src={slide.banner.mobile}
+                      alt=""
+                      fill
+                      aria-hidden
+                      priority={i === 0}
+                      sizes="100vw"
+                      className="object-cover object-center md:hidden"
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  <PaperTexture />
+                  {i === 0 && <HeroWordmark logo={logo} />}
+                </>
+              )}
             </div>
             <Container className="relative z-10 w-full py-24">
               <div
@@ -142,17 +192,11 @@ export function HeroSlider() {
                   {slide.eyebrow}
                 </p>
 
-                {slide.titleEn && (
-                  <p className="mt-6 font-display text-sm font-medium uppercase tracking-[0.18em] opacity-70">
-                    {slide.titleEn}
-                  </p>
-                )}
-
-                <h2 className="mt-4 font-maruburi text-3xl font-light leading-tight tracking-tight md:text-5xl lg:text-6xl">
+                <h2 className="mt-10 font-sans text-3xl font-semibold leading-tight tracking-tight break-keep md:mt-14 md:text-5xl lg:text-6xl">
                   {slide.titleKo.split("\n").map((line, li) => (
                     <span
                       key={li}
-                      className="block not-first:mt-4 md:not-first:mt-6"
+                      className="block not-first:mt-2 md:not-first:mt-3.5"
                     >
                       {line}
                     </span>
@@ -162,7 +206,7 @@ export function HeroSlider() {
                 {slide.body && (
                   <p
                     className={cn(
-                      "mt-6 whitespace-pre text-base font-medium leading-relaxed md:text-lg",
+                      "mt-10 whitespace-pre-line break-keep text-base font-medium leading-relaxed md:mt-14 md:text-lg",
                       dark ? "text-ink/70" : "text-paper/70"
                     )}
                   >
@@ -170,30 +214,14 @@ export function HeroSlider() {
                   </p>
                 )}
 
-                {slide.pills && (
-                  <ul className="mt-8 flex flex-wrap gap-3">
-                    {slide.pills.map((pill) => (
-                      <li
-                        key={pill}
-                        className={cn(
-                          "rounded-full border px-4 py-2 font-display text-[11px] font-semibold uppercase tracking-[0.15em]",
-                          dark ? "border-ink/25" : "border-paper/25"
-                        )}
-                      >
-                        {pill}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                {slide.news && (
+                {slide.showsNews && (
                   <ul
                     className={cn(
-                      "mt-8 max-w-xl border-t",
+                      "mt-10 max-w-xl border-t md:mt-14",
                       dark ? "border-ink/15" : "border-paper/15"
                     )}
                   >
-                    {slide.news.map((item) => (
+                    {PUBLISHED_NEWS.slice(0, slide.newsLimit).map((item) => (
                       <li
                         key={item.slug}
                         className={cn(
@@ -230,7 +258,10 @@ export function HeroSlider() {
                   </ul>
                 )}
 
-                <Link href={slide.cta.href} className="group mt-10 inline-flex flex-col">
+                <Link
+                  href={slide.cta.href}
+                  className="group mt-14 inline-flex flex-col md:mt-20"
+                >
                   <span className="flex origin-left items-center gap-3 font-display text-sm font-semibold uppercase tracking-[0.18em] transition-transform duration-300 group-hover:scale-105">
                     {slide.cta.label}
                     <ArrowRight
@@ -264,10 +295,12 @@ export function HeroSlider() {
           aria-hidden
           className={cn(
             "mb-2 h-14 w-0.5",
-            activeScheme === "dark" ? "bg-ink/80" : "bg-paper/80"
+            // Brand purple over the light banners; falls back to paper on a
+            // dark slide, where purple would disappear.
+            activeScheme === "dark" ? "bg-brand" : "bg-paper/80"
           )}
         />
-        {HERO_SLIDES.map((slide, i) => (
+        {slides.map((slide, i) => (
           <button
             key={slide.id}
             type="button"
@@ -276,7 +309,7 @@ export function HeroSlider() {
             onClick={() => scrollTo(i)}
             className={cn(
               "font-display text-xs font-semibold tracking-widest transition-all",
-              activeScheme === "dark" ? "text-ink" : "text-paper",
+              activeScheme === "dark" ? "text-brand" : "text-paper",
               i === active
                 ? "opacity-100"
                 : "opacity-40 hover:opacity-70"
@@ -293,7 +326,7 @@ export function HeroSlider() {
         className={cn(
           "fixed bottom-8 left-1/2 z-40 -translate-x-1/2 transition-opacity duration-500",
           activeScheme === "dark" ? "text-ink/70" : "text-paper/70",
-          settled && active < HERO_SLIDES.length - 1
+          settled && active < slides.length - 1
             ? "opacity-100"
             : "opacity-0"
         )}

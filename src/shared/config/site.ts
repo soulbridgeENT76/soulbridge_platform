@@ -8,6 +8,12 @@ export type NavItem = {
   /** English label shown in the nav (design uses uppercase English). */
   label: string;
   href: string;
+  /**
+   * Section publish switch. When `false`, the section is hidden from the site
+   * navigation (the page route itself stays reachable by direct URL).
+   * Omitted / `true` means visible. TODO(backend): drive from a settings table.
+   */
+  active?: boolean;
 };
 
 export const SITE = {
@@ -15,6 +21,11 @@ export const SITE = {
   nameKo: "소울브릿지 ENT",
   /** One-line company intro shown next to the footer logo. */
   intro: "영혼과 영혼을 잇는 미래 엔터테인먼트",
+  /**
+   * Wordmark lockup. Monochrome black on transparent, so the footer can flip
+   * it to white with a CSS filter. Set to null to fall back to the text logo.
+   */
+  logo: { src: "/logo.png", width: 826, height: 373 },
   tagline: {
     en: "CONNECTING SOULS, INSPIRING LIVES.",
     ko: "사람과 사람을 잇는 이야기,\n소울브릿지 ENT",
@@ -26,11 +37,11 @@ export const SITE = {
 } as const;
 
 export const NAV: NavItem[] = [
-  { label: "ABOUT", href: "/about" },
-  { label: "CONTENTS", href: "/contents" },
-  { label: "ARTISTS", href: "/artists" },
-  { label: "NEWS", href: "/news" },
-  { label: "CONTACT", href: "/contact" },
+  { label: "ABOUT", href: "/about", active: true },
+  { label: "CONTENTS", href: "/contents", active: true },
+  { label: "ARTISTS", href: "/artists", active: true },
+  { label: "NOTICE", href: "/notice", active: true },
+  { label: "CONTACT", href: "/contact", active: true },
 ];
 
 export const CONTACT = {

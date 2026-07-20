@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { PageShell } from "@widgets/page-shell";
 import { Container, Tag } from "@shared/ui";
 import { formatNewsDate, type NewsItem } from "@entities/news";
@@ -31,23 +31,41 @@ export function NewsDetailView({ item }: NewsDetailViewProps) {
           {/* Body */}
           {item.body && (
             <div className="mt-10 border-t border-ink/10 pt-10">
-              <p className="max-w-4xl whitespace-pre-line text-base leading-[2] text-ink/70 md:text-lg">
+              <p className="whitespace-pre-line text-base leading-[2] text-ink/70 md:text-lg">
                 {item.body}
               </p>
+            </div>
+          )}
+
+          {/* Attached source link (article mode with an external URL). */}
+          {item.externalUrl && (
+            <div className="mt-8">
+              <a
+                href={item.externalUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="group inline-flex items-center gap-2 rounded-full border border-ink/15 px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-plum hover:text-plum"
+              >
+                원문 보기
+                <ArrowUpRight
+                  size={16}
+                  className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </a>
             </div>
           )}
 
           {/* Back-to-list CTA */}
           <div className="mt-16 flex justify-center border-t border-ink/10 pt-14">
             <Link
-              href="/news"
+              href="/notice"
               className="group inline-flex items-center gap-2.5 rounded-full bg-brand px-8 py-4 font-display text-sm font-semibold uppercase tracking-[0.15em] text-paper transition-transform hover:scale-[1.03]"
             >
               <ArrowLeft
                 size={16}
                 className="transition-transform group-hover:-translate-x-0.5"
               />
-              BACK TO NEWS
+              BACK TO NOTICE
             </Link>
           </div>
         </div>

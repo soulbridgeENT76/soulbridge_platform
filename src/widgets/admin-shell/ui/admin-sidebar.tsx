@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -15,30 +16,36 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { cn } from "@shared/lib/cn";
+import { SITE } from "@shared/config/site";
+import type { SiteLogo } from "@entities/brand";
 
 const NAV = [
-  { label: "대시보드", href: "/admin", icon: LayoutDashboard },
-  { label: "브랜드", href: "/admin/brand", icon: Sparkles },
-  { label: "홈", href: "/admin/home", icon: Home },
-  { label: "회사소개", href: "/admin/about", icon: Building2 },
-  { label: "콘텐츠", href: "/admin/contents", icon: Film },
-  { label: "아티스트", href: "/admin/artists", icon: Users },
-  { label: "뉴스", href: "/admin/news", icon: Newspaper },
-  { label: "연락처", href: "/admin/contact", icon: MapPin },
-  { label: "푸터", href: "/admin/footer", icon: PanelBottom },
+  { label: "DASHBOARD", href: "/admin", icon: LayoutDashboard },
+  { label: "BRAND", href: "/admin/brand", icon: Sparkles },
+  { label: "HOME", href: "/admin/home", icon: Home },
+  { label: "ABOUT", href: "/admin/about", icon: Building2 },
+  { label: "CONTENTS", href: "/admin/contents", icon: Film },
+  { label: "ARTISTS", href: "/admin/artists", icon: Users },
+  { label: "NOTICE", href: "/admin/notice", icon: Newspaper },
+  { label: "CONTACT", href: "/admin/contact", icon: MapPin },
+  { label: "FOOTER", href: "/admin/footer", icon: PanelBottom },
 ] as const;
 
-export function AdminSidebar() {
+export function AdminSidebar({ logo }: { logo: SiteLogo }) {
   const pathname = usePathname();
 
   return (
     <aside className="flex w-60 shrink-0 flex-col bg-ink text-paper">
-      {/* Wordmark */}
-      <Link href="/admin" className="block px-6 py-7">
-        <span className="font-display text-lg font-black leading-[0.9] tracking-tight">
-          Soul Bridge
-        </span>
-        <span className="mt-1 block font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-brand-soft">
+      {/* Wordmark — black artwork flipped to white for the dark sidebar. */}
+      <Link href="/admin" className="block px-6 py-7" aria-label={SITE.name}>
+        <Image
+          src={logo.src}
+          alt={SITE.name}
+          width={logo.width}
+          height={logo.height}
+          className="h-9 w-auto brightness-0 invert"
+        />
+        <span className="mt-2.5 block font-display text-[10px] font-semibold uppercase tracking-[0.3em] text-brand-soft">
           Admin
         </span>
       </Link>

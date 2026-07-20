@@ -4,6 +4,7 @@ import type { NewsItem } from "./types";
 export const NEWS: NewsItem[] = [
   {
     slug: "official-launch",
+    active: true,
     date: "2026-07-02",
     category: "NEWS",
     title: '소울브릿지ENT 공식 출범 — "영혼과 영혼을 잇는 미래 엔터테인먼트"',
@@ -13,6 +14,7 @@ export const NEWS: NewsItem[] = [
   },
   {
     slug: "cvo-appointment",
+    active: true,
     date: "2026-06-24",
     category: "NEWS",
     title: "손정은 CVO 합류, 장기 비전 및 글로벌 미디어 전략 총괄",
@@ -22,6 +24,7 @@ export const NEWS: NewsItem[] = [
   },
   {
     slug: "rok-media-partnership",
+    active: true,
     date: "2026-06-18",
     category: "NEWS",
     title: "로크미디어와 웹툰·웹소설 원천 IP 파트너십 체결",
@@ -31,6 +34,7 @@ export const NEWS: NewsItem[] = [
   },
   {
     slug: "youtube-channel-teaser",
+    active: true,
     date: "2026-06-10",
     category: "NOTICE",
     title: "오리지널 유튜브 채널 하반기 론칭 예고",
@@ -40,6 +44,7 @@ export const NEWS: NewsItem[] = [
   },
   {
     slug: "open-audition",
+    active: false,
     date: "2026-06-05",
     category: "NOTICE",
     title: "신규 크리에이터·아티스트 상시 오디션 안내",
@@ -49,6 +54,7 @@ export const NEWS: NewsItem[] = [
   },
   {
     slug: "incorporation",
+    active: true,
     date: "2026-06-01",
     category: "NEWS",
     title: "소울브릿지ENT 법인 설립 완료",
@@ -57,6 +63,12 @@ export const NEWS: NewsItem[] = [
 콘텐츠와 사람, 세대를 잇는 종합 엔터테인먼트로 나아가겠습니다.`,
   },
 ];
+
+/**
+ * Only items switched on are visible on the public site. `NEWS` stays the full
+ * list for the admin, which needs to see inactive items too.
+ */
+export const PUBLISHED_NEWS: NewsItem[] = NEWS.filter((n) => n.active === true);
 
 /** Format an ISO date as the design's "YYYY. MM. DD". */
 export function formatNewsDate(iso: string): string {
@@ -67,3 +79,14 @@ export function formatNewsDate(iso: string): string {
 /** Look up a single news item by slug. */
 export const getNewsBySlug = (slug: string): NewsItem | undefined =>
   NEWS.find((n) => n.slug === slug);
+
+/**
+ * True when a row should jump straight to an external URL instead of opening
+ * the in-site detail page. Requires both the mode and a URL to be set.
+ */
+export const isExternalNews = (item: NewsItem): boolean =>
+  item.linkType === "external" && Boolean(item.externalUrl);
+
+/** Where a row links to: the external URL, or the in-site detail page. */
+export const getNewsHref = (item: NewsItem): string =>
+  isExternalNews(item) ? item.externalUrl! : `/notice/${item.slug}`;
