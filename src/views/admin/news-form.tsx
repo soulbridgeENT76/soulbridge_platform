@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import { FileText, Link2 } from "lucide-react";
+import { showToast } from "@shared/ui/toast";
 import {
   AdminField,
   AdminInput,
@@ -34,6 +35,7 @@ export function NewsForm({ initial }: NewsFormProps) {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): collect values and create/update the news record.
+    showToast("저장되었습니다");
   };
 
   return (

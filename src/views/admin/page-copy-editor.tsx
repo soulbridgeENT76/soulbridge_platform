@@ -7,6 +7,7 @@ import {
   AdminTextarea,
   AdminButton,
 } from "@widgets/admin-shell";
+import { showToast } from "@shared/ui/toast";
 import type { PageCopy } from "@shared/config/page-copy";
 
 type PageCopyEditorProps = {
@@ -26,6 +27,7 @@ export function PageCopyEditor({
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): save the page copy.
+    showToast("저장되었습니다");
   };
 
   return (

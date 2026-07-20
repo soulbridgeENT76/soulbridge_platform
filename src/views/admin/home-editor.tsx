@@ -99,7 +99,7 @@ export function HomeEditor({ slides }: { slides: HomeSlide[] }) {
                   />
                 </AdminField>
 
-                <AdminField label="배너 이미지 (모바일)" hint="세로형 9:16">
+                <AdminField label="모바일" hint="세로형 9:16">
                   <AdminImageUpload
                     ratio="9 / 16"
                     name="bannerMobile"
@@ -111,8 +111,9 @@ export function HomeEditor({ slides }: { slides: HomeSlide[] }) {
                   />
                 </AdminField>
               </div>
-              <p className="mt-3 text-xs text-ink/45">
-                모바일 배너는 데스크톱을 자른 게 아니라 세로 구도로 새로 잡은
+
+              <p className="mt-5 border-t border-ink/[0.07] pt-4 text-xs text-ink/45">
+                ※ 모바일 배너는 데스크톱을 자른 게 아니라 세로 구도로 새로 잡은
                 이미지여야 합니다.
               </p>
             </div>

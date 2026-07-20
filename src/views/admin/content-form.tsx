@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import { Image as ImageIcon, Video } from "lucide-react";
+import { showToast } from "@shared/ui/toast";
 import {
   AdminField,
   AdminInput,
@@ -35,6 +36,7 @@ export function ContentForm({ initial }: ContentFormProps) {
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     // TODO(backend): collect values and create/update the content record.
+    showToast("저장되었습니다");
   };
 
   return (
