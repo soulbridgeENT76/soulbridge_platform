@@ -4,6 +4,13 @@ export {
   getVisibleHomeSlides,
   PAGE_CONTENT_TAG,
 } from "./api/get-home-slides";
+export { getPageCopy, type PageCopy } from "./api/get-page-copy";
+export {
+  getAboutContent,
+  type AboutContent,
+  type AboutLeadership,
+  type AboutSection,
+} from "./api/get-about-content";
 export {
   getPageContent,
   updatePageContent,
