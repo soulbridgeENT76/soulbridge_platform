@@ -3,8 +3,14 @@ import {
   SectionVisibilityToggle,
 } from "@widgets/admin-shell";
 import { AboutEditor } from "@views/admin";
+import { getPageCopy, getAboutContent } from "@entities/page-content";
 
-export default function AdminAboutPage() {
+export default async function AdminAboutPage() {
+  const [copy, about] = await Promise.all([
+    getPageCopy("about"),
+    getAboutContent(),
+  ]);
+
   return (
     <div>
       <AdminPageHeader
@@ -15,7 +21,11 @@ export default function AdminAboutPage() {
         <SectionVisibilityToggle href="/about" />
       </div>
       <div className="mt-6">
-        <AboutEditor />
+        <AboutEditor
+          copy={copy}
+          leadership={about.leadership}
+          sections={about.sections}
+        />
       </div>
     </div>
   );

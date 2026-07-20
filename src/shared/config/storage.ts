@@ -5,4 +5,6 @@ export const MEDIA_FOLDER = {
   artist: "artist",
   home: "home",
   logo: "logo",
+  /** ABOUT page imagery — currently the leadership portrait. */
+  about: "about",
 };

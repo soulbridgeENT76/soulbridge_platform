@@ -12,6 +12,7 @@ import {
 import { LOGO_MIN_HEIGHT, LOGO_OUTPUT_HEIGHT } from "@shared/config/media";
 import { SITE } from "@shared/config/site";
 import { mediaUrl } from "@shared/lib/media-url";
+import { WEBP_QUALITY_LOGO } from "@shared/lib/image-to-webp";
 import { type BrandSettings } from "@entities/brand";
 import { saveBrand } from "@/src/features/update-brand";
 
@@ -95,6 +96,7 @@ export function BrandEditor({ initial }: BrandEditorProps) {
             minHeight={LOGO_MIN_HEIGHT}
             requireTransparent
             output={{ height: LOGO_OUTPUT_HEIGHT }}
+            outputQuality={WEBP_QUALITY_LOGO}
             className="max-w-xs"
           />
         </div>

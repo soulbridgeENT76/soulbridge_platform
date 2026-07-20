@@ -17,14 +17,28 @@ function supabaseImagePattern() {
     protocol: protocol.replace(":", "") as "http" | "https",
     hostname,
     port, // "" for default ports, which is what remotePatterns expects
-    pathname: "/storage/v1/object/public/**",
+    pathname: "/**",
   };
 }
+
+/**
+ * Next refuses to optimize images whose host resolves to a private IP — an
+ * SSRF guard. That blocks the local Supabase stack on 127.0.0.1, so banners and
+ * the logo render broken in local development.
+ *
+ * Scoped to exactly that case: the flag turns on only when the configured
+ * Supabase host is itself local, so a hosted *.supabase.co project never
+ * enables it and the guard stays intact everywhere it matters.
+ */
+const LOCAL_SUPABASE = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+);
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
   images: {
     remotePatterns: [supabaseImagePattern()],
+    dangerouslyAllowLocalIP: LOCAL_SUPABASE,
   },
 };
 
