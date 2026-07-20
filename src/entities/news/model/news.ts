@@ -79,3 +79,14 @@ export function formatNewsDate(iso: string): string {
 /** Look up a single news item by slug. */
 export const getNewsBySlug = (slug: string): NewsItem | undefined =>
   NEWS.find((n) => n.slug === slug);
+
+/**
+ * True when a row should jump straight to an external URL instead of opening
+ * the in-site detail page. Requires both the mode and a URL to be set.
+ */
+export const isExternalNews = (item: NewsItem): boolean =>
+  item.linkType === "external" && Boolean(item.externalUrl);
+
+/** Where a row links to: the external URL, or the in-site detail page. */
+export const getNewsHref = (item: NewsItem): string =>
+  isExternalNews(item) ? item.externalUrl! : `/notice/${item.slug}`;

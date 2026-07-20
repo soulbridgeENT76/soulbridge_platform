@@ -3,6 +3,7 @@ import {
   AdminPageHeader,
   AdminLinkButton,
   DeleteButton,
+  SectionVisibilityToggle,
 } from "@widgets/admin-shell";
 import { CategoryManager, PageCopyEditor } from "@views/admin";
 import { CONTENTS, CONTENT_CATEGORIES } from "@entities/content";
@@ -23,7 +24,11 @@ export default function AdminContentsPage() {
         }
       />
 
-      <div className="mt-8 flex flex-col gap-4">
+      <div className="mt-8">
+        <SectionVisibilityToggle href="/contents" />
+      </div>
+
+      <div className="mt-6 flex flex-col gap-4">
         <PageCopyEditor initial={PAGE_COPY.contents} />
         <CategoryManager initial={CONTENT_CATEGORIES} />
       </div>
