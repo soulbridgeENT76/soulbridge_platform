@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { TriangleAlert } from "lucide-react";
 import {
   AdminField,
   AdminInput,
   AdminImageUpload,
   AdminFormActions,
 } from "@widgets/admin-shell";
-import { LOGO_MIN_WIDTH, LOGO_OUTPUT } from "@shared/config/media";
+import { LOGO_MIN_HEIGHT, LOGO_OUTPUT_HEIGHT } from "@shared/config/media";
+import { SITE } from "@shared/config/site";
+import { mediaUrl } from "@shared/lib/media-url";
 import { type BrandSettings } from "@entities/brand";
 import { saveBrand } from "@/src/features/update-brand";
 
@@ -18,14 +21,14 @@ interface BrandEditorProps {
 export function BrandEditor({ initial }: BrandEditorProps) {
   const [brandName, setBrandName] = useState(initial.brand.name);
   const [brandInfo, setBrandInfo] = useState(initial.brand.intro);
+  const [state, formAction] = useActionState(saveBrand, { ok: true });
 
   return (
-    <form action={saveBrand} className="flex flex-col gap-5">
+    <form action={formAction} className="flex flex-col gap-5">
       <section className="rounded-2xl border border-ink/10 bg-white p-5">
         <p className="text-sm font-semibold text-ink">로고</p>
         <p className="mt-0.5 text-xs text-ink/50">
-          헤더·푸터·메뉴에 사용됩니다. 삭제하면 텍스트 로고 “{brandName}”로
-          표시됩니다.
+          헤더·푸터·메뉴에 사용됩니다. 제거하면 기본 로고로 돌아갑니다.
         </p>
 
         <ul className="mt-3 flex flex-col gap-1 text-xs text-ink/55">
@@ -36,7 +39,7 @@ export function BrandEditor({ initial }: BrandEditorProps) {
           <li>
             ·{" "}
             <b className="font-semibold text-ink/75">
-              가로 {LOGO_MIN_WIDTH}px 이상
+              세로 {LOGO_MIN_HEIGHT}px 이상
             </b>{" "}
             — 작으면 고화질 화면에서 흐려집니다
           </li>
@@ -51,13 +54,17 @@ export function BrandEditor({ initial }: BrandEditorProps) {
         </ul>
 
         <div className="mt-5">
+          {/* The stored file keeps its own ratio, so the preview box has no
+              fixed shape to mirror — it takes the current wordmark's, and
+              `contain` letterboxes anything narrower without distorting it. */}
           <AdminImageUpload
-            ratio={`${LOGO_OUTPUT.width} / ${LOGO_OUTPUT.height}`}
+            ratio={`${SITE.logo.width} / ${SITE.logo.height}`}
             fit="contain"
             name="logo"
-            minWidth={LOGO_MIN_WIDTH}
+            initialUrl={mediaUrl(initial.brand.logo?.path)}
+            minHeight={LOGO_MIN_HEIGHT}
             requireTransparent
-            output={LOGO_OUTPUT}
+            output={{ height: LOGO_OUTPUT_HEIGHT }}
             className="max-w-xs"
           />
         </div>
@@ -121,6 +128,15 @@ export function BrandEditor({ initial }: BrandEditorProps) {
           </AdminField>
         </div>
       </section>
+
+      {/* Uploads fail for reasons the operator can act on (file too large,
+          network dropped), so the action reports them instead of throwing. */}
+      {state.error && (
+        <p className="flex items-start gap-1.5 text-sm text-red-600">
+          <TriangleAlert size={15} className="mt-0.5 shrink-0" />
+          {state.error}
+        </p>
+      )}
 
       <AdminFormActions cancelHref="/admin" />
     </form>

@@ -6,6 +6,7 @@ create table public.page_contents (
     title text not null,
     subtitle text not null,
     description text,
+    is_active boolean not null default true, -- 페이지 활성화/비활성화 기회 추가
     -- 페이지별 추가 필드 (스키마 변경 없이 확장)
     metadata jsonb not null default '{}',
     updated_at timestamptz not null default now()

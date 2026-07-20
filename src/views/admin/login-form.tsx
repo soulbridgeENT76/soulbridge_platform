@@ -7,9 +7,10 @@ import { TriangleAlert } from "lucide-react";
 import { AdminField, AdminInput, AdminButton } from "@widgets/admin-shell";
 import { SITE } from "@shared/config/site";
 import { createClient } from "@/lib/supabase/client";
+import type { SiteLogo } from "@entities/brand";
 
 /** Admin sign-in. Rendered outside the sidebar shell. */
-export function LoginForm() {
+export function LoginForm({ logo }: { logo: SiteLogo }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -45,10 +46,10 @@ export function LoginForm() {
         {/* Brand */}
         <div className="flex flex-col items-center">
           <Image
-            src={SITE.logo.src}
+            src={logo.src}
             alt={SITE.name}
-            width={SITE.logo.width}
-            height={SITE.logo.height}
+            width={logo.width}
+            height={logo.height}
             priority
             className="h-12 w-auto"
           />

@@ -1,7 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
+import { normalizeBrandSettings } from "../model/normalize";
 import type { BrandSettings } from "../model/types";
 
-/** Server-only: reads the single site_settings row. */
+/**
+ * Server-only, authed, uncached: reads the single site_settings row through the
+ * cookie-bearing client. For the admin editor and for saveBrand, which both
+ * need the true current row rather than a cached copy.
+ *
+ * The render path uses getBrandPublic() instead — it must not read cookies.
+ */
 export async function getBrand(): Promise<BrandSettings> {
   const supabase = await createClient();
 
@@ -12,5 +19,5 @@ export async function getBrand(): Promise<BrandSettings> {
     .single();
   if (error) throw error;
 
-  return data as BrandSettings;
+  return normalizeBrandSettings(data);
 }

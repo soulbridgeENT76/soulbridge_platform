@@ -32,21 +32,23 @@ export const UPLOAD_SIZE = {
 export const formatSize = (s: UploadSize) => `${s.width} × ${s.height}`;
 
 /**
- * Minimum width accepted at upload. 106px (largest on-screen use) × 3 for dense
- * mobile ≈ 318 → 512 with headroom, so the source has pixels to downscale from.
+ * Minimum height accepted at upload. The logo is sized by height everywhere it
+ * appears (`h-12 w-auto` in the header, footer and menu), so height — not width
+ * — decides how sharp it renders: a wide but short export would clear a width
+ * check and still look soft. 48px (tallest on-screen use) × 3 for dense mobile
+ * ≈ 144, and 512 leaves headroom for the hero wordmark, which masks the same
+ * file several hundred px wide.
  *
  * The logo must stay transparent + monochrome: the footer flips it to white
  * with a CSS filter, which breaks on an opaque or multi-colour file.
  */
-export const LOGO_MIN_WIDTH = 512;
+export const LOGO_MIN_HEIGHT = 512;
 
 /**
- * Fixed output box the logo is fitted into on upload (1.5:1 = 3:2), so every
- * stored logo is a predictable size and next/image gets stable dimensions
- * without a resizing pipeline. `contain` letterboxes onto a transparent canvas
- * — a wordmark must be fitted, never cropped. 512 × round(512 × 2/3) = 512 × 341.
+ * Height every stored logo is scaled to on upload; the width follows the source
+ * ratio. Fitting into a fixed box instead would letterbox the wordmark onto a
+ * transparent canvas, and since the site sizes the logo by height that baked-in
+ * padding shrinks the artwork everywhere it appears — the very thing the
+ * uploader rejects source files for.
  */
-export const LOGO_OUTPUT = {
-  width: 512,
-  height: Math.round((512 * 2) / 3),
-} as const satisfies UploadSize;
+export const LOGO_OUTPUT_HEIGHT = 512;

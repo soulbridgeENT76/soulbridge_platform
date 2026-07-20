@@ -1,6 +1,6 @@
 import { type ReactNode, Suspense } from "react";
 import { redirect } from "next/navigation";
-import { AdminSidebar } from "@widgets/admin-shell";
+import { AdminSidebarSlot } from "@widgets/admin-shell/ui/admin-sidebar-slot";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -30,7 +30,7 @@ export default function AdminShellLayout({ children }: { children: ReactNode }) 
         <AuthGate />
       </Suspense>
       <Suspense fallback={<div className="w-60 shrink-0 bg-ink" />}>
-        <AdminSidebar />
+        <AdminSidebarSlot />
       </Suspense>
       <main className="flex-1 overflow-x-hidden px-8 py-8 lg:px-12">
         <div className="mx-auto max-w-5xl">

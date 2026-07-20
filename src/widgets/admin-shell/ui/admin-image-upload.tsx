@@ -13,8 +13,15 @@ import {
 type AdminImageUploadProps = {
   /** CSS aspect-ratio, e.g. "16 / 9", "3 / 4". */
   ratio?: string;
-  /** Input name for when the backend wires up submission. */
+  /**
+   * Form field name. Two hidden companions are submitted alongside it:
+   * `<name>_width` (the encoded width, which only the browser knows) and
+   * `<name>_cleared` (so "removed" is distinguishable from "left alone" —
+   * clearing a file input looks identical to never touching it).
+   */
   name?: string;
+  /** Already-stored image to show until a new one is picked. */
+  initialUrl?: string | null;
   /** How the preview fills the box. Use "contain" for logos. */
   fit?: "cover" | "contain";
   /**
@@ -22,8 +29,11 @@ type AdminImageUploadProps = {
    * reaches the form, so the resizing server always gets a predictable original.
    */
   requiredSize?: UploadSize;
-  /** Minimum pixel width — for assets used at several sizes (e.g. the logo). */
-  minWidth?: number;
+  /**
+   * Minimum pixel height — for assets used at several sizes (e.g. the logo,
+   * which the site always renders at a fixed height with an automatic width).
+   */
+  minHeight?: number;
   /** Reject files without a transparent background (logo on a solid block). */
   requireTransparent?: boolean;
   /** Accept SVG and skip the raster checks (vectors scale to any size). */
@@ -41,7 +51,10 @@ type AdminImageUploadProps = {
 const MAX_FILE_MB = 12;
 
 /** Downscale once and read the pixels — used by the alpha + padding checks. */
-function samplePixels(img: HTMLImageElement, n = 128): Uint8ClampedArray | null {
+function samplePixels(
+  img: HTMLImageElement,
+  n = 128,
+): Uint8ClampedArray | null {
   const canvas = document.createElement("canvas");
   canvas.width = n;
   canvas.height = n;
@@ -60,30 +73,6 @@ function hasTransparency(data: Uint8ClampedArray): boolean {
 }
 
 /**
- * How much of the canvas the artwork actually fills, per axis. A tightly
- * cropped logo fills ~1 on both; a logo exported with transparent padding
- * around it fills much less, which would make it render small in the header.
- */
-function artworkFill(data: Uint8ClampedArray, n = 128) {
-  let minX = n,
-    minY = n,
-    maxX = -1,
-    maxY = -1;
-  for (let y = 0; y < n; y++) {
-    for (let x = 0; x < n; x++) {
-      if (data[(y * n + x) * 4 + 3] > 8) {
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
-      }
-    }
-  }
-  if (maxX < 0) return { width: 0, height: 0 }; // fully transparent
-  return { width: (maxX - minX + 1) / n, height: (maxY - minY + 1) / n };
-}
-
-/**
  * Visual image picker with local preview and exact-size enforcement. Upload
  * itself is not wired — the selected file is previewed client-side only.
  * TODO(backend): send the file to storage and store the returned URL.
@@ -93,19 +82,25 @@ export function AdminImageUpload({
   name,
   fit = "cover",
   requiredSize,
-  minWidth,
+  minHeight,
   requireTransparent,
   allowSvg,
   output,
+  initialUrl,
   className,
 }: AdminImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(initialUrl ?? null);
   const [error, setError] = useState<string | null>(null);
+  /** Encoded width, submitted alongside the file — see `name` above. */
+  const [width, setWidth] = useState("");
+  /** Set once the operator explicitly removes the stored image. */
+  const [cleared, setCleared] = useState(false);
 
   const reject = (message: string, url?: string) => {
     setError(message);
     setPreview(null);
+    setWidth("");
     if (url) URL.revokeObjectURL(url);
     if (inputRef.current) inputRef.current.value = "";
   };
@@ -118,15 +113,20 @@ export function AdminImageUpload({
   const accept = async (file: File, url: string) => {
     if (output && inputRef.current) {
       try {
-        const blob = await imageToWebp(file, WEBP_QUALITY_LOGO, output);
+        const encoded = await imageToWebp(file, WEBP_QUALITY_LOGO, output);
         const dt = new DataTransfer();
-        dt.items.add(new File([blob], "image.webp", { type: "image/webp" }));
+        dt.items.add(
+          new File([encoded.blob], "image.webp", { type: "image/webp" }),
+        );
         inputRef.current.files = dt.files;
+        setWidth(String(encoded.width));
       } catch {
         reject("이미지를 변환하지 못했습니다.", url);
         return;
       }
     }
+    // Picking a file supersedes an earlier removal.
+    setCleared(false);
     setPreview(url);
   };
 
@@ -137,7 +137,7 @@ export function AdminImageUpload({
     const mb = file.size / 1024 / 1024;
     if (mb > MAX_FILE_MB) {
       reject(
-        `${mb.toFixed(1)}MB 파일입니다. ${MAX_FILE_MB}MB 이하로 올려주세요 — 사진은 PNG 대신 고품질 JPG로 저장하면 크게 줄어듭니다.`
+        `${mb.toFixed(1)}MB 파일입니다. ${MAX_FILE_MB}MB 이하로 올려주세요 — 사진은 PNG 대신 고품질 JPG로 저장하면 크게 줄어듭니다.`,
       );
       return;
     }
@@ -158,7 +158,7 @@ export function AdminImageUpload({
       return;
     }
 
-    if (!requiredSize && !minWidth && !requireTransparent) {
+    if (!requiredSize && !minHeight && !requireTransparent) {
       accept(file, url);
       return;
     }
@@ -169,45 +169,31 @@ export function AdminImageUpload({
     probe.onload = () => {
       const { naturalWidth: w, naturalHeight: h } = probe;
 
-      if (requiredSize && (w !== requiredSize.width || h !== requiredSize.height)) {
+      if (
+        requiredSize &&
+        (w !== requiredSize.width || h !== requiredSize.height)
+      ) {
         reject(
           `${w} × ${h} 이미지입니다. ${formatSize(requiredSize)} 만 등록할 수 있어요.`,
-          url
+          url,
         );
         return;
       }
-      if (minWidth && w < minWidth) {
+      if (minHeight && h < minHeight) {
         reject(
-          `가로 ${w}px 이미지입니다. ${minWidth}px 이상이어야 선명하게 나와요.`,
-          url
+          `세로 ${h}px 이미지입니다. ${minHeight}px 이상이어야 선명하게 나와요.`,
+          url,
         );
         return;
       }
       if (requireTransparent) {
         const pixels = samplePixels(probe);
         if (pixels && !hasTransparency(pixels)) {
-          reject("배경이 투명하지 않습니다. 배경을 지운 파일로 올려주세요.", url);
+          reject(
+            "배경이 투명하지 않습니다. 배경을 지운 파일로 올려주세요.",
+            url,
+          );
           return;
-        }
-        // Padding baked into the file would shrink the logo everywhere it is
-        // sized by height, so catch it here rather than let it ship.
-        if (pixels) {
-          const fill = artworkFill(pixels);
-          if (fill.width === 0) {
-            reject("전체가 투명한 파일입니다.", url);
-            return;
-          }
-          if (fill.width < 0.9 || fill.height < 0.9) {
-            reject(
-              `로고 주변에 빈 여백이 많습니다 (그림이 가로 ${Math.round(
-                fill.width * 100
-              )}%, 세로 ${Math.round(
-                fill.height * 100
-              )}%만 차지). 여백 없이 딱 맞게 잘라서 올려주세요 — 여백까지 크기에 포함돼 로고가 작게 보입니다.`,
-              url
-            );
-            return;
-          }
         }
       }
       accept(file, url);
@@ -219,14 +205,16 @@ export function AdminImageUpload({
   const clear = () => {
     setPreview(null);
     setError(null);
+    setWidth("");
+    setCleared(true);
     if (inputRef.current) inputRef.current.value = "";
   };
 
   // Shown inside the drop box so the requirement sits where the eye already is.
   const sizeLabel = requiredSize
     ? formatSize(requiredSize)
-    : minWidth
-      ? `가로 ${minWidth}px 이상`
+    : minHeight
+      ? `세로 ${minHeight}px 이상`
       : null;
 
   return (
@@ -238,7 +226,7 @@ export function AdminImageUpload({
           "group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-colors",
           error
             ? "border-red-400 bg-red-500/[0.04]"
-            : "border-ink/20 bg-ink/[0.02] hover:border-brand hover:bg-brand/[0.04]"
+            : "border-ink/20 bg-ink/[0.02] hover:border-brand hover:bg-brand/[0.04]",
         )}
         style={{ aspectRatio: ratio }}
       >
@@ -250,7 +238,7 @@ export function AdminImageUpload({
               alt="미리보기"
               className={cn(
                 "h-full w-full",
-                fit === "contain" ? "object-contain p-3" : "object-cover"
+                fit === "contain" ? "object-contain p-3" : "object-cover",
               )}
             />
             {/* Make it obvious the filled box is still clickable. */}
@@ -264,7 +252,7 @@ export function AdminImageUpload({
           <span
             className={cn(
               "flex flex-col items-center gap-2 px-2 text-center",
-              error ? "text-red-500/80" : "text-ink/45"
+              error ? "text-red-500/80" : "text-ink/45",
             )}
           >
             <span
@@ -272,7 +260,7 @@ export function AdminImageUpload({
                 "flex h-11 w-11 items-center justify-center rounded-full transition-colors",
                 error
                   ? "bg-red-500/10"
-                  : "bg-ink/[0.06] group-hover:bg-brand group-hover:text-paper"
+                  : "bg-ink/[0.06] group-hover:bg-brand group-hover:text-paper",
               )}
             >
               <ImagePlus size={20} />
@@ -320,6 +308,21 @@ export function AdminImageUpload({
         onChange={(e) => pick(e.target.files?.[0])}
         className="hidden"
       />
+
+      {/* Companions to the file field. The width exists only here — the server
+          receives an opaque blob and has no decoder to measure it. The cleared
+          flag exists because an emptied file input is byte-identical to an
+          untouched one, so without it the operator could never remove an image. */}
+      {name && (
+        <>
+          <input type="hidden" name={`${name}_width`} value={width} />
+          <input
+            type="hidden"
+            name={`${name}_cleared`}
+            value={cleared ? "1" : ""}
+          />
+        </>
+      )}
     </div>
   );
 }

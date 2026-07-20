@@ -1,1 +1,1 @@
-export { saveBrand } from "./api/actions";
+export { saveBrand, type BrandFormState } from "./api/actions";

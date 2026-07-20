@@ -8,14 +8,27 @@ create table public.news (
     id uuid primary key default gen_random_uuid(),
     title text not null,
     content text not null default '',
+    -- 0=자체 작성(content 를 상세 페이지에 보여준다), 1=링크(상세 페이지 없이
+    -- reference_url 로 리다이렉트). 대부분 자체 작성이라 0이 기본값.
+    type smallint not null default 0 check (type in (0, 1)),
+    -- type=1 이면 리다이렉트 대상이라 필수(아래 constraint), type=0 이면
+    -- 본문에 곁들이는 참고 링크로 선택 입력.
+    reference_url text,
     category_id bigint references public.news_categories (id) on delete restrict,
     is_active boolean not null default false,
     published_at timestamptz, -- 발행 시각. null=미발행(초안), 값 있으면 발행됨.
     created_at timestamptz not null default now(),
-    updated_at timestamptz not null default now()
+    updated_at timestamptz not null default now(),
+
+    -- 링크 타입인데 주소가 없으면 목록에서 눌러도 갈 곳이 없다. 리다이렉트
+    -- 대상이 비는 상태를 스키마 차원에서 막는다. (type=0 은 제약 없음)
+    constraint news_reference_url_required
+        check (type <> 1 or reference_url is not null)
 );
 
--- updated_at 자동 갱신
+-- ## 자동화
+-- updated_at 자동 갱신. 이후 마이그레이션들이 그대로 재사용하는 공용 함수라
+-- 여기서 한 번만 정의한다.
 create or replace function public.handle_updated_at()
 returns trigger language plpgsql as $$
 begin
@@ -24,8 +37,6 @@ begin
 end;
 $$;
 
--- ## 자동화
--- updated_at 자동 갱신
 create trigger news_set_updated_at
     before update on public.news
     for each row execute function public.handle_updated_at();
@@ -57,13 +68,12 @@ create policy "public can read news"
         and published_at <= now()
     );
 
--- 조회(관리자): 로그인 관리자는 발행 여부·작성자와 무관하게 전체 조회 가능.
--- (생성/수정/삭제는 아래 정책에서 여전히 소유권으로 제한된다.)
+-- 조회(관리자): 초안·예약분까지 전부 보여야 편집할 수 있으므로 조건 없이 전체 공개.
 create policy "authenticated can read news"
     on public.news for select to authenticated
     using (true);
 
--- 카테고리: 로그인 관리자 전체 접근(저자 개념 없음).
+-- 카테고리: 로그인 관리자면 전체 접근.
 create policy "authenticated can write news_categories"
     on public.news_categories for all to authenticated
     using (true)

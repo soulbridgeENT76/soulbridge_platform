@@ -4,12 +4,14 @@ export const WEBP_QUALITY_LOGO = 1;
 export const WEBP_QUALITY_PHOTO = 0.85;
 
 /**
- * Fixed output box. `contain` fits the whole image inside and centres it
- * (transparent letterbox — right for a wordmark, which must not be cropped);
- * `cover` fills the box and crops the overflow.
+ * Output size. Give both dimensions for a fixed box — `contain` fits the whole
+ * image inside and centres it (transparent letterbox), `cover` fills the box
+ * and crops the overflow. Give `height` alone to scale by height with the width
+ * following the source ratio, which stores no padding at all — right for a
+ * wordmark, which must neither be cropped nor gain empty margins.
  */
 export type WebpTarget = {
-  width: number;
+  width?: number;
   height: number;
   fit?: "contain" | "cover";
 };
@@ -29,24 +31,45 @@ function placeInBox(
   return { dx: (tw - dw) / 2, dy: (th - dh) / 2, dw, dh };
 }
 
+/**
+ * The encoded file plus the size it came out at. The dimensions are returned
+ * rather than recomputed by the caller because this is the only place they are
+ * known — a height-only target derives the width from the source ratio, and the
+ * server that stores the result has no image decoder to measure it with.
+ */
+export type WebpResult = {
+  blob: Blob;
+  width: number;
+  height: number;
+};
+
 export async function imageToWebp(
   file: File,
   quality: number = WEBP_QUALITY_PHOTO,
   target?: WebpTarget,
-): Promise<Blob> {
+): Promise<WebpResult> {
   const bitmap = await createImageBitmap(file, {
     imageOrientation: "from-image",
   });
 
   try {
     const canvas = document.createElement("canvas");
-    canvas.width = target?.width ?? bitmap.width;
-    canvas.height = target?.height ?? bitmap.height;
+    if (target) {
+      // Height-only target: the canvas takes the source ratio, so the artwork
+      // fills it edge to edge and no padding is baked into the stored file.
+      canvas.width =
+        target.width ??
+        Math.round((bitmap.width * target.height) / bitmap.height);
+      canvas.height = target.height;
+    } else {
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+    }
 
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("이미지를 변환할 수 없습니다.");
 
-    if (target) {
+    if (target?.width) {
       const { dx, dy, dw, dh } = placeInBox(
         bitmap.width,
         bitmap.height,
@@ -58,7 +81,7 @@ export async function imageToWebp(
       // so the letterbox stays see-through and the logo's transparency holds.
       ctx.drawImage(bitmap, dx, dy, dw, dh);
     } else {
-      ctx.drawImage(bitmap, 0, 0);
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     }
 
     const blob = await new Promise<Blob | null>((resolve) =>
@@ -66,7 +89,7 @@ export async function imageToWebp(
     );
     if (!blob) throw new Error("이미지를 WebP로 변환하지 못했습니다.");
 
-    return blob;
+    return { blob, width: canvas.width, height: canvas.height };
   } finally {
     bitmap.close();
   }

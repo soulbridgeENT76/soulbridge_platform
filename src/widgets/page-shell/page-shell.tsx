@@ -3,6 +3,7 @@ import { SiteHeader } from "@widgets/site-header";
 import { SiteFooter } from "@widgets/site-footer";
 import { PaperTexture } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
+import { getSiteLogo } from "@entities/brand";
 
 type PageShellProps = {
   children: ReactNode;
@@ -13,20 +14,25 @@ type PageShellProps = {
 };
 
 /** Brand-wrapped page frame: header + main + footer on the paper base. */
-export function PageShell({
+export async function PageShell({
   children,
   headerVariant = "solid",
   padTop = true,
 }: PageShellProps) {
+  // getSiteLogo is cached under one tag, so awaiting it here costs a single
+  // read for the whole site — and it reads no cookies, which is what keeps
+  // these pages prerenderable under cacheComponents.
+  const logo = await getSiteLogo();
+
   return (
     <div className="relative flex min-h-screen flex-col bg-paper font-sans text-ink">
       <PaperTexture variant="subtle" className="z-0" />
-      <SiteHeader variant={headerVariant} />
+      <SiteHeader variant={headerVariant} logo={logo} />
       <main className={cn("relative z-10 flex-1", padTop && "pt-24 md:pt-28")}>
         {children}
       </main>
       <div className="relative z-10">
-        <SiteFooter />
+        <SiteFooter logo={logo} />
       </div>
     </div>
   );
