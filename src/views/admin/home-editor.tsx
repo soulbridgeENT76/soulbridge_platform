@@ -67,12 +67,20 @@ export function HomeEditor() {
           </div>
 
           <div className="mt-5 flex flex-col gap-5">
-            {/* Desktop + mobile banners are two separate compositions, so they
-                sit side by side. Widths are picked so both boxes end up the
-                same height (24rem ÷ 16:9 ≈ 7.6rem ÷ 9:16 ≈ 13.5rem). */}
-            <div>
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-                <AdminField label="배너 이미지 (데스크톱)" hint="가로형 16:9">
+            {/* Desktop + mobile banners are two separate compositions. Grouped
+                in one card with generous spacing so the 16:9 / 9:16 size
+                contrast reads as intentional device previews, not two boxes
+                crammed together. Widths give both boxes the same height
+                (24rem ÷ 16:9 ≈ 7.6rem ÷ 9:16 ≈ 13.5rem). */}
+            <div className="rounded-xl border border-ink/10 p-5">
+              <p className="text-sm font-semibold text-ink">배너 이미지</p>
+              <p className="mt-0.5 text-xs text-ink/50">
+                데스크톱·모바일 배너를 각각 등록하세요. 두 배너는 서로 다른
+                구도의 이미지여야 합니다.
+              </p>
+
+              <div className="mt-5 flex flex-col gap-10 sm:flex-row sm:items-start sm:gap-14">
+                <AdminField label="데스크톱" hint="가로형 16:9">
                   <AdminImageUpload
                     ratio={LANDSCAPE_RATIO}
                     name="bannerDesktop"
@@ -81,7 +89,7 @@ export function HomeEditor() {
                   />
                 </AdminField>
 
-                <AdminField label="배너 이미지 (모바일)" hint="세로형 9:16">
+                <AdminField label="모바일" hint="세로형 9:16">
                   <AdminImageUpload
                     ratio="9 / 16"
                     name="bannerMobile"
@@ -90,8 +98,9 @@ export function HomeEditor() {
                   />
                 </AdminField>
               </div>
-              <p className="mt-3 text-xs text-ink/45">
-                모바일 배너는 데스크톱을 자른 게 아니라 세로 구도로 새로 잡은
+
+              <p className="mt-5 border-t border-ink/[0.07] pt-4 text-xs text-ink/45">
+                ※ 모바일 배너는 데스크톱을 자른 게 아니라 세로 구도로 새로 잡은
                 이미지여야 합니다.
               </p>
             </div>
