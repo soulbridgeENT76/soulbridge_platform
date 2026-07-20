@@ -1,4 +1,7 @@
-import { AdminPageHeader } from "@widgets/admin-shell";
+import {
+  AdminPageHeader,
+  SectionVisibilityToggle,
+} from "@widgets/admin-shell";
 import { AboutEditor } from "@views/admin";
 
 export default function AdminAboutPage() {
@@ -9,6 +12,9 @@ export default function AdminAboutPage() {
         description="ABOUT 페이지의 문구와 섹션을 관리합니다."
       />
       <div className="mt-8">
+        <SectionVisibilityToggle href="/about" />
+      </div>
+      <div className="mt-6">
         <AboutEditor />
       </div>
     </div>

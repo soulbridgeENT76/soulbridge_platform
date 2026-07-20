@@ -4,6 +4,7 @@ import {
   AdminLinkButton,
   DeleteButton,
   AdminStatusToggle,
+  SectionVisibilityToggle,
 } from "@widgets/admin-shell";
 import { PageCopyEditor } from "@views/admin";
 import { PAGE_COPY } from "@shared/config/page-copy";
@@ -14,16 +15,20 @@ export default function AdminNewsPage() {
   return (
     <div>
       <AdminPageHeader
-        title="NEWS"
+        title="NOTICE"
         description={`총 ${NEWS.length}개`}
         action={
-          <AdminLinkButton href="/admin/news/new" variant="solid">
+          <AdminLinkButton href="/admin/notice/new" variant="solid">
             <Plus size={16} />새 뉴스
           </AdminLinkButton>
         }
       />
 
       <div className="mt-8">
+        <SectionVisibilityToggle href="/notice" />
+      </div>
+
+      <div className="mt-6">
         <PageCopyEditor
           initial={PAGE_COPY.news}
           caption="뉴스 페이지 상단에 표시되는 제목·소제목입니다."
@@ -60,7 +65,7 @@ export default function AdminNewsPage() {
                 <td className="px-5 py-4">
                   <div className="flex justify-center gap-1">
                     <AdminLinkButton
-                      href={`/admin/news/${item.slug}`}
+                      href={`/admin/notice/${item.slug}`}
                       variant="ghost"
                     >
                       편집

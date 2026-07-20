@@ -8,7 +8,7 @@ import { formatNewsDate } from "@entities/news";
 import type { SiteLogo } from "@entities/brand";
 import { Container, PaperTexture } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
-import { HERO_SLIDES } from "../model/slides";
+import { VISIBLE_HERO_SLIDES } from "../model/slides";
 import { HeroWordmark, HeroSocials, ScrollMouse } from "./hero-decor";
 
 /**
@@ -95,11 +95,11 @@ export function HeroSlider({ logo }: { logo: SiteLogo }) {
     sectionRefs.current[index]?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const activeScheme = HERO_SLIDES[active].scheme;
+  const activeScheme = VISIBLE_HERO_SLIDES[active].scheme;
 
   return (
     <div className="hero-scroll relative">
-      {HERO_SLIDES.map((slide, i) => {
+      {VISIBLE_HERO_SLIDES.map((slide, i) => {
         const dark = slide.scheme === "dark";
         return (
           <section
@@ -167,7 +167,7 @@ export function HeroSlider({ logo }: { logo: SiteLogo }) {
                   </p>
                 )}
 
-                <h2 className="mt-10 font-maruburi text-3xl font-light leading-tight tracking-tight break-keep md:mt-14 md:text-5xl lg:text-6xl">
+                <h2 className="mt-10 font-sans text-3xl font-semibold leading-tight tracking-tight break-keep md:mt-14 md:text-5xl lg:text-6xl">
                   {slide.titleKo.split("\n").map((line, li) => (
                     <span
                       key={li}
@@ -291,7 +291,7 @@ export function HeroSlider({ logo }: { logo: SiteLogo }) {
             activeScheme === "dark" ? "bg-brand" : "bg-paper/80"
           )}
         />
-        {HERO_SLIDES.map((slide, i) => (
+        {VISIBLE_HERO_SLIDES.map((slide, i) => (
           <button
             key={slide.id}
             type="button"
@@ -317,7 +317,7 @@ export function HeroSlider({ logo }: { logo: SiteLogo }) {
         className={cn(
           "fixed bottom-8 left-1/2 z-40 -translate-x-1/2 transition-opacity duration-500",
           activeScheme === "dark" ? "text-ink/70" : "text-paper/70",
-          settled && active < HERO_SLIDES.length - 1
+          settled && active < VISIBLE_HERO_SLIDES.length - 1
             ? "opacity-100"
             : "opacity-0"
         )}
