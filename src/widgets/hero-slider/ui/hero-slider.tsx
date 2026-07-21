@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { formatNewsDate, PUBLISHED_NEWS } from "@entities/news";
+// Helper + type from their own modules, not the entity barrel: this is a client
+// component and the barrel also exports the server-only readers.
+import { formatNoticeDate } from "@entities/notices/model/helpers";
+import type { Notice } from "@entities/notices/model/types";
 import type { SiteLogo } from "@entities/brand";
 import type { SocialLink } from "@shared/config/socials";
 import type { HomeSlide } from "@entities/page-content";
@@ -19,6 +22,8 @@ type HeroSliderProps = {
   socials: readonly SocialLink[];
   /** Ordered and already filtered by section visibility. */
   slides: HomeSlide[];
+  /** Published notices, for the news slide. */
+  notices: Notice[];
 };
 
 /**
@@ -27,7 +32,7 @@ type HeroSliderProps = {
  * Scroll-snap (scoped via `.hero-scroll` in globals.css) makes each banner
  * settle into view.
  */
-export function HeroSlider({ logo, socials, slides }: HeroSliderProps) {
+export function HeroSlider({ logo, socials, slides, notices }: HeroSliderProps) {
   const [active, setActive] = useState(0);
   // The scroll hint shows only while the view is settled on a slide; it fades
   // out the moment scrolling starts and fades back in once it stops.
@@ -224,9 +229,9 @@ export function HeroSlider({ logo, socials, slides }: HeroSliderProps) {
                       dark ? "border-ink/15" : "border-paper/15"
                     )}
                   >
-                    {PUBLISHED_NEWS.slice(0, slide.newsLimit).map((item) => (
+                    {notices.slice(0, slide.newsLimit).map((item) => (
                       <li
-                        key={item.slug}
+                        key={item.id}
                         className={cn(
                           "flex items-center gap-4 border-b py-3.5 md:gap-6",
                           dark ? "border-ink/15" : "border-paper/15"
@@ -238,7 +243,7 @@ export function HeroSlider({ logo, socials, slides }: HeroSliderProps) {
                             dark ? "text-ink/50" : "text-paper/50"
                           )}
                         >
-                          {formatNewsDate(item.date)}
+                          {formatNoticeDate(item.date)}
                         </span>
                         <span
                           className={cn(

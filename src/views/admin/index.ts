@@ -1,7 +1,7 @@
 export { ContentForm } from "./content-form";
 export { ArtistForm } from "./artist-form";
 export { ArtistTable } from "./artist-table";
-export { NewsForm } from "./news-form";
+export { NoticeForm } from "./notice-form";
 export { CategoryManager } from "./category-manager";
 export { PageCopyEditor } from "./page-copy-editor";
 export { AboutEditor } from "./about-editor";

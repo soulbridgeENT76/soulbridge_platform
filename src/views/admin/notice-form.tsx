@@ -1,8 +1,7 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
-import { FileText, Link2 } from "lucide-react";
-import { showToast } from "@shared/ui/toast";
+import { useActionState, useState } from "react";
+import { FileText, Link2, TriangleAlert } from "lucide-react";
 import {
   AdminField,
   AdminInput,
@@ -15,49 +14,53 @@ import {
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
-import {
-  NEWS_CATEGORIES,
-  type NewsItem,
-  type NewsLinkType,
-} from "@entities/news";
+import type { Notice, NoticeLinkType } from "@entities/notices/model/types";
+import { saveNotice } from "@features/update-notices";
 
-type NewsFormProps = {
-  initial?: NewsItem;
+type NoticeFormProps = {
+  initial?: Notice;
+  /** Category options, resolved from the DB by the server parent. */
+  categories: string[];
 };
 
-// NOTE(backend): slug/id are generated on the server, so they are not shown here.
-export function NewsForm({ initial }: NewsFormProps) {
+const SLUG_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+export function NoticeForm({ initial, categories }: NoticeFormProps) {
   const editing = Boolean(initial);
-  const [linkType, setLinkType] = useState<NewsLinkType>(
+  const [linkType, setLinkType] = useState<NoticeLinkType>(
     initial?.linkType ?? "article"
   );
   const external = linkType === "external";
-  const { errors, clearError, flashErrors, focusFirst } = useFieldErrors();
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const [state, formAction] = useActionState(saveNotice, { ok: true });
+  const { errors, clearError, guardAction } = useFieldErrors();
 
-    const formData = new FormData(e.currentTarget);
+  const validate = (formData: FormData): Record<string, string> => {
     const errs: Record<string, string> = {};
     if (!fieldValue(formData, "title")) errs.title = "제목을 입력해주세요.";
-    if (!fieldValue(formData, "date")) errs.date = "작성일을 선택해주세요.";
+    if (!fieldValue(formData, "date")) errs.date = "게시일을 선택해주세요.";
     // Only the link mode requires a URL; article mode's link is optional.
     if (external && !fieldValue(formData, "externalUrl")) {
       errs.externalUrl = "외부 링크 URL 을 입력해주세요.";
     }
-
-    if (Object.keys(errs).length > 0) {
-      flashErrors(errs);
-      focusFirst(errs, ["title", "date", "externalUrl"]);
-      return;
+    const slug = fieldValue(formData, "slug");
+    if (slug && !SLUG_PATTERN.test(slug)) {
+      errs.slug = "영문, 숫자, -, _ 만 사용할 수 있습니다.";
     }
-
-    // TODO(backend): collect values and create/update the news record.
-    showToast("저장되었습니다");
+    return errs;
   };
 
+  const clientAction = guardAction(
+    validate,
+    ["title", "date", "externalUrl", "slug"],
+    formAction
+  );
+
   return (
-    <form onSubmit={onSubmit}>
+    <form action={clientAction}>
+      {/* Empty on create — the action reads this to tell insert from update. */}
+      <input type="hidden" name="id" value={initial?.id ?? ""} />
+
       <AdminPageHeader
         title={editing ? "뉴스 편집" : "새 뉴스"}
         description={editing ? initial?.title : "새 소식을 등록합니다."}
@@ -80,9 +83,9 @@ export function NewsForm({ initial }: NewsFormProps) {
             <AdminSelect
               id="category"
               name="category"
-              defaultValue={initial?.category ?? NEWS_CATEGORIES[0]}
+              defaultValue={initial?.category ?? categories[0] ?? ""}
             >
-              {NEWS_CATEGORIES.map((c) => (
+              {categories.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
@@ -90,7 +93,7 @@ export function NewsForm({ initial }: NewsFormProps) {
             </AdminSelect>
           </AdminField>
 
-          <AdminField label="작성일" htmlFor="date" required error={errors.date}>
+          <AdminField label="게시일" htmlFor="date" required error={errors.date}>
             <AdminInput
               id="date"
               name="date"
@@ -101,6 +104,24 @@ export function NewsForm({ initial }: NewsFormProps) {
             />
           </AdminField>
         </AdminFormGrid>
+
+        {/* Optional custom URL — blank routes by id. */}
+        <AdminField
+          label="URL 주소 (선택)"
+          htmlFor="slug"
+          hint="영문, 숫자, -, _ 만 사용 가능합니다. 비우면 ID 주소로 접근합니다."
+          error={errors.slug}
+          className="max-w-md"
+        >
+          <AdminInput
+            id="slug"
+            name="slug"
+            defaultValue={initial?.slug ?? ""}
+            placeholder="예: official-launch"
+            aria-invalid={errors.slug ? true : undefined}
+            onChange={() => clearError("slug")}
+          />
+        </AdminField>
 
         {/* Publish switch — new items start inactive. */}
         <div className="rounded-xl border border-ink/10 p-4">
@@ -177,7 +198,7 @@ export function NewsForm({ initial }: NewsFormProps) {
             <AdminField
               label="첨부 링크 (선택)"
               htmlFor="externalUrl"
-              hint="입력하면 상세 페이지에 '원문 보기' 버튼으로 표시됩니다."
+              hint="입력하면 상세 페이지에 '관련 링크' 버튼으로 표시됩니다."
             >
               <AdminInput
                 id="externalUrl"
@@ -190,6 +211,13 @@ export function NewsForm({ initial }: NewsFormProps) {
           </>
         )}
       </div>
+
+      {state.error && (
+        <p className="mt-5 flex items-start gap-1.5 text-sm text-red-600">
+          <TriangleAlert size={15} className="mt-0.5 shrink-0" />
+          {state.error}
+        </p>
+      )}
 
       <AdminFormActions cancelHref="/admin/notice" />
     </form>
