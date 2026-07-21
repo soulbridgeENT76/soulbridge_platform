@@ -10,7 +10,7 @@ import {
   AdminFormActions,
   AdminReferenceCard,
 } from "@widgets/admin-shell";
-import { CONTACT, SOCIALS } from "@shared/config/site";
+import { CONTACT } from "@shared/config/site";
 import { PAGE_COPY } from "@shared/config/page-copy";
 
 /**
@@ -18,7 +18,7 @@ import { PAGE_COPY } from "@shared/config/page-copy";
  * SNS links are managed on the Brand page.
  * TODO(backend): persist on save.
  */
-export function ContactEditor() {
+export function ContactEditor({ socialsSummary }: { socialsSummary: string }) {
   const copy = PAGE_COPY.contact;
 
   const onSubmit = (e: FormEvent) => {
@@ -74,7 +74,7 @@ export function ContactEditor() {
         caption="브랜드 페이지에서 관리하는 SNS가 이 페이지 하단에도 표시됩니다."
         href="/admin/brand"
         hrefLabel="브랜드에서 편집"
-        rows={[{ label: "SNS", value: SOCIALS.map((s) => s.label).join(" · ") }]}
+        rows={[{ label: "SNS", value: socialsSummary }]}
       />
 
       {/* Map — address only; URLs are derived automatically */}

@@ -19,6 +19,7 @@ import {
   STRATEGY_PILLARS,
 } from "@entities/about";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
+import { useSaveToast } from "@shared/ui/use-save-toast";
 import type {
   PageCopy,
   AboutLeadership,
@@ -53,7 +54,10 @@ const SEED_SECTIONS: Omit<Section, "key">[] = [
 /**
  * ABOUT page editor — hero copy, the fixed Leadership section, and a variable
  * number of "label + title + items" sections (add/remove).
- * TODO(backend): persist on save.
+ *
+ * Every field prefills from the stored row, never from the bundled constants:
+ * the fields are uncontrolled, so a constant shown here would be submitted as
+ * if it were the saved value and overwrite the real one on the next save.
  */
 type AboutEditorProps = {
   copy: PageCopy | null;
@@ -66,8 +70,17 @@ export function AboutEditor({
   leadership,
   sections: storedSections,
 }: AboutEditorProps) {
-  const [copyState, copyAction] = useActionState(savePageCopy, { ok: true });
-  const [aboutState, aboutAction] = useActionState(saveAbout, { ok: true });
+  const [copyState, copyAction, copyPending] = useActionState(savePageCopy, {
+    ok: true,
+  });
+  const [aboutState, aboutAction, aboutPending] = useActionState(saveAbout, {
+    ok: true,
+  });
+
+  // Two independent forms on one screen — each announces its own save, so the
+  // operator can tell which half of the page was written.
+  useSaveToast(copyState, copyPending, "상단 문구가 저장되었습니다");
+  useSaveToast(aboutState, aboutPending);
 
   // Until the page is saved once the row holds no leadership or sections, so
   // the bundled constants seed the form — the same content the page renders.
@@ -226,7 +239,7 @@ export function AboutEditor({
           <AdminInput
             id="leaderRole"
             name="leaderRole"
-            defaultValue={LEADERSHIP.role}
+            defaultValue={leader.role}
             className="max-w-md"
           />
         </AdminField>
@@ -235,7 +248,7 @@ export function AboutEditor({
           <AdminInput
             id="leaderName"
             name="leaderName"
-            defaultValue={LEADERSHIP.nameKo}
+            defaultValue={leader.name}
             className="max-w-xs"
           />
         </AdminField>
@@ -244,7 +257,7 @@ export function AboutEditor({
           <AdminTextarea
             id="leaderBio"
             name="leaderBio"
-            defaultValue={LEADERSHIP.bio}
+            defaultValue={leader.bio}
           />
         </AdminField>
 

@@ -1,7 +1,7 @@
 import {
   AdminPageHeader,
-  SectionVisibilityToggle,
 } from "@widgets/admin-shell";
+import { SectionVisibilityToggle } from "@widgets/admin-shell/ui/section-visibility-toggle";
 import { AboutEditor } from "@views/admin";
 import { getPageCopy, getAboutContent } from "@entities/page-content";
 

@@ -1,8 +1,7 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
-import { showToast } from "@shared/ui/toast";
+import { useActionState, useState } from "react";
+import { Plus, Trash2, TriangleAlert } from "lucide-react";
 import {
   AdminField,
   AdminInput,
@@ -14,31 +13,63 @@ import {
   AdminButton,
 } from "@widgets/admin-shell";
 import { PORTRAIT_RATIO, UPLOAD_SIZE } from "@shared/config/media";
-import type { Artist } from "@entities/artist";
-
-type WorkRow = { year: string; title: string };
+import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
+import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
+import type { SocialKey } from "@shared/config/socials";
+import type { Artist, ArtistWork } from "@entities/artist";
+import { saveArtist } from "@features/update-artist";
 
 type ArtistFormProps = {
   initial?: Artist;
 };
 
-// NOTE(backend): slug/id are generated on the server, so they are not shown here.
+// The slug is derived from the English name on the server, so it is not shown
+// here — one less field to keep consistent, and it stays stable across renames.
 export function ArtistForm({ initial }: ArtistFormProps) {
   const editing = Boolean(initial);
-  const [works, setWorks] = useState<WorkRow[]>(initial?.works ?? []);
+  const [works, setWorks] = useState<ArtistWork[]>(initial?.works ?? []);
+  const [state, formAction] = useActionState(saveArtist, { ok: true });
 
-  // Prefill each fixed social field from the existing socials list.
-  const socialHref = (label: string) =>
-    initial?.socials?.find((s) => s.label === label)?.href ?? "";
+  // Prefill each fixed social field from the existing socials list. Keyed by
+  // SocialKey, the same registry the public icons resolve through, so a field
+  // here and the icon it produces can never disagree.
+  const socialHref = (key: SocialKey) =>
+    initial?.socials.find((s) => s.key === key)?.href ?? "";
 
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    // TODO(backend): collect values (incl. works/socials) and save.
-    showToast("저장되었습니다");
+  const { errors, clearError, guardAction } = useFieldErrors();
+
+  // Fields top-to-bottom, so the first invalid one is the one that takes focus.
+  const validate = (formData: FormData): Record<string, string> => {
+    const errs: Record<string, string> = {};
+
+    if (!fieldValue(formData, "nameKo")) {
+      errs.nameKo = "이름(한글)을 입력해주세요.";
+    }
+
+    const nameEn = fieldValue(formData, "nameEn");
+    if (!nameEn) errs.nameEn = "이름(영문)을 입력해주세요.";
+    else if (!/^[A-Za-z _-]+$/.test(nameEn)) {
+      errs.nameEn = "이름(영문)은 영문, 공백, -, _ 만 사용할 수 있습니다.";
+    }
+
+    if (!fieldValue(formData, "role")) errs.role = "역할을 입력해주세요.";
+
+    return errs;
   };
 
+  const clientAction = guardAction(
+    validate,
+    ["nameKo", "nameEn", "role"],
+    formAction
+  );
+
   return (
-    <form onSubmit={onSubmit}>
+    <form action={clientAction}>
+      {/* Empty on create — the action reads this to tell insert from update. */}
+      <input type="hidden" name="id" value={initial?.id ?? ""} />
+      {/* The career list is variable-length, so it travels as one JSON field
+          rather than as indexed input names. */}
+      <input type="hidden" name="works" value={JSON.stringify(works)} />
       <AdminPageHeader
         title={editing ? "아티스트 편집" : "새 아티스트"}
         description={editing ? initial?.nameKo : "새 아티스트를 등록합니다."}
@@ -52,26 +83,62 @@ export function ArtistForm({ initial }: ArtistFormProps) {
           <AdminImageUpload
             ratio={PORTRAIT_RATIO}
             name="profile"
+            initialUrl={initial?.photo}
             requiredSize={UPLOAD_SIZE.portrait}
+            output={{ ...UPLOAD_SIZE.portrait, fit: "cover" }}
+            outputQuality={WEBP_QUALITY_PHOTO}
             className="w-60"
           />
         </AdminField>
 
         <AdminFormGrid>
-          <AdminField label="이름 (한글)" htmlFor="nameKo" required>
-            <AdminInput id="nameKo" name="nameKo" defaultValue={initial?.nameKo} />
+          <AdminField
+            label="이름 (한글)"
+            htmlFor="nameKo"
+            required
+            error={errors.nameKo}
+          >
+            <AdminInput
+              id="nameKo"
+              name="nameKo"
+              defaultValue={initial?.nameKo}
+              aria-invalid={errors.nameKo ? true : undefined}
+              onChange={() => clearError("nameKo")}
+            />
           </AdminField>
-          <AdminField label="이름 (영문)" htmlFor="nameEn">
-            <AdminInput id="nameEn" name="nameEn" defaultValue={initial?.nameEn} />
+          <AdminField
+            label="이름 (영문)"
+            htmlFor="nameEn"
+            required
+            hint="영문, 공백, -, _ 만 사용 가능합니다."
+            error={errors.nameEn}
+          >
+            {/* No native `required`/`pattern`: validation is handled in
+                clientAction so the message shows inline, not as a tooltip. */}
+            <AdminInput
+              id="nameEn"
+              name="nameEn"
+              defaultValue={initial?.nameEn}
+              aria-invalid={errors.nameEn ? true : undefined}
+              onChange={() => clearError("nameEn")}
+            />
           </AdminField>
         </AdminFormGrid>
 
-        <AdminField label="역할" htmlFor="role" required className="max-w-sm">
+        <AdminField
+          label="역할"
+          htmlFor="role"
+          required
+          error={errors.role}
+          className="max-w-sm"
+        >
           <AdminInput
             id="role"
             name="role"
             defaultValue={initial?.role}
             placeholder="예: 방송인, 배우, 크리에이터"
+            aria-invalid={errors.role ? true : undefined}
+            onChange={() => clearError("role")}
           />
         </AdminField>
 
@@ -79,11 +146,13 @@ export function ArtistForm({ initial }: ArtistFormProps) {
           <AdminTextarea id="bio" name="bio" defaultValue={initial?.bio} />
         </AdminField>
 
-        {/* Career — repeatable (year + title) */}
+        {/* Career — repeatable. Controlled, because the rows are serialized to
+            the hidden `works` field on submit: uncontrolled inputs would keep
+            their text in the DOM where the JSON never sees it. */}
         <RepeatableSection
           label="활동 이력"
           addLabel="이력 추가"
-          onAdd={() => setWorks((w) => [...w, { year: "", title: "" }])}
+          onAdd={() => setWorks((w) => [...w, { label: "", description: "" }])}
         >
           {works.map((work, i) => (
             <RepeatableRow
@@ -92,10 +161,27 @@ export function ArtistForm({ initial }: ArtistFormProps) {
             >
               <AdminInput
                 placeholder="활동 연도"
-                defaultValue={work.year}
+                value={work.label}
+                onChange={(e) =>
+                  setWorks((w) =>
+                    w.map((x, j) =>
+                      j === i ? { ...x, label: e.target.value } : x
+                    )
+                  )
+                }
                 className="sm:w-32"
               />
-              <AdminInput placeholder="제목" defaultValue={work.title} />
+              <AdminInput
+                placeholder="제목"
+                value={work.description}
+                onChange={(e) =>
+                  setWorks((w) =>
+                    w.map((x, j) =>
+                      j === i ? { ...x, description: e.target.value } : x
+                    )
+                  )
+                }
+              />
             </RepeatableRow>
           ))}
         </RepeatableSection>
@@ -111,7 +197,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
               <AdminInput
                 id="instagram"
                 name="instagram"
-                defaultValue={socialHref("INSTAGRAM")}
+                defaultValue={socialHref("instagram")}
                 placeholder="https://instagram.com/..."
               />
             </AdminField>
@@ -119,7 +205,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
               <AdminInput
                 id="youtube"
                 name="youtube"
-                defaultValue={socialHref("YOUTUBE")}
+                defaultValue={socialHref("youtube")}
                 placeholder="https://youtube.com/@..."
               />
             </AdminField>
@@ -127,13 +213,23 @@ export function ArtistForm({ initial }: ArtistFormProps) {
               <AdminInput
                 id="messenger"
                 name="messenger"
-                defaultValue={socialHref("KAKAO")}
+                defaultValue={socialHref("messenger")}
                 placeholder="카카오톡 채널 링크 등"
               />
             </AdminField>
           </div>
         </div>
       </div>
+
+      {/* Uploads and saves fail for reasons the operator can act on (file too
+          large, network dropped), so the action reports them instead of
+          throwing. Success redirects, so nothing else needs announcing. */}
+      {state.error && (
+        <p className="mt-5 flex items-start gap-1.5 text-sm text-red-600">
+          <TriangleAlert size={15} className="mt-0.5 shrink-0" />
+          {state.error}
+        </p>
+      )}
 
       <AdminFormActions cancelHref="/admin/artists" />
     </form>

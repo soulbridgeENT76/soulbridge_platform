@@ -17,4 +17,8 @@ export { AdminFormActions } from "./ui/admin-form-actions";
 export { DeleteButton } from "./ui/delete-button";
 export { AdminReferenceCard } from "./ui/admin-reference-card";
 export { AdminStatusToggle } from "./ui/admin-status-toggle";
-export { SectionVisibilityToggle } from "./ui/section-visibility-toggle";
+// SectionVisibilityToggle is intentionally NOT re-exported here. It is an async
+// server component that reads the database, and this barrel is imported by
+// client components (forms, the artist table) — re-exporting it would pull
+// server-only modules into the client graph. Import it by path:
+// "@widgets/admin-shell/ui/section-visibility-toggle".

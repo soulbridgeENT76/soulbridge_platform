@@ -3,8 +3,8 @@ import {
   AdminPageHeader,
   AdminLinkButton,
   DeleteButton,
-  SectionVisibilityToggle,
 } from "@widgets/admin-shell";
+import { SectionVisibilityToggle } from "@widgets/admin-shell/ui/section-visibility-toggle";
 import { CategoryManager, PageCopyEditor } from "@views/admin";
 import { CONTENTS, CONTENT_CATEGORIES } from "@entities/content";
 import { PAGE_COPY } from "@shared/config/page-copy";

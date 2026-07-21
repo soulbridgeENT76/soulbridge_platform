@@ -1,14 +1,17 @@
 import { MapPin } from "lucide-react";
 import { PageShell } from "@widgets/page-shell";
 import { Container, Eyebrow, SocialLinks } from "@shared/ui";
-import { CONTACT, SITE, SOCIALS } from "@shared/config/site";
+import { CONTACT } from "@shared/config/site";
 import { PAGE_COPY } from "@shared/config/page-copy";
 import { buildMapLinks } from "@shared/lib/map-links";
+import { getSiteBrand } from "@entities/brand";
 
-export function ContactView() {
+export async function ContactView() {
   const copy = PAGE_COPY.contact;
   // Map URLs are derived from the address string, not stored.
   const maps = buildMapLinks(CONTACT.mapAddress);
+  // Same cached entry the shell already reads — no extra database round trip.
+  const brand = await getSiteBrand();
   return (
     <PageShell>
       {/* Top: message + address / socials */}
@@ -41,10 +44,10 @@ export function ContactView() {
           {/* Follow */}
           <div className="sm:text-right">
             <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-plum">
-              FOLLOW {SITE.name.toUpperCase()}
+              FOLLOW {brand.name.toUpperCase()}
             </p>
             <SocialLinks
-              items={SOCIALS}
+              items={brand.socials}
               size={20}
               className="mt-4 sm:justify-end"
               itemClassName="text-ink/60 hover:text-ink"
@@ -58,7 +61,7 @@ export function ContactView() {
         <div className="overflow-hidden rounded-2xl border border-ink/10">
           <iframe
             src={maps.embed}
-            title={`${SITE.name} 위치 지도`}
+            title={`${brand.name} 위치 지도`}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             className="block h-[320px] w-full md:h-[440px]"

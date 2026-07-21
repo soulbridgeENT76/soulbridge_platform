@@ -6,6 +6,13 @@ export {
 } from "./api/get-home-slides";
 export { getPageCopy, type PageCopy } from "./api/get-page-copy";
 export {
+  getVisibleNav,
+  getHiddenSectionSlugs,
+  getSectionActive,
+  setSectionActive,
+  sectionSlug,
+} from "./api/get-sections";
+export {
   getAboutContent,
   type AboutContent,
   type AboutLeadership,

@@ -1,10 +1,14 @@
 import {
   AdminPageHeader,
-  SectionVisibilityToggle,
 } from "@widgets/admin-shell";
+import { SectionVisibilityToggle } from "@widgets/admin-shell/ui/section-visibility-toggle";
 import { ContactEditor } from "@views/admin";
+import { socialSummary } from "@shared/config/socials";
+import { getBrand, resolveSiteBrand } from "@entities/brand";
 
-export default function AdminContactPage() {
+export default async function AdminContactPage() {
+  const { socials } = resolveSiteBrand(await getBrand());
+
   return (
     <div>
       <AdminPageHeader
@@ -15,7 +19,7 @@ export default function AdminContactPage() {
         <SectionVisibilityToggle href="/contact" />
       </div>
       <div className="mt-6">
-        <ContactEditor />
+        <ContactEditor socialsSummary={socialSummary(socials) || "미설정"} />
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import {
   AdminPageHeader,
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
+import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
 import { LANDSCAPE_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import { CONTENT_CATEGORIES, type Content } from "@entities/content";
 
@@ -33,8 +34,24 @@ export function ContentForm({ initial }: ContentFormProps) {
     initial?.youtubeId ? "video" : "image"
   );
 
-  const onSubmit = (e: FormEvent) => {
+  const { errors, clearError, flashErrors, focusFirst } = useFieldErrors();
+
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const errs: Record<string, string> = {};
+    if (!fieldValue(formData, "category")) {
+      errs.category = "카테고리를 선택해주세요.";
+    }
+    if (!fieldValue(formData, "title")) errs.title = "제목을 입력해주세요.";
+
+    if (Object.keys(errs).length > 0) {
+      flashErrors(errs);
+      focusFirst(errs, ["category", "title"]);
+      return;
+    }
+
     // TODO(backend): collect values and create/update the content record.
     showToast("저장되었습니다");
   };
@@ -48,11 +65,19 @@ export function ContentForm({ initial }: ContentFormProps) {
 
       <div className="mt-8 flex flex-col gap-6">
         {/* Category — options are managed on the contents list screen. */}
-        <AdminField label="카테고리" htmlFor="category" required className="max-w-sm">
+        <AdminField
+          label="카테고리"
+          htmlFor="category"
+          required
+          error={errors.category}
+          className="max-w-sm"
+        >
           <AdminSelect
             id="category"
             name="category"
             defaultValue={initial?.category ?? CONTENT_CATEGORIES[0]}
+            aria-invalid={errors.category ? true : undefined}
+            onChange={() => clearError("category")}
           >
             {CONTENT_CATEGORIES.map((c) => (
               <option key={c} value={c}>
@@ -63,12 +88,14 @@ export function ContentForm({ initial }: ContentFormProps) {
         </AdminField>
 
         {/* Main title */}
-        <AdminField label="제목" htmlFor="title" required>
+        <AdminField label="제목" htmlFor="title" required error={errors.title}>
           <AdminInput
             id="title"
             name="title"
             defaultValue={initial?.title}
             placeholder="콘텐츠 메인 제목"
+            aria-invalid={errors.title ? true : undefined}
+            onChange={() => clearError("title")}
           />
         </AdminField>
 

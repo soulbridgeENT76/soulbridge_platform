@@ -2,28 +2,35 @@ import Link from "next/link";
 import { Film, Users, Newspaper, ArrowRight } from "lucide-react";
 import { AdminPageHeader } from "@widgets/admin-shell";
 import { CONTENTS } from "@entities/content";
-import { ARTISTS } from "@entities/artist";
+import { getArtistsAdmin } from "@entities/artist";
 import { NEWS } from "@entities/news";
 
-// TODO(backend): counts currently come from the static entity arrays.
-// Swap these for DB queries when the data layer lands.
-const STATS = [
-  {
-    label: "콘텐츠",
-    href: "/admin/contents",
-    count: CONTENTS.length,
-    icon: Film,
-  },
-  {
-    label: "아티스트",
-    href: "/admin/artists",
-    count: ARTISTS.length,
-    icon: Users,
-  },
-  { label: "뉴스", href: "/admin/notice", count: NEWS.length, icon: Newspaper },
-];
+export default async function AdminDashboardPage() {
+  // Artists are DB-backed now; contents and news still come from their static
+  // arrays. TODO(backend): swap those two once their data layers land.
+  const artists = await getArtistsAdmin();
 
-export default function AdminDashboardPage() {
+  const STATS = [
+    {
+      label: "콘텐츠",
+      href: "/admin/contents",
+      count: CONTENTS.length,
+      icon: Film,
+    },
+    {
+      label: "아티스트",
+      href: "/admin/artists",
+      count: artists.length,
+      icon: Users,
+    },
+    {
+      label: "뉴스",
+      href: "/admin/notice",
+      count: NEWS.length,
+      icon: Newspaper,
+    },
+  ];
+
   return (
     <div>
       <AdminPageHeader
