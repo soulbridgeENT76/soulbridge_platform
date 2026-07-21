@@ -1,20 +1,23 @@
 import Link from "next/link";
 import { Film, Users, Newspaper, ArrowRight } from "lucide-react";
 import { AdminPageHeader } from "@widgets/admin-shell";
-import { CONTENTS } from "@entities/content";
+import { getContentsAdmin } from "@entities/content";
 import { getArtistsAdmin } from "@entities/artist";
 import { NEWS } from "@entities/news";
 
 export default async function AdminDashboardPage() {
-  // Artists are DB-backed now; contents and news still come from their static
-  // arrays. TODO(backend): swap those two once their data layers land.
-  const artists = await getArtistsAdmin();
+  // Artists and contents are DB-backed now; news still comes from its static
+  // array. TODO(backend): swap that once its data layer lands.
+  const [artists, contents] = await Promise.all([
+    getArtistsAdmin(),
+    getContentsAdmin(),
+  ]);
 
   const STATS = [
     {
       label: "콘텐츠",
       href: "/admin/contents",
-      count: CONTENTS.length,
+      count: contents.length,
       icon: Film,
     },
     {

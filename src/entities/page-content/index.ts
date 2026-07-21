@@ -2,9 +2,15 @@ export type { HomeSlide, SlideBanner } from "./model/types";
 export {
   getHomeSlides,
   getVisibleHomeSlides,
+  getSectionEyebrow,
   PAGE_CONTENT_TAG,
 } from "./api/get-home-slides";
 export { getPageCopy, type PageCopy } from "./api/get-page-copy";
+export {
+  getContactContent,
+  getContactAdmin,
+  type ContactContent,
+} from "./api/get-contact";
 export {
   getVisibleNav,
   getHiddenSectionSlugs,

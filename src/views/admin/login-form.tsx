@@ -24,7 +24,11 @@ export function LoginForm({ logo }: { logo: SiteLogo }) {
     // Empty-field checks show inline like the rest of the admin forms; the
     // credentials-wrong case stays a form-level message (it is not per-field).
     const errs: Record<string, string> = {};
-    if (!fieldValue(form, "email")) errs.email = "이메일을 입력해주세요.";
+    const email = fieldValue(form, "email");
+    if (!email) errs.email = "이메일을 입력해주세요.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errs.email = "올바른 이메일 형식이 아닙니다.";
+    }
     if (!fieldValue(form, "password")) errs.password = "비밀번호를 입력해주세요.";
     if (Object.keys(errs).length > 0) {
       flashErrors(errs);
@@ -74,6 +78,7 @@ export function LoginForm({ logo }: { logo: SiteLogo }) {
 
         <form
           onSubmit={onSubmit}
+          noValidate
           className="mt-8 rounded-2xl border border-ink/10 bg-white p-6 shadow-sm"
         >
           <div className="flex flex-col gap-5">

@@ -103,3 +103,22 @@ export async function getVisibleHomeSlides(): Promise<HomeSlide[]> {
     return !hidden.has(sectionSlug(slide.section));
   });
 }
+
+/**
+ * The English label for a section page's top eyebrow.
+ *
+ * It is the very string that section's home-slide CTA button shows ("페이지
+ * 이동 버튼 문구"), read straight from the slide — so the button and the page
+ * label share one source and can never drift. Editing it in the home editor
+ * updates both at once.
+ *
+ * null when the section has no slide or its CTA label is blank; the caller
+ * falls back to its bundled copy.
+ */
+export async function getSectionEyebrow(
+  sectionHref: string
+): Promise<string | null> {
+  const slides = await getHomeSlides();
+  const label = slides.find((s) => s.section === sectionHref)?.cta.label.trim();
+  return label ? label : null;
+}

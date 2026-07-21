@@ -1,8 +1,8 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
-import { Image as ImageIcon, Video } from "lucide-react";
-import { showToast } from "@shared/ui/toast";
+import { useActionState, useState } from "react";
+import NextImage from "next/image";
+import { Image as ImageIcon, TriangleAlert, Video } from "lucide-react";
 import {
   AdminField,
   AdminInput,
@@ -14,50 +14,77 @@ import {
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
+import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
+import { parseYoutubeId, youtubeThumbnail } from "@shared/lib/youtube";
 import { LANDSCAPE_RATIO, UPLOAD_SIZE } from "@shared/config/media";
-import { CONTENT_CATEGORIES, type Content } from "@entities/content";
+// Type from the model, not the entity barrel: this is a client component and
+// the barrel also exports the server-only readers.
+import type { Content } from "@entities/content/model/types";
+import { saveContent } from "@features/update-content";
 
 type ContentFormProps = {
   /** Present in edit mode; absent when creating. */
   initial?: Content;
+  /** Category options, resolved from the DB by the server parent. */
+  categories: string[];
 };
 
 type MediaType = "image" | "video";
 
-// NOTE(backend): slug/id are generated on the server, so they are not shown here.
-// Categories are managed on the contents list screen, not in this form.
-export function ContentForm({ initial }: ContentFormProps) {
+/** URL-safe: English letters, digits, hyphen, underscore. */
+const SLUG_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+// The slug is derived from the title on the server, so it is not shown here.
+export function ContentForm({ initial, categories }: ContentFormProps) {
   const editing = Boolean(initial);
 
-  // Image OR video — mutually exclusive.
+  // Image OR video — mutually exclusive. The hidden `mediaType` field tells the
+  // action which branch to persist.
   const [mediaType, setMediaType] = useState<MediaType>(
-    initial?.youtubeId ? "video" : "image"
+    initial?.mediaType === "youtube" ? "video" : "image"
   );
 
-  const { errors, clearError, flashErrors, focusFirst } = useFieldErrors();
+  // Controlled so the thumbnail preview updates as the URL is typed. Editing a
+  // YouTube content prefills the stored id, which parses back to itself.
+  const [youtubeUrl, setYoutubeUrl] = useState(initial?.youtubeId ?? "");
+  const previewId = parseYoutubeId(youtubeUrl);
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const [state, formAction] = useActionState(saveContent, { ok: true });
+  const { errors, clearError, guardAction } = useFieldErrors();
 
-    const formData = new FormData(e.currentTarget);
+  const validate = (formData: FormData): Record<string, string> => {
     const errs: Record<string, string> = {};
     if (!fieldValue(formData, "category")) {
       errs.category = "카테고리를 선택해주세요.";
     }
     if (!fieldValue(formData, "title")) errs.title = "제목을 입력해주세요.";
-
-    if (Object.keys(errs).length > 0) {
-      flashErrors(errs);
-      focusFirst(errs, ["category", "title"]);
-      return;
+    // Slug is optional; a filled one must be URL-safe.
+    const slug = fieldValue(formData, "slug");
+    if (slug && !SLUG_PATTERN.test(slug)) {
+      errs.slug = "영문, 숫자, -, _ 만 사용할 수 있습니다.";
     }
-
-    // TODO(backend): collect values and create/update the content record.
-    showToast("저장되었습니다");
+    // Video mode: a provided link must be a YouTube URL. Empty is allowed.
+    if (mediaType === "video") {
+      const url = fieldValue(formData, "youtubeUrl");
+      if (url && !parseYoutubeId(url)) {
+        errs.youtubeUrl = "유튜브 URL 만 입력할 수 있습니다.";
+      }
+    }
+    return errs;
   };
 
+  const clientAction = guardAction(
+    validate,
+    ["category", "title", "slug", "youtubeUrl"],
+    formAction
+  );
+
   return (
-    <form onSubmit={onSubmit}>
+    <form action={clientAction}>
+      {/* Empty on create — the action reads this to tell insert from update. */}
+      <input type="hidden" name="id" value={initial?.id ?? ""} />
+      <input type="hidden" name="mediaType" value={mediaType} />
+
       <AdminPageHeader
         title={editing ? "콘텐츠 편집" : "새 콘텐츠"}
         description={editing ? initial?.title : "새 콘텐츠를 등록합니다."}
@@ -75,11 +102,11 @@ export function ContentForm({ initial }: ContentFormProps) {
           <AdminSelect
             id="category"
             name="category"
-            defaultValue={initial?.category ?? CONTENT_CATEGORIES[0]}
+            defaultValue={initial?.category ?? categories[0] ?? ""}
             aria-invalid={errors.category ? true : undefined}
             onChange={() => clearError("category")}
           >
-            {CONTENT_CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -119,10 +146,28 @@ export function ContentForm({ initial }: ContentFormProps) {
           <AdminInput id="airDate" name="airDate" defaultValue={initial?.year} />
         </AdminField>
 
+        {/* Optional custom URL — blank routes by id. */}
+        <AdminField
+          label="URL 주소 (선택)"
+          htmlFor="slug"
+          hint="영문, 숫자, -, _ 만 사용 가능합니다. 비우면 ID 주소로 접근합니다."
+          error={errors.slug}
+          className="max-w-md"
+        >
+          <AdminInput
+            id="slug"
+            name="slug"
+            defaultValue={initial?.slug ?? ""}
+            placeholder="예: bridge-people-s1"
+            aria-invalid={errors.slug ? true : undefined}
+            onChange={() => clearError("slug")}
+          />
+        </AdminField>
+
         {/* Media: image OR video (mutually exclusive) */}
         <AdminField
           label="대표 미디어"
-          hint="이미지 또는 유튜브 URL 중 하나만 등록할 수 있습니다."
+          error={mediaType === "video" ? errors.youtubeUrl : undefined}
         >
           <div className="inline-flex rounded-lg border border-ink/15 p-1">
             <MediaTab
@@ -145,16 +190,48 @@ export function ContentForm({ initial }: ContentFormProps) {
                 <AdminImageUpload
                   ratio={LANDSCAPE_RATIO}
                   name="image"
+                  initialUrl={initial?.mediaType === "image" ? initial.thumbnail : null}
                   requiredSize={UPLOAD_SIZE.landscape}
+                  output={{ ...UPLOAD_SIZE.landscape, fit: "cover" }}
+                  outputQuality={WEBP_QUALITY_PHOTO}
                 />
                 <p className="mt-2 text-xs text-ink/45">가로형 16:9</p>
               </div>
             ) : (
-              <AdminInput
-                name="youtubeUrl"
-                defaultValue={initial?.youtubeId}
-                placeholder="https://youtube.com/watch?v=..."
-              />
+              <div>
+                <AdminInput
+                  id="youtubeUrl"
+                  name="youtubeUrl"
+                  value={youtubeUrl}
+                  onChange={(e) => {
+                    setYoutubeUrl(e.target.value);
+                    clearError("youtubeUrl");
+                  }}
+                  aria-invalid={errors.youtubeUrl ? true : undefined}
+                  placeholder="https://youtube.com/watch?v=..."
+                />
+                <p className="mt-2 text-xs text-ink/45">
+                  유튜브 URL 만 입력할 수 있습니다.
+                </p>
+
+                {/* Live thumbnail preview once a valid id is parsed. */}
+                {previewId && (
+                  <div className="mt-3">
+                    <p className="mb-1.5 text-xs font-medium text-ink/55">
+                      썸네일 미리보기
+                    </p>
+                    <NextImage
+                      src={youtubeThumbnail(previewId)}
+                      alt=""
+                      width={320}
+                      height={180}
+                      unoptimized
+                      className="w-64 rounded-lg border border-ink/10"
+                      style={{ aspectRatio: LANDSCAPE_RATIO }}
+                    />
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </AdminField>
@@ -164,12 +241,21 @@ export function ContentForm({ initial }: ContentFormProps) {
           <AdminTextarea
             id="body"
             name="body"
-            defaultValue={initial?.synopsis ?? initial?.description}
+            defaultValue={initial?.synopsis}
             className="min-h-48"
             placeholder="작품 소개, 크레딧 등을 자유롭게 작성"
           />
         </AdminField>
       </div>
+
+      {/* Uploads and saves fail for reasons the operator can act on, so the
+          action reports them here. Success redirects to the list. */}
+      {state.error && (
+        <p className="mt-5 flex items-start gap-1.5 text-sm text-red-600">
+          <TriangleAlert size={15} className="mt-0.5 shrink-0" />
+          {state.error}
+        </p>
+      )}
 
       <AdminFormActions cancelHref="/admin/contents" />
     </form>

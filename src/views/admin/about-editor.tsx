@@ -153,16 +153,8 @@ export function AboutEditor({
         <input type="hidden" name="slug" value="about" />
         <Card
           title="페이지 문구"
-          caption="ABOUT 상단에 표시되는 영문 라벨·대제목·소제목입니다."
+          caption="ABOUT 상단에 표시되는 대제목·소제목입니다. 영문 라벨은 홈 배너의 '이동 버튼 문구'에서 관리됩니다."
         >
-          <AdminField label="영문 라벨" htmlFor="aboutEyebrow">
-            <AdminInput
-              id="aboutEyebrow"
-              name="eyebrow"
-              defaultValue={copy?.eyebrow ?? ABOUT.eyebrow}
-              className="max-w-md"
-            />
-          </AdminField>
           <AdminField label="대제목" htmlFor="aboutTitle" hint="줄바꿈 그대로 반영">
             <AdminTextarea
               id="aboutTitle"

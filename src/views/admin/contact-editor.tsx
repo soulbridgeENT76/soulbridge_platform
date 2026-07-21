@@ -1,7 +1,7 @@
 "use client";
 
-import type { FormEvent } from "react";
-import { showToast } from "@shared/ui/toast";
+import { useActionState } from "react";
+import { TriangleAlert } from "lucide-react";
 import {
   AdminField,
   AdminInput,
@@ -10,35 +10,62 @@ import {
   AdminFormActions,
   AdminReferenceCard,
 } from "@widgets/admin-shell";
-import { CONTACT } from "@shared/config/site";
-import { PAGE_COPY } from "@shared/config/page-copy";
+import { useSaveToast } from "@shared/ui/use-save-toast";
+import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
+import type { ContactContent } from "@entities/page-content";
+import { saveContact } from "@features/update-contact";
+
+/** Digits in hyphen-separated groups: "02-000-0000", "0212345678". */
+export const PHONE_PATTERN = /^\d+(-\d+)*$/;
+
+/** A single address: something@something.something, no spaces. */
+export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type ContactEditorProps = {
+  initial: ContactContent;
+  socialsSummary: string;
+};
 
 /**
  * CONTACT page editor — heading copy, contact details, and map location.
  * SNS links are managed on the Brand page.
- * TODO(backend): persist on save.
  */
-export function ContactEditor({ socialsSummary }: { socialsSummary: string }) {
-  const copy = PAGE_COPY.contact;
+export function ContactEditor({ initial, socialsSummary }: ContactEditorProps) {
+  const [state, formAction, pending] = useActionState(saveContact, { ok: true });
+  useSaveToast(state, pending);
+  const { errors, clearError, guardAction } = useFieldErrors();
 
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    // TODO(backend): save contact info.
-    showToast("저장되었습니다");
+  // Phone and email have a format rule; the rest are free text. Both optional,
+  // so a blank one is fine — only a filled one is checked.
+  const validate = (formData: FormData): Record<string, string> => {
+    const errs: Record<string, string> = {};
+    const tel = fieldValue(formData, "tel");
+    if (tel && !PHONE_PATTERN.test(tel)) {
+      errs.tel = "회사번호는 숫자와 - 만 사용할 수 있습니다.";
+    }
+    const email = fieldValue(formData, "email");
+    if (email && !EMAIL_PATTERN.test(email)) {
+      errs.email = "올바른 이메일 형식이 아닙니다.";
+    }
+    return errs;
   };
 
+  const clientAction = guardAction(validate, ["tel", "email"], formAction);
+
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-5">
+    // noValidate turns off the browser's native tooltips (type="email") so the
+    // email error shows inline like every other field, not as a popup.
+    <form action={clientAction} noValidate className="flex flex-col gap-5">
       {/* Heading copy */}
       <Card title="페이지 문구" caption="CONTACT 상단에 표시되는 제목·부제목입니다.">
         <AdminField label="제목" htmlFor="title">
-          <AdminInput id="title" name="title" defaultValue={copy.title} />
+          <AdminInput id="title" name="title" defaultValue={initial.title} />
         </AdminField>
-        <AdminField label="부제목" htmlFor="subtitle" hint="줄바꿈 그대로 반영">
+        <AdminField label="부제목" htmlFor="description" hint="줄바꿈 그대로 반영">
           <AdminTextarea
-            id="subtitle"
-            name="subtitle"
-            defaultValue={copy.description}
+            id="description"
+            name="description"
+            defaultValue={initial.description}
             className="min-h-20"
           />
         </AdminField>
@@ -50,19 +77,34 @@ export function ContactEditor({ socialsSummary }: { socialsSummary: string }) {
           <AdminInput
             id="address"
             name="address"
-            defaultValue={CONTACT.address}
+            defaultValue={initial.address}
           />
         </AdminField>
         <AdminFormGrid>
-          <AdminField label="회사번호" htmlFor="tel">
-            <AdminInput id="tel" name="tel" defaultValue={CONTACT.tel} />
+          <AdminField
+            label="회사번호"
+            htmlFor="tel"
+            hint="숫자와 - 만 사용 가능합니다."
+            error={errors.tel}
+          >
+            <AdminInput
+              id="tel"
+              name="tel"
+              defaultValue={initial.tel}
+              inputMode="tel"
+              placeholder="예: 02-000-0000"
+              aria-invalid={errors.tel ? true : undefined}
+              onChange={() => clearError("tel")}
+            />
           </AdminField>
-          <AdminField label="이메일" htmlFor="email">
+          <AdminField label="이메일" htmlFor="email" error={errors.email}>
             <AdminInput
               id="email"
               name="email"
               type="email"
-              defaultValue={CONTACT.email}
+              defaultValue={initial.email}
+              aria-invalid={errors.email ? true : undefined}
+              onChange={() => clearError("email")}
             />
           </AdminField>
         </AdminFormGrid>
@@ -90,11 +132,18 @@ export function ContactEditor({ socialsSummary }: { socialsSummary: string }) {
           <AdminInput
             id="mapAddress"
             name="mapAddress"
-            defaultValue={CONTACT.mapAddress}
+            defaultValue={initial.mapAddress}
             placeholder="예: 서울특별시 마포구 성암로 330 DMC첨단산업센터"
           />
         </AdminField>
       </Card>
+
+      {state.error && (
+        <p className="flex items-start gap-1.5 text-sm text-red-600">
+          <TriangleAlert size={15} className="mt-0.5 shrink-0" />
+          {state.error}
+        </p>
+      )}
 
       <AdminFormActions cancelHref="/admin" />
     </form>

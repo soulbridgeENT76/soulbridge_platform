@@ -5,9 +5,13 @@ import { SectionVisibilityToggle } from "@widgets/admin-shell/ui/section-visibil
 import { ContactEditor } from "@views/admin";
 import { socialSummary } from "@shared/config/socials";
 import { getBrand, resolveSiteBrand } from "@entities/brand";
+import { getContactAdmin } from "@entities/page-content";
 
 export default async function AdminContactPage() {
-  const { socials } = resolveSiteBrand(await getBrand());
+  const [{ socials }, contact] = await Promise.all([
+    getBrand().then(resolveSiteBrand),
+    getContactAdmin(),
+  ]);
 
   return (
     <div>
@@ -19,7 +23,10 @@ export default async function AdminContactPage() {
         <SectionVisibilityToggle href="/contact" />
       </div>
       <div className="mt-6">
-        <ContactEditor socialsSummary={socialSummary(socials) || "미설정"} />
+        <ContactEditor
+          initial={contact}
+          socialsSummary={socialSummary(socials) || "미설정"}
+        />
       </div>
     </div>
   );

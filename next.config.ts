@@ -37,7 +37,11 @@ const LOCAL_SUPABASE = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.te
 const nextConfig: NextConfig = {
   cacheComponents: true,
   images: {
-    remotePatterns: [supabaseImagePattern()],
+    remotePatterns: [
+      supabaseImagePattern(),
+      // YouTube video thumbnails (content whose media is a YouTube link).
+      { protocol: "https", hostname: "img.youtube.com", pathname: "/vi/**" },
+    ],
     dangerouslyAllowLocalIP: LOCAL_SUPABASE,
   },
 };

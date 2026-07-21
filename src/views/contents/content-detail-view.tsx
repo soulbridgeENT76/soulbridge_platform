@@ -1,22 +1,26 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { PageShell } from "@widgets/page-shell";
 import { Container, PlaceholderImage, Tag } from "@shared/ui";
+import { UPLOAD_SIZE } from "@shared/config/media";
 import { CONTENT_THUMB_RATIO, type Content } from "@entities/content";
 
 type ContentDetailViewProps = {
   content: Content;
 };
 
+/**
+ * Content only — the page owns PageShell so the chrome can prerender while this
+ * streams in behind a Suspense boundary (the slug is runtime data).
+ */
 export function ContentDetailView({ content }: ContentDetailViewProps) {
-  const isYoutube = content.category === "YOUTUBE";
+  const isYoutube = content.mediaType === "youtube";
   const watchUrl = content.youtubeId
     ? `https://www.youtube.com/watch?v=${content.youtubeId}`
     : null;
 
   return (
-    <PageShell>
-      <Container className="pb-24 pt-16 md:pt-24">
+    <Container className="pb-24 pt-16 md:pt-24">
        <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="flex items-center gap-2 text-plum">
@@ -68,20 +72,33 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
             )}
 
             <p className="mt-10 whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
-              {content.synopsis ?? content.description ?? content.note}
+              {content.synopsis || content.note}
             </p>
           </div>
         ) : (
           /* Non-video IP: 16:9 image + description stacked */
           <>
             <div className="mx-auto mt-10 max-w-5xl">
-              <PlaceholderImage
-                label="콘텐츠 대표 이미지"
-                ratio={CONTENT_THUMB_RATIO}
-              />
+              {content.thumbnail ? (
+                <Image
+                  src={content.thumbnail}
+                  alt={content.title}
+                  width={UPLOAD_SIZE.landscape.width}
+                  height={UPLOAD_SIZE.landscape.height}
+                  sizes="(min-width: 1024px) 64rem, 100vw"
+                  priority
+                  className="w-full rounded-2xl object-cover"
+                  style={{ aspectRatio: CONTENT_THUMB_RATIO }}
+                />
+              ) : (
+                <PlaceholderImage
+                  label="콘텐츠 대표 이미지"
+                  ratio={CONTENT_THUMB_RATIO}
+                />
+              )}
             </div>
             <p className="mt-10 whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
-              {content.synopsis ?? content.description ?? content.note}
+              {content.synopsis || content.note}
             </p>
           </>
         )}
@@ -100,7 +117,6 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
           </Link>
         </div>
        </div>
-      </Container>
-    </PageShell>
+    </Container>
   );
 }
