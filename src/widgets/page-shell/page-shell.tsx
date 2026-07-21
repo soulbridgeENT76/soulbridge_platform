@@ -3,7 +3,8 @@ import { SiteHeader } from "@widgets/site-header";
 import { SiteFooter } from "@widgets/site-footer";
 import { PaperTexture } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
-import { getSiteLogo } from "@entities/brand";
+import { getSiteLogo, getSiteBrand } from "@entities/brand";
+import { getVisibleNav } from "@entities/page-content";
 
 type PageShellProps = {
   children: ReactNode;
@@ -19,20 +20,23 @@ export async function PageShell({
   headerVariant = "solid",
   padTop = true,
 }: PageShellProps) {
-  // getSiteLogo is cached under one tag, so awaiting it here costs a single
-  // read for the whole site — and it reads no cookies, which is what keeps
-  // these pages prerenderable under cacheComponents.
-  const logo = await getSiteLogo();
+  // All cookie-free and cached, so the shell stays prerenderable: brand under
+  // BRAND_TAG (one read for the pair), nav under the page-content tag.
+  const [logo, brand, nav] = await Promise.all([
+    getSiteLogo(),
+    getSiteBrand(),
+    getVisibleNav(),
+  ]);
 
   return (
     <div className="relative flex min-h-screen flex-col bg-paper font-sans text-ink">
       <PaperTexture variant="subtle" className="z-0" />
-      <SiteHeader variant={headerVariant} logo={logo} />
+      <SiteHeader variant={headerVariant} logo={logo} brand={brand} nav={nav} />
       <main className={cn("relative z-10 flex-1", padTop && "pt-24 md:pt-28")}>
         {children}
       </main>
       <div className="relative z-10">
-        <SiteFooter logo={logo} />
+        <SiteFooter logo={logo} brand={brand} />
       </div>
     </div>
   );

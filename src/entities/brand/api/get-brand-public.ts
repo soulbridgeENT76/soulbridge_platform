@@ -2,8 +2,8 @@ import { cacheLife, cacheTag } from "next/cache";
 import { createAnonClient } from "@/lib/supabase/anon";
 import { SITE } from "@shared/config/site";
 import { mediaUrl } from "@shared/lib/media-url";
-import { normalizeBrandSettings } from "../model/normalize";
-import type { BrandSettings, SiteLogo } from "../model/types";
+import { normalizeBrandSettings, resolveSiteBrand } from "../model/normalize";
+import type { BrandSettings, SiteBrand, SiteLogo } from "../model/types";
 
 /** Invalidated by saveBrand via updateTag(). */
 export const BRAND_TAG = "brand";
@@ -52,4 +52,18 @@ export async function getSiteLogo(): Promise<SiteLogo> {
   const logo = (await getBrandPublic())?.brand.logo;
   const src = logo && mediaUrl(logo.path);
   return src ? { src, width: logo.width, height: logo.height } : SITE.logo;
+}
+
+/**
+ * The brand text and social links to render. Like getSiteLogo(), never null:
+ * a blank field (or an unreachable database) resolves to the bundled SITE
+ * default, so no caller needs a fallback branch of its own.
+ *
+ * Blank is treated as unset rather than as an intentional empty string — an
+ * operator who clears 회사명 wants the default back, not a nameless header.
+ * Socials differ: a cleared network is genuinely removed, since there is no
+ * sensible default link to fall back to.
+ */
+export async function getSiteBrand(): Promise<SiteBrand> {
+  return resolveSiteBrand(await getBrandPublic());
 }

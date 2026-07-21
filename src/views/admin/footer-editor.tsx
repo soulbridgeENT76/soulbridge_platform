@@ -1,11 +1,17 @@
 import { AdminReferenceCard } from "@widgets/admin-shell";
-import { CONTACT, SITE, SOCIALS } from "@shared/config/site";
+import { CONTACT } from "@shared/config/site";
+import { socialSummary } from "@shared/config/socials";
+import { getBrand, resolveSiteBrand } from "@entities/brand";
 
 /**
  * Footer editor. All footer content is shared with other pages (brand +
  * contact), so this screen only points to their single source of truth.
  */
-export function FooterEditor() {
+export async function FooterEditor() {
+  // The authed, uncached read — a preview that claims to mirror the brand page
+  // has to show what was actually saved, not a cached or bundled stand-in.
+  const brand = resolveSiteBrand(await getBrand());
+
   return (
     <div className="flex flex-col gap-5">
       <AdminReferenceCard
@@ -14,9 +20,9 @@ export function FooterEditor() {
         href="/admin/brand"
         hrefLabel="브랜드에서 편집"
         rows={[
-          { label: "회사명", value: SITE.name },
-          { label: "한줄소개", value: SITE.intro },
-          { label: "SNS", value: SOCIALS.map((s) => s.label).join(" · ") },
+          { label: "회사명", value: brand.name },
+          { label: "한줄소개", value: brand.intro },
+          { label: "SNS", value: socialSummary(brand.socials) || "미설정" },
         ]}
       />
 

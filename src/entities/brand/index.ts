@@ -4,7 +4,9 @@ export type {
   Socials,
   BrandSettings,
   SiteLogo,
+  SiteBrand,
 } from "./model/types";
+export { resolveSiteBrand } from "./model/normalize";
 export { getBrand } from "./api/get-brand";
-export { getSiteLogo, BRAND_TAG } from "./api/get-brand-public";
+export { getSiteLogo, getSiteBrand, BRAND_TAG } from "./api/get-brand-public";
 export { updateBrand } from "./api/update-brand";

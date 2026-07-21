@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { showToast } from "@shared/ui/toast";
 import { cn } from "@shared/lib/cn";
 
 type AdminStatusToggleProps = {
@@ -13,23 +14,42 @@ type AdminStatusToggleProps = {
    * name. Omit in list rows, where the toggle saves on its own.
    */
   name?: string;
+  /**
+   * Bound server action that persists the new state immediately. When set, the
+   * toggle saves on click (optimistic, reverting on failure) rather than
+   * waiting for a form submit. Mutually exclusive with `name`.
+   */
+  action?: (active: boolean) => Promise<{ ok: boolean; error?: string }>;
 };
 
 /**
- * Compact on/off switch for publish state. Used both in list rows (toggle
- * saves immediately) and inside forms (submits with the form via `name`).
- * TODO(backend): in list rows, PATCH on toggle and revert on failure.
+ * Compact on/off switch for publish state. Used in list rows (with `action`, it
+ * saves immediately), inside forms (submits with the form via `name`), or as a
+ * still-unwired stub (neither prop).
  */
 export function AdminStatusToggle({
   initial,
   itemName,
   name,
+  action,
 }: AdminStatusToggleProps) {
   const [active, setActive] = useState(initial);
+  const [pending, startTransition] = useTransition();
 
   const toggle = () => {
-    setActive((v) => !v);
-    // TODO(backend): when used without `name`, PATCH this item's `active` field.
+    const next = !active;
+    setActive(next); // optimistic
+
+    if (!action) return;
+    startTransition(async () => {
+      const result = await action(next);
+      if (result.ok) {
+        showToast(next ? "메뉴에 노출됩니다" : "메뉴에서 숨겨집니다");
+      } else {
+        setActive(!next); // revert
+        showToast(result.error ?? "저장에 실패했습니다.", "error");
+      }
+    });
   };
 
   return (
@@ -41,7 +61,8 @@ export function AdminStatusToggle({
         aria-checked={active}
         aria-label={`${itemName} ${active ? "비활성으로 전환" : "활성으로 전환"}`}
         onClick={toggle}
-        className="inline-flex items-center gap-2"
+        disabled={pending}
+        className="inline-flex items-center gap-2 disabled:opacity-60"
       >
         {/* Knob is placed with flex alignment (no absolute/transform) so it can
             never escape the track or overlap the label. */}

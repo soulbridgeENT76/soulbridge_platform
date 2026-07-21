@@ -1,4 +1,6 @@
-import type { BrandLogo, BrandSettings } from "./types";
+import { SITE } from "@shared/config/site";
+import { toSocialLinks } from "@shared/config/socials";
+import type { BrandLogo, BrandSettings, SiteBrand } from "./types";
 
 /**
  * `brand.logo` was a plain string before the upload feature landed, and a bug
@@ -21,6 +23,25 @@ export function normalizeLogo(raw: unknown): BrandLogo | null {
     return null;
   }
   return { path, width, height };
+}
+
+/**
+ * Applies the bundled SITE defaults to produce render-ready brand text.
+ *
+ * Shared by the public render path and the admin preview cards so the two agree
+ * on what a blank field shows — an operator comparing the two screens should
+ * never see them disagree.
+ *
+ * Blank is "unset", not an intentional empty string: clearing 회사명 should
+ * bring the default back rather than leave a nameless header. Socials differ —
+ * a cleared network is genuinely removed, as there is no default link to use.
+ */
+export function resolveSiteBrand(settings: BrandSettings | null): SiteBrand {
+  return {
+    name: settings?.brand.name?.trim() || SITE.name,
+    intro: settings?.brand.intro?.trim() || SITE.intro,
+    socials: toSocialLinks(settings?.socials),
+  };
 }
 
 /** Shapes a raw `site_settings` row into BrandSettings. */

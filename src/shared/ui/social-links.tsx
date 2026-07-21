@@ -1,35 +1,8 @@
-import type { IconType } from "react-icons";
-import { SiInstagram, SiYoutube } from "react-icons/si";
-import { IoChatbubble } from "react-icons/io5";
+import { SOCIAL_META, type SocialLink } from "@shared/config/socials";
 import { cn } from "@shared/lib/cn";
 
-/** Icons keyed by social label. MESSENGER is a generic chat icon so any
- *  messenger link can be used (KAKAO kept as a legacy alias). */
-const BRAND_ICON: Record<string, IconType> = {
-  INSTAGRAM: SiInstagram,
-  YOUTUBE: SiYoutube,
-  MESSENGER: IoChatbubble,
-  KAKAO: IoChatbubble,
-};
-
-/** Optical size tweak: glyphs fill their box differently, so they read larger
- *  or smaller at the same px size. Nudge each to match the others. */
-const OPTICAL_SCALE: Record<string, number> = {
-  YOUTUBE: 1.15,
-  MESSENGER: 1.05,
-  KAKAO: 1.05,
-};
-
-/** Per-icon vertical nudge in px (negative = up) to align optical centers. */
-const NUDGE_Y: Record<string, number> = {
-  MESSENGER: -0.75,
-  KAKAO: -0.75,
-};
-
-type SocialItem = { label: string; href: string };
-
 type SocialLinksProps = {
-  items: readonly SocialItem[];
+  items: readonly SocialLink[];
   /** Icon size in px. */
   size?: number;
   /** Classes for the wrapping row (e.g. gap / justify). */
@@ -38,25 +11,34 @@ type SocialLinksProps = {
   itemClassName?: string;
 };
 
-/** Row of social links rendered as official brand icons. */
+/**
+ * Row of social links rendered as official brand icons.
+ *
+ * Items carry a SocialKey and are looked up in SOCIAL_META, so the brand
+ * chrome and an artist profile render from the same registry — a network added
+ * there appears in both with no change here.
+ */
 export function SocialLinks({
   items,
   size = 20,
   className,
   itemClassName,
 }: SocialLinksProps) {
+  // Every network can be left blank, so an empty row is normal — render
+  // nothing rather than an empty flex box that still eats its parent's gap.
+  if (items.length === 0) return null;
+
   return (
     <div className={cn("flex items-center gap-5", className)}>
       {items.map((social) => {
-        const Icon = BRAND_ICON[social.label];
-        if (!Icon) return null;
-        const glyphSize = size * (OPTICAL_SCALE[social.label] ?? 1);
-        const nudgeY = NUDGE_Y[social.label];
+        const meta = SOCIAL_META[social.key];
+        if (!meta) return null;
+        const { label, Icon, opticalScale, nudgeY } = meta;
         return (
           <a
-            key={social.label}
+            key={social.key}
             href={social.href}
-            aria-label={social.label}
+            aria-label={label}
             target="_blank"
             rel="noreferrer"
             className={cn(
@@ -65,9 +47,11 @@ export function SocialLinks({
             )}
           >
             <Icon
-              size={glyphSize}
+              size={size * (opticalScale ?? 1)}
               className="block"
-              style={nudgeY ? { transform: `translateY(${nudgeY}px)` } : undefined}
+              style={
+                nudgeY ? { transform: `translateY(${nudgeY}px)` } : undefined
+              }
               aria-hidden
             />
           </a>

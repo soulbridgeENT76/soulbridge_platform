@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { TriangleAlert } from "lucide-react";
 import { AdminField, AdminInput, AdminButton } from "@widgets/admin-shell";
 import { SITE } from "@shared/config/site";
+import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
 import { createClient } from "@/lib/supabase/client";
 import type { SiteLogo } from "@entities/brand";
 
@@ -14,13 +15,30 @@ export function LoginForm({ logo }: { logo: SiteLogo }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const { errors, clearError, flashErrors, focusFirst } = useFieldErrors();
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const form = new FormData(e.currentTarget);
+    // Empty-field checks show inline like the rest of the admin forms; the
+    // credentials-wrong case stays a form-level message (it is not per-field).
+    const errs: Record<string, string> = {};
+    const email = fieldValue(form, "email");
+    if (!email) errs.email = "이메일을 입력해주세요.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errs.email = "올바른 이메일 형식이 아닙니다.";
+    }
+    if (!fieldValue(form, "password")) errs.password = "비밀번호를 입력해주세요.";
+    if (Object.keys(errs).length > 0) {
+      flashErrors(errs);
+      focusFirst(errs, ["email", "password"]);
+      return;
+    }
+
     setError(null);
     setPending(true);
 
-    const form = new FormData(e.currentTarget);
     const supabase = createClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: String(form.get("email") ?? ""),
@@ -60,28 +78,38 @@ export function LoginForm({ logo }: { logo: SiteLogo }) {
 
         <form
           onSubmit={onSubmit}
+          noValidate
           className="mt-8 rounded-2xl border border-ink/10 bg-white p-6 shadow-sm"
         >
           <div className="flex flex-col gap-5">
-            <AdminField label="이메일" htmlFor="email">
+            <AdminField label="이메일" htmlFor="email" required error={errors.email}>
+              {/* No native `required`: the empty-field message shows inline,
+                  not as a browser tooltip. */}
               <AdminInput
                 id="email"
                 name="email"
                 type="email"
                 autoComplete="email"
-                required
                 placeholder="admin@soulbridge.com"
+                aria-invalid={errors.email ? true : undefined}
+                onChange={() => clearError("email")}
               />
             </AdminField>
 
-            <AdminField label="비밀번호" htmlFor="password">
+            <AdminField
+              label="비밀번호"
+              htmlFor="password"
+              required
+              error={errors.password}
+            >
               <AdminInput
                 id="password"
                 name="password"
                 type="password"
                 autoComplete="current-password"
-                required
                 placeholder="••••••••"
+                aria-invalid={errors.password ? true : undefined}
+                onChange={() => clearError("password")}
               />
             </AdminField>
           </div>

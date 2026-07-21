@@ -1,24 +1,30 @@
 import { MapPin } from "lucide-react";
 import { PageShell } from "@widgets/page-shell";
 import { Container, Eyebrow, SocialLinks } from "@shared/ui";
-import { CONTACT, SITE, SOCIALS } from "@shared/config/site";
-import { PAGE_COPY } from "@shared/config/page-copy";
 import { buildMapLinks } from "@shared/lib/map-links";
+import { getSiteBrand } from "@entities/brand";
+import { getContactContent, getSectionEyebrow } from "@entities/page-content";
 
-export function ContactView() {
-  const copy = PAGE_COPY.contact;
+export async function ContactView() {
+  // Both cached and cookie-free, so the page stays prerenderable.
+  const [brand, contact, eyebrow] = await Promise.all([
+    getSiteBrand(),
+    getContactContent(),
+    // The English label mirrors the home banner's CTA button for this section.
+    getSectionEyebrow("/contact"),
+  ]);
   // Map URLs are derived from the address string, not stored.
-  const maps = buildMapLinks(CONTACT.mapAddress);
+  const maps = buildMapLinks(contact.mapAddress);
   return (
     <PageShell>
       {/* Top: message + address / socials */}
       <Container className="pb-16 pt-16 md:pt-24">
-        <Eyebrow className="text-plum">{copy.eyebrow}</Eyebrow>
+        <Eyebrow className="text-plum">{eyebrow ?? contact.eyebrow}</Eyebrow>
         <h1 className="mt-6 max-w-3xl whitespace-pre-line text-3xl/[1.25] font-bold tracking-tight text-ink md:text-4xl/[1.25] lg:text-5xl/[1.25]">
-          {copy.title}
+          {contact.title}
         </h1>
         <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-ink/60 md:text-lg">
-          {copy.description}
+          {contact.description}
         </p>
 
         <div className="mt-14 grid gap-10 border-t border-ink/10 pt-10 sm:grid-cols-2">
@@ -29,22 +35,22 @@ export function ContactView() {
             </p>
             <p className="mt-4 flex items-start gap-2 text-lg text-ink/80">
               <MapPin size={18} className="mt-1 shrink-0 text-ink/40" />
-              {CONTACT.address}
+              {contact.address}
             </p>
             <p className="mt-4 text-sm text-ink/55">
-              TEL {CONTACT.tel}
+              TEL {contact.tel}
               <span className="mx-2 text-ink/20">·</span>
-              {CONTACT.email}
+              {contact.email}
             </p>
           </div>
 
           {/* Follow */}
           <div className="sm:text-right">
             <p className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-plum">
-              FOLLOW {SITE.name.toUpperCase()}
+              FOLLOW {brand.name.toUpperCase()}
             </p>
             <SocialLinks
-              items={SOCIALS}
+              items={brand.socials}
               size={20}
               className="mt-4 sm:justify-end"
               itemClassName="text-ink/60 hover:text-ink"
@@ -58,7 +64,7 @@ export function ContactView() {
         <div className="overflow-hidden rounded-2xl border border-ink/10">
           <iframe
             src={maps.embed}
-            title={`${SITE.name} 위치 지도`}
+            title={`${brand.name} 위치 지도`}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             className="block h-[320px] w-full md:h-[440px]"

@@ -1,3 +1,5 @@
+import type { SocialKey, SocialLink } from "@shared/config/socials";
+
 /**
  * An uploaded logo. `path` is the Storage path inside MEDIA_BUCKET
  * ("logo/<uuid>.webp"), NOT a URL — wrap it with mediaUrl() at render time so
@@ -36,16 +38,26 @@ export type Brand = {
 };
 
 /**
- * Fixed keys rather than a list: social-links.tsx maps label→icon in code, so a
- * new network needs a deploy anyway. Empty string means unset.
+ * Fixed keys rather than a list: SOCIAL_META maps key→icon in code, so a new
+ * network needs a deploy anyway. Deriving the shape from SOCIAL_KEYS keeps the
+ * stored columns and the renderable registry from drifting apart. Empty string
+ * means unset.
  */
-export type Socials = {
-  instagram: string;
-  youtube: string;
-  messenger: string;
-};
+export type Socials = Record<SocialKey, string>;
 
 export type BrandSettings = {
   brand: Brand;
   socials: Socials;
+};
+
+/**
+ * Render-ready brand text and links: the CMS values with the bundled SITE
+ * defaults already substituted for anything left blank. The render path never
+ * has to decide what "unset" should look like.
+ */
+export type SiteBrand = {
+  name: string;
+  intro: string;
+  /** Only the networks actually filled in, in registry order. */
+  socials: SocialLink[];
 };

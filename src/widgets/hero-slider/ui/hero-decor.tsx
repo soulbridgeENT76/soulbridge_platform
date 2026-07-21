@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { SOCIALS } from "@shared/config/site";
+import type { SocialLink } from "@shared/config/socials";
 import { SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 import type { SiteLogo } from "@entities/brand";
@@ -85,10 +85,10 @@ export function HeroWordmark({ logo }: { logo: SiteLogo }) {
 }
 
 /** Social links pinned to the bottom-left of the hero. */
-export function HeroSocials() {
+export function HeroSocials({ socials }: { socials: readonly SocialLink[] }) {
   return (
     <SocialLinks
-      items={SOCIALS}
+      items={socials}
       size={20}
       className="absolute bottom-8 left-6 md:left-10 lg:left-16"
       itemClassName="text-ink/70 hover:text-ink"

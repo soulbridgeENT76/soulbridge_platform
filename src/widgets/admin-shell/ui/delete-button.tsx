@@ -1,24 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { AlertTriangle } from "lucide-react";
+import { showToast } from "@shared/ui/toast";
 import { AdminButton } from "./admin-button";
 
 type DeleteButtonProps = {
   /** Name of the item shown in the confirm dialog. */
   itemName: string;
+  /**
+   * Bound server action performing the delete. Optional: the lists that are
+   * not wired to a backend yet still render the dialog, and confirming there
+   * simply closes it.
+   * TODO(backend): pass this from the contents and notice lists too.
+   */
+  action?: () => Promise<{ ok: boolean; error?: string }>;
 };
 
-/**
- * Ghost "삭제" button that opens a confirmation modal.
- * TODO(backend): call the delete action in `onConfirm`.
- */
-export function DeleteButton({ itemName }: DeleteButtonProps) {
+/** Ghost "삭제" button that opens a confirmation modal. */
+export function DeleteButton({ itemName, action }: DeleteButtonProps) {
   const [open, setOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
 
   const onConfirm = () => {
-    // TODO(backend): perform the delete here, then refresh the list.
-    setOpen(false);
+    if (!action) {
+      setOpen(false);
+      return;
+    }
+    // The action revalidates the list path, so the row disappears on its own —
+    // the dialog only has to report a failure the operator can act on.
+    startTransition(async () => {
+      const result = await action();
+      if (result.ok) {
+        setOpen(false);
+        showToast("삭제되었습니다");
+      } else {
+        showToast(result.error ?? "삭제에 실패했습니다.", "error");
+      }
+    });
   };
 
   return (
@@ -58,8 +77,9 @@ export function DeleteButton({ itemName }: DeleteButtonProps) {
                 variant="solid"
                 className="bg-red-600 hover:bg-red-500"
                 onClick={onConfirm}
+                disabled={pending}
               >
-                삭제
+                {pending ? "삭제 중…" : "삭제"}
               </AdminButton>
             </div>
           </div>

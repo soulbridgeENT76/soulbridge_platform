@@ -14,6 +14,7 @@ import {
   AdminStatusToggle,
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
+import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
 import {
   NEWS_CATEGORIES,
   type NewsItem,
@@ -31,9 +32,26 @@ export function NewsForm({ initial }: NewsFormProps) {
     initial?.linkType ?? "article"
   );
   const external = linkType === "external";
+  const { errors, clearError, flashErrors, focusFirst } = useFieldErrors();
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const errs: Record<string, string> = {};
+    if (!fieldValue(formData, "title")) errs.title = "제목을 입력해주세요.";
+    if (!fieldValue(formData, "date")) errs.date = "작성일을 선택해주세요.";
+    // Only the link mode requires a URL; article mode's link is optional.
+    if (external && !fieldValue(formData, "externalUrl")) {
+      errs.externalUrl = "외부 링크 URL 을 입력해주세요.";
+    }
+
+    if (Object.keys(errs).length > 0) {
+      flashErrors(errs);
+      focusFirst(errs, ["title", "date", "externalUrl"]);
+      return;
+    }
+
     // TODO(backend): collect values and create/update the news record.
     showToast("저장되었습니다");
   };
@@ -46,12 +64,14 @@ export function NewsForm({ initial }: NewsFormProps) {
       />
 
       <div className="mt-8 flex flex-col gap-6">
-        <AdminField label="제목" htmlFor="title" required>
+        <AdminField label="제목" htmlFor="title" required error={errors.title}>
           <AdminInput
             id="title"
             name="title"
             defaultValue={initial?.title}
             placeholder="소식 제목"
+            aria-invalid={errors.title ? true : undefined}
+            onChange={() => clearError("title")}
           />
         </AdminField>
 
@@ -70,12 +90,14 @@ export function NewsForm({ initial }: NewsFormProps) {
             </AdminSelect>
           </AdminField>
 
-          <AdminField label="작성일" htmlFor="date" required>
+          <AdminField label="작성일" htmlFor="date" required error={errors.date}>
             <AdminInput
               id="date"
               name="date"
               type="date"
               defaultValue={initial?.date}
+              aria-invalid={errors.date ? true : undefined}
+              onChange={() => clearError("date")}
             />
           </AdminField>
         </AdminFormGrid>
@@ -127,6 +149,7 @@ export function NewsForm({ initial }: NewsFormProps) {
             htmlFor="externalUrl"
             required
             hint="클릭 시 새 탭에서 이 주소로 바로 이동합니다."
+            error={errors.externalUrl}
           >
             <AdminInput
               id="externalUrl"
@@ -134,6 +157,8 @@ export function NewsForm({ initial }: NewsFormProps) {
               type="url"
               defaultValue={initial?.externalUrl}
               placeholder="https://..."
+              aria-invalid={errors.externalUrl ? true : undefined}
+              onChange={() => clearError("externalUrl")}
             />
           </AdminField>
         ) : (

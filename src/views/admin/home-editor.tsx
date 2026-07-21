@@ -10,10 +10,10 @@ import {
   AdminFormActions,
   AdminReferenceCard,
 } from "@widgets/admin-shell";
-import { SOCIALS } from "@shared/config/site";
 import { LANDSCAPE_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import { cn } from "@shared/lib/cn";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
+import { useSaveToast } from "@shared/ui/use-save-toast";
 import type { HomeSlide } from "@entities/page-content";
 import { saveHomeSlide } from "@features/update-home-slide";
 
@@ -26,10 +26,21 @@ import { saveHomeSlide } from "@features/update-home-slide";
  * this screen and the site can never drift apart.
  * TODO(backend): persist the active slide on save.
  */
-export function HomeEditor({ slides }: { slides: HomeSlide[] }) {
+export function HomeEditor({
+  slides,
+  socialsSummary,
+}: {
+  slides: HomeSlide[];
+  socialsSummary: string;
+}) {
   const [active, setActive] = useState(0);
   const slide = slides[active];
-  const [state, formAction] = useActionState(saveHomeSlide, { ok: true });
+  const [state, formAction, isPending] = useActionState(saveHomeSlide, {
+    ok: true,
+  });
+  // Each slide saves on its own, and the page does not navigate afterwards —
+  // without this the operator gets no sign the write landed.
+  useSaveToast(state, isPending);
 
   if (!slide) {
     return (
@@ -159,7 +170,7 @@ export function HomeEditor({ slides }: { slides: HomeSlide[] }) {
                 href="/admin/brand"
                 hrefLabel="브랜드에서 편집"
                 rows={[
-                  { label: "SNS", value: SOCIALS.map((s) => s.label).join(" · ") },
+                  { label: "SNS", value: socialsSummary },
                 ]}
               />
             )}

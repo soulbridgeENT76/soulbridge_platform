@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
-import { getContentBySlug } from "@entities/content";
+import {
+  getContentByRefAdmin,
+  getContentCategoriesAdmin,
+} from "@entities/content";
 import { ContentForm } from "@views/admin";
 
 export default async function EditContentPage({
@@ -8,7 +11,13 @@ export default async function EditContentPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const content = getContentBySlug(slug);
+  // Authed, uncached — an edit form must show what is actually stored.
+  const [content, categories] = await Promise.all([
+    getContentByRefAdmin(slug),
+    getContentCategoriesAdmin(),
+  ]);
   if (!content) notFound();
-  return <ContentForm initial={content} />;
+  return (
+    <ContentForm initial={content} categories={categories.map((c) => c.name)} />
+  );
 }

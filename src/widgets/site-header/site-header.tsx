@@ -5,10 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { NAV, SOCIALS, CONTACT, SITE } from "@shared/config/site";
+import { CONTACT, type NavItem } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
-import type { SiteLogo } from "@entities/brand";
+import type { SiteBrand, SiteLogo } from "@entities/brand";
 
 type SiteHeaderProps = {
   /**
@@ -18,9 +18,22 @@ type SiteHeaderProps = {
   variant?: "overlay" | "solid";
   /** Resolved by the server parent — the CMS logo, or the bundled default. */
   logo: SiteLogo;
+  /** Resolved by the server parent — CMS brand text and links, with defaults. */
+  brand: SiteBrand;
+  /**
+   * Menu items already filtered to the sections switched on in the CMS. The
+   * server parent resolves this so the visibility read stays cookie-free and
+   * cached, off the client.
+   */
+  nav: NavItem[];
 };
 
-export function SiteHeader({ variant = "solid", logo }: SiteHeaderProps) {
+export function SiteHeader({
+  variant = "solid",
+  logo,
+  brand,
+  nav,
+}: SiteHeaderProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -48,8 +61,9 @@ export function SiteHeader({ variant = "solid", logo }: SiteHeaderProps) {
   // Transparent only while at the top of an overlay-mode page (the light hero).
   const transparent = variant === "overlay" && !scrolled && !menuOpen;
 
-  // Deactivated sections drop out of the nav (route stays reachable by URL).
-  const visibleNav = NAV.filter((item) => item.active !== false);
+  // Already filtered by the server parent; a deactivated section is simply
+  // absent (its route stays reachable by direct URL).
+  const visibleNav = nav;
 
   return (
     <>
@@ -63,10 +77,14 @@ export function SiteHeader({ variant = "solid", logo }: SiteHeaderProps) {
       >
         <Container className="relative flex h-24 max-w-none items-center justify-between md:h-28">
           {/* Wordmark logo (black artwork; header sits on the light paper bg) */}
-          <Link href="/" onClick={() => setMenuOpen(false)} aria-label={SITE.name}>
+          <Link
+            href="/"
+            onClick={() => setMenuOpen(false)}
+            aria-label={brand.name}
+          >
             <Image
               src={logo.src}
-              alt={SITE.name}
+              alt={brand.name}
               width={logo.width}
               height={logo.height}
               priority
@@ -182,14 +200,14 @@ export function SiteHeader({ variant = "solid", logo }: SiteHeaderProps) {
         <div className="mt-auto flex items-center gap-4 border-t border-ink/10 px-7 py-7">
           <Image
             src={logo.src}
-            alt={SITE.name}
+            alt={brand.name}
             width={logo.width}
             height={logo.height}
             className="h-10 w-auto shrink-0"
           />
           <div className="min-w-0 flex-1">
             <SocialLinks
-              items={SOCIALS}
+              items={brand.socials}
               size={18}
               className="justify-end gap-4"
               itemClassName="text-ink/50 hover:text-ink"

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getArtistBySlug } from "@entities/artist";
+import { getArtistBySlugAdmin } from "@entities/artist";
 import { ArtistForm } from "@views/admin";
 
 export default async function EditArtistPage({
@@ -8,7 +8,9 @@ export default async function EditArtistPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const artist = getArtistBySlug(slug);
+  // The authed, uncached read — an edit form has to show what is actually
+  // stored, not a cached copy a save may already have superseded.
+  const artist = await getArtistBySlugAdmin(slug);
   if (!artist) notFound();
   return <ArtistForm initial={artist} />;
 }
