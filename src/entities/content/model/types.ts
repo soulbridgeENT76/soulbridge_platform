@@ -6,30 +6,39 @@ export type ContentCategory =
   | "WEBTOON"
   | "WEBNOVEL";
 
+/** How a content's media renders: an uploaded image or a YouTube embed. */
+export type ContentMediaType = "image" | "youtube";
+
 export type Content = {
-  slug: string;
+  id: string;
+  /** Custom URL slug, or null — then the id is the identifier. */
+  slug: string | null;
+  /** Routing identifier: the custom slug if set, else the id (uuid). */
+  ref: string;
   title: string;
-  category: ContentCategory;
+  /** One of CONTENT_CATEGORIES — stored as free text in the DB. */
+  category: string;
   /** Release year / status line, e.g. "2027" or "2026 — ONGOING". */
   year: string;
-  /** Short note, e.g. "교양 시리즈", "로크미디어 제휴". */
+  /** Short note under the title, e.g. "교양 시리즈". */
   note: string;
-  /** Marks the hero/featured content on the home & contents pages. */
-  featured?: boolean;
-  /** Longer copy shown for featured items. */
-  description?: string;
-  /** Uppercase eyebrow for featured items, e.g. "YOUTUBE ORIGINAL". */
-  badge?: string;
-  /** Longer synopsis shown on the detail page (falls back to description/note). */
-  synopsis?: string;
-  /** YouTube video ID — shows an embedded player + link on the detail page. */
-  youtubeId?: string;
+  /** Detail-page body copy. */
+  synopsis: string;
+  mediaType: ContentMediaType;
+  /** Resolved image URL when mediaType is "image", else null. */
+  thumbnail: string | null;
+  /** YouTube video id when mediaType is "youtube", else null. */
+  youtubeId: string | null;
+  /**
+   * A thumbnail to show in lists/cards: the uploaded image for image media, the
+   * video's thumbnail for YouTube media, or null when neither is set.
+   */
+  preview: string | null;
 };
 
 /**
  * Single source of truth for the content thumbnail aspect ratio, shared by the
- * list card and the detail page. Keep list/detail in sync and make it easy to
- * feed one target size to an image-resizing server later.
+ * list card and the detail page.
  */
 export const CONTENT_THUMB_RATIO = LANDSCAPE_RATIO;
 

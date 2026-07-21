@@ -4,8 +4,8 @@ import {
   AdminLinkButton,
   DeleteButton,
   AdminStatusToggle,
-  SectionVisibilityToggle,
 } from "@widgets/admin-shell";
+import { SectionVisibilityToggle } from "@widgets/admin-shell/ui/section-visibility-toggle";
 import { PageCopyEditor } from "@views/admin";
 import { PAGE_COPY } from "@shared/config/page-copy";
 import { NEWS, formatNewsDate } from "@entities/news";

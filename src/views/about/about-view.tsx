@@ -6,7 +6,11 @@ import {
   PORTFOLIO,
   STRATEGY_PILLARS,
 } from "@entities/about";
-import { getPageCopy, getAboutContent } from "@entities/page-content";
+import {
+  getPageCopy,
+  getAboutContent,
+  getSectionEyebrow,
+} from "@entities/page-content";
 import { LeadershipSection } from "./ui/leadership-section";
 import { AboutSectionList } from "./ui/about-section-list";
 
@@ -46,16 +50,18 @@ const FALLBACK_SECTIONS = [
 export async function AboutView() {
   // The bundled ABOUT constant is the fallback, not a second source of truth:
   // it only shows if the row is missing or the database is unreachable.
-  const [copy, about] = await Promise.all([
+  const [copy, about, eyebrow] = await Promise.all([
     getPageCopy("about"),
     getAboutContent(),
+    // The English label mirrors the home banner's CTA button for this section.
+    getSectionEyebrow("/about"),
   ]);
 
   return (
     <PageShell>
       {/* Left-aligned hero */}
       <Container className="pb-10 pt-16 md:pb-14 md:pt-24">
-        <Eyebrow className="text-plum">{copy?.eyebrow ?? ABOUT.eyebrow}</Eyebrow>
+        <Eyebrow className="text-plum">{eyebrow ?? ABOUT.eyebrow}</Eyebrow>
         <h1 className="mt-6 max-w-4xl whitespace-pre-line text-3xl/[1.25] font-bold tracking-tight text-ink md:text-4xl/[1.25] lg:text-5xl/[1.25]">
           {copy?.title ?? ABOUT.title}
         </h1>

@@ -58,10 +58,5 @@ export const CONTACT = {
   mapAddress: "서울특별시 마포구 성암로 330 DMC첨단산업센터",
 } as const;
 
-export type SocialLink = { label: string; href: string };
-
-export const SOCIALS: SocialLink[] = [
-  { label: "INSTAGRAM", href: "#" },
-  { label: "YOUTUBE", href: "#" },
-  { label: "MESSENGER", href: "#" },
-];
+// Social links are CMS-driven — see @shared/config/socials for the key/icon
+// registry and @entities/brand `getSiteBrand()` for the stored values.

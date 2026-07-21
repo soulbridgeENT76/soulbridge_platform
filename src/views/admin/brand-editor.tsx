@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useState } from "react";
 import { TriangleAlert } from "lucide-react";
-import { showToast } from "@shared/ui/toast";
+import { useSaveToast } from "@shared/ui/use-save-toast";
 import {
   AdminField,
   AdminInput,
@@ -23,18 +23,8 @@ interface BrandEditorProps {
 export function BrandEditor({ initial }: BrandEditorProps) {
   const [brandName, setBrandName] = useState(initial.brand.name);
   const [brandInfo, setBrandInfo] = useState(initial.brand.intro);
-  const [state, formAction] = useActionState(saveBrand, { ok: true });
-
-  // Toast only after a real save. `useActionState` returns a brand-new object
-  // each time the action resolves, so a change of identity from the initial
-  // value means the server actually responded. Comparing against the captured
-  // initial (rather than a first-render flag) also stays correct under React
-  // StrictMode's double-mount, which would otherwise fire a toast on load.
-  const initialState = useRef(state);
-  useEffect(() => {
-    if (state === initialState.current) return;
-    if (state.ok && !state.error) showToast("저장되었습니다");
-  }, [state]);
+  const [state, formAction, isPending] = useActionState(saveBrand, { ok: true });
+  useSaveToast(state, isPending);
 
   return (
     <form action={formAction} className="flex flex-col gap-5">

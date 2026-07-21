@@ -1,21 +1,33 @@
+import { Suspense } from "react";
 import { Plus } from "lucide-react";
 import {
   AdminPageHeader,
   AdminLinkButton,
-  DeleteButton,
-  SectionVisibilityToggle,
 } from "@widgets/admin-shell";
-import { PageCopyEditor } from "@views/admin";
+import { SectionVisibilityToggle } from "@widgets/admin-shell/ui/section-visibility-toggle";
+import { PageCopyEditor, ArtistTable } from "@views/admin";
+// Imported by path, not from the @shared/ui barrel: that barrel is pulled into
+// server components and deliberately keeps client-only toast modules out.
+import { RedirectToast } from "@shared/ui/redirect-toast";
 import { PAGE_COPY } from "@shared/config/page-copy";
-import { ARTISTS } from "@entities/artist";
+import { getArtistsAdmin } from "@entities/artist";
 
-// TODO(backend): read from DB/API instead of the static ARTISTS array.
-export default function AdminArtistsPage() {
+export default async function AdminArtistsPage() {
+  // Authed and uncached: the list is the operator's view of the truth, so it
+  // must not lag a save by however long the public cache entry lives.
+  const artists = await getArtistsAdmin();
+
   return (
     <div>
+      {/* Confirms a save that redirected here from the form. useSearchParams
+          needs a Suspense boundary under cacheComponents. */}
+      <Suspense>
+        <RedirectToast param="saved" />
+      </Suspense>
+
       <AdminPageHeader
         title="ARTISTS"
-        description={`총 ${ARTISTS.length}명`}
+        description={`총 ${artists.length}명`}
         action={
           <AdminLinkButton href="/admin/artists/new" variant="solid">
             <Plus size={16} />새 아티스트
@@ -34,41 +46,13 @@ export default function AdminArtistsPage() {
         />
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-ink/10 bg-white">
-        <table className="w-full text-center text-sm">
-          <thead className="border-b border-ink/10 text-xs uppercase tracking-wider text-ink/45">
-            <tr>
-              <th className="px-5 py-3.5 font-semibold">이름</th>
-              <th className="px-5 py-3.5 font-semibold">역할</th>
-              <th className="px-5 py-3.5 font-semibold">관리</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-ink/[0.06]">
-            {ARTISTS.map((artist) => (
-              <tr key={artist.slug} className="hover:bg-ink/[0.015]">
-                <td className="px-5 py-4 font-medium text-ink">
-                  {artist.nameKo}
-                  <span className="ml-2 text-xs text-ink/40">
-                    {artist.nameEn}
-                  </span>
-                </td>
-                <td className="px-5 py-4 text-ink/60">{artist.role}</td>
-                <td className="px-5 py-4">
-                  <div className="flex justify-center gap-1">
-                    <AdminLinkButton
-                      href={`/admin/artists/${artist.slug}`}
-                      variant="ghost"
-                    >
-                      편집
-                    </AdminLinkButton>
-                    <DeleteButton itemName={artist.nameKo} />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {artists.length === 0 ? (
+        <p className="mt-6 rounded-2xl border border-ink/10 bg-white px-5 py-10 text-center text-sm text-ink/45">
+          등록된 아티스트가 없습니다.
+        </p>
+      ) : (
+        <ArtistTable artists={artists} />
+      )}
     </div>
   );
 }

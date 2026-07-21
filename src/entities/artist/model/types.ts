@@ -1,34 +1,32 @@
-export type ArtistRole = "방송인" | "배우" | "크리에이터";
+import type { SocialLink } from "@shared/config/socials";
 
-/** A single filmography / activity entry. */
+/**
+ * One career entry. `label` is the year or range as typed ("2018",
+ * "2020 — 2024", "2023 — "), so it is free text rather than a date: the roster
+ * mixes single years, ranges and open-ended runs.
+ */
 export type ArtistWork = {
-  year: string;
-  title: string;
-  /** Role in the work, e.g. "주연", "진행", "내레이션". */
-  role: string;
+  label: string;
+  description: string;
 };
 
-/** A social link shown on the detail page. */
-export type ArtistSocial = {
-  /** Uppercase label, e.g. "INSTAGRAM", "YOUTUBE". */
-  label: string;
-  href: string;
-};
+/**
+ * An artist's social link. Keyed by the shared SocialKey registry, the same one
+ * the site footer resolves icons through — see @shared/config/socials.
+ */
+export type ArtistSocial = SocialLink;
 
 export type Artist = {
+  id: string;
+  /** URL identifier. Derived from the English name once, then held fixed. */
   slug: string;
   nameKo: string;
   nameEn: string;
-  role: ArtistRole;
-  /** Optional headline for the home spotlight slide. */
-  spotlight?: {
-    titleEn: string;
-    description: string;
-  };
-  /** Profile bio shown on the detail page (multiline free text). */
-  bio?: string;
-  /** Filmography / activities. */
-  works?: ArtistWork[];
-  /** Social links. */
-  socials?: ArtistSocial[];
+  /** Free text ("방송인", "배우", "크리에이터", …) — the admin field is open. */
+  role: string;
+  bio: string;
+  /** Resolved URL, not a Storage path — null when nothing is uploaded. */
+  photo: string | null;
+  works: ArtistWork[];
+  socials: ArtistSocial[];
 };

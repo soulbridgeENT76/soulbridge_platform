@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { formatNewsDate, PUBLISHED_NEWS } from "@entities/news";
 import type { SiteLogo } from "@entities/brand";
+import type { SocialLink } from "@shared/config/socials";
 import type { HomeSlide } from "@entities/page-content";
 import { Container, PaperTexture } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
@@ -14,6 +15,8 @@ import { HeroWordmark, HeroSocials, ScrollMouse } from "./hero-decor";
 
 type HeroSliderProps = {
   logo: SiteLogo;
+  /** Brand social links, shown pinned to the first slide. */
+  socials: readonly SocialLink[];
   /** Ordered and already filtered by section visibility. */
   slides: HomeSlide[];
 };
@@ -24,7 +27,7 @@ type HeroSliderProps = {
  * Scroll-snap (scoped via `.hero-scroll` in globals.css) makes each banner
  * settle into view.
  */
-export function HeroSlider({ logo, slides }: HeroSliderProps) {
+export function HeroSlider({ logo, socials, slides }: HeroSliderProps) {
   const [active, setActive] = useState(0);
   // The scroll hint shows only while the view is settled on a slide; it fades
   // out the moment scrolling starts and fades back in once it stops.
@@ -281,7 +284,7 @@ export function HeroSlider({ logo, slides }: HeroSliderProps) {
             </Container>
 
             {/* Hero-only decorations on the first banner */}
-            {i === 0 && <HeroSocials />}
+            {i === 0 && <HeroSocials socials={socials} />}
           </section>
         );
       })}

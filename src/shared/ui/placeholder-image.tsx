@@ -9,6 +9,13 @@ type PlaceholderImageProps = {
   ratio?: string;
   /** Tone of the placeholder fill. */
   tone?: "light" | "dark";
+  /**
+   * "sm" tightens the frame and drops the caption, for thumbnail-sized boxes
+   * (admin list rows) where the full ornament would not fit. The fill and
+   * texture stay identical, so a thumbnail still reads as the same placeholder
+   * the public page shows.
+   */
+  size?: "md" | "sm";
   className?: string;
 };
 
@@ -20,8 +27,10 @@ export function PlaceholderImage({
   label = "IMAGE",
   ratio = "3 / 4",
   tone = "light",
+  size = "md",
   className,
 }: PlaceholderImageProps) {
+  const compact = size === "sm";
   return (
     <div
       style={{ aspectRatio: ratio } as CSSProperties}
@@ -38,7 +47,8 @@ export function PlaceholderImage({
       <span
         aria-hidden
         className={cn(
-          "pointer-events-none absolute inset-3 border",
+          "pointer-events-none absolute border",
+          compact ? "inset-1" : "inset-3",
           tone === "light" ? "border-ink/10" : "border-paper/10"
         )}
       />
@@ -46,13 +56,18 @@ export function PlaceholderImage({
         <span
           aria-hidden
           className={cn(
-            "h-6 w-6 rounded-full border",
+            "rounded-full border",
+            compact ? "h-3 w-3" : "h-6 w-6",
             tone === "light" ? "border-ink/25" : "border-paper/25"
           )}
         />
-        <span className="px-4 text-center font-display text-[11px] font-medium uppercase tracking-[0.2em]">
-          {label}
-        </span>
+        {/* The caption needs room the thumbnail does not have; the fill and
+            hairline frame alone still read as the same placeholder. */}
+        {!compact && (
+          <span className="px-4 text-center font-display text-[11px] font-medium uppercase tracking-[0.2em]">
+            {label}
+          </span>
+        )}
       </span>
     </div>
   );

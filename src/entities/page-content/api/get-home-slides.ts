@@ -1,11 +1,12 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { createAnonClient } from "@/lib/supabase/anon";
-import { NAV } from "@shared/config/site";
 import { mediaUrl } from "@shared/lib/media-url";
 import type { HomeSlide } from "../model/types";
+import { getHiddenSectionSlugs, sectionSlug } from "./get-sections";
 
-/** Invalidated by the admin save action once home editing is wired up. */
-export const PAGE_CONTENT_TAG = "page-content";
+// Re-exported for the readers and actions that import it from here.
+export { PAGE_CONTENT_TAG } from "./tags";
+import { PAGE_CONTENT_TAG } from "./tags";
 
 /** Home slides live under this slug prefix: "home/about", "home/contents", … */
 const HOME_SLUG_PREFIX = "home/";
@@ -85,17 +86,39 @@ export async function getHomeSlides(): Promise<HomeSlide[]> {
 
 /**
  * Slides actually shown to visitors. A slide whose section menu is switched off
- * is dropped here too, so home never advertises a page the header hides.
+ * (page_contents.is_active = false on the section it points at) is dropped here
+ * too, so home never advertises a page the header hides.
  *
- * Deliberately outside the cache: NAV is a code constant today, and folding it
- * into the cached entry would keep serving the old visibility after a deploy.
+ * Both reads share the page-content tag, so the admin toggle invalidates the
+ * home banner and the header nav together.
  */
 export async function getVisibleHomeSlides(): Promise<HomeSlide[]> {
-  const slides = await getHomeSlides();
+  const [slides, hidden] = await Promise.all([
+    getHomeSlides(),
+    getHiddenSectionSlugs(),
+  ]);
 
   return slides.filter((slide) => {
     if (!slide.section) return true;
-    const nav = NAV.find((n) => n.href === slide.section);
-    return !nav || nav.active !== false;
+    return !hidden.has(sectionSlug(slide.section));
   });
+}
+
+/**
+ * The English label for a section page's top eyebrow.
+ *
+ * It is the very string that section's home-slide CTA button shows ("페이지
+ * 이동 버튼 문구"), read straight from the slide — so the button and the page
+ * label share one source and can never drift. Editing it in the home editor
+ * updates both at once.
+ *
+ * null when the section has no slide or its CTA label is blank; the caller
+ * falls back to its bundled copy.
+ */
+export async function getSectionEyebrow(
+  sectionHref: string
+): Promise<string | null> {
+  const slides = await getHomeSlides();
+  const label = slides.find((s) => s.section === sectionHref)?.cta.label.trim();
+  return label ? label : null;
 }

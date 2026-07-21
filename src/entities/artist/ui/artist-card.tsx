@@ -1,6 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { PlaceholderImage } from "@shared/ui";
-import { PORTRAIT_RATIO } from "@shared/config/media";
+import { PORTRAIT_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import type { Artist } from "../model/types";
 
 type ArtistCardProps = {
@@ -14,11 +15,25 @@ export function ArtistCard({ artist, index }: ArtistCardProps) {
   return (
     <Link href={`/artists/${artist.slug}`} className="group block">
       <div className="relative overflow-hidden">
-        <PlaceholderImage
-          label={`${artist.nameKo} · 프로필`}
-          ratio={PORTRAIT_RATIO}
-          className="transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-        />
+        {/* The placeholder stays the fallback: a roster can hold an artist
+            whose profile cut has not been supplied yet. */}
+        {artist.photo ? (
+          <Image
+            src={artist.photo}
+            alt={`${artist.nameKo} · 프로필`}
+            width={UPLOAD_SIZE.portrait.width}
+            height={UPLOAD_SIZE.portrait.height}
+            sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
+            style={{ aspectRatio: PORTRAIT_RATIO }}
+            className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          />
+        ) : (
+          <PlaceholderImage
+            label={`${artist.nameKo} · 프로필`}
+            ratio={PORTRAIT_RATIO}
+            className="transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          />
+        )}
         {index != null && (
           <span className="absolute left-4 top-4 font-display text-xs font-semibold tracking-widest text-ink/40">
             {String(index).padStart(2, "0")}

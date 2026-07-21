@@ -2,7 +2,9 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@shared/lib/cn";
 
 const controlBase =
-  "w-full rounded-lg border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-ink/30 focus:border-brand";
+  // aria-invalid rules win by specificity (attr + pseudo), so a red border
+  // shows without fighting the base border/focus classes.
+  "w-full rounded-lg border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-ink/30 focus:border-brand aria-[invalid=true]:border-red-500 aria-[invalid=true]:focus:border-red-500";
 
 /** Labeled field wrapper. */
 export function AdminField({
@@ -10,6 +12,7 @@ export function AdminField({
   htmlFor,
   hint,
   required,
+  error,
   className,
   children,
 }: {
@@ -17,6 +20,8 @@ export function AdminField({
   htmlFor?: string;
   hint?: string;
   required?: boolean;
+  /** Transient validation message shown inline next to the label. */
+  error?: string | null;
   className?: string;
   children: ReactNode;
 }) {
@@ -25,6 +30,9 @@ export function AdminField({
       <label htmlFor={htmlFor} className="text-sm font-semibold text-ink">
         {label}
         {required && <span className="ml-1 text-brand">*</span>}
+        {error && (
+          <span className="ml-2 text-xs font-medium text-red-600">{error}</span>
+        )}
       </label>
       {children}
       {hint && <p className="text-xs text-ink/45">{hint}</p>}
