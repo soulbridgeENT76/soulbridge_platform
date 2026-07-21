@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { NewsView } from "@views/news";
+import { NoticesView } from "@views/notices";
 
 export const metadata: Metadata = { title: "News" };
 
-export default function NewsPage() {
-  return <NewsView />;
+export default function NoticePage() {
+  return <NoticesView />;
 }

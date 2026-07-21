@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { PageShell } from "@widgets/page-shell";
 import { Container, Tag } from "@shared/ui";
-import { formatNewsDate, type NewsItem } from "@entities/news";
+import { formatNoticeDate, type Notice } from "@entities/notices";
 
-type NewsDetailViewProps = {
-  item: NewsItem;
+type NoticeDetailViewProps = {
+  item: Notice;
 };
 
-export function NewsDetailView({ item }: NewsDetailViewProps) {
+/**
+ * Content only — the page owns PageShell so the chrome can prerender while this
+ * streams in behind a Suspense boundary (the slug is runtime data).
+ */
+export function NoticeDetailView({ item }: NoticeDetailViewProps) {
   return (
-    <PageShell>
-      <Container className="pb-24 pt-16 md:pt-24">
+    <Container className="pb-24 pt-16 md:pt-24">
         {/* min-height keeps even short articles tall enough to scroll, so the
             fixed header doesn't shift when the scrollbar appears/disappears. */}
         <div className="mx-auto flex min-h-screen max-w-6xl flex-col">
@@ -25,7 +27,7 @@ export function NewsDetailView({ item }: NewsDetailViewProps) {
 
           {/* Byline: date */}
           <div className="mt-5 text-sm text-ink/50">
-            작성일 {formatNewsDate(item.date)}
+            게시일 {formatNoticeDate(item.date)}
           </div>
 
           {/* Body */}
@@ -46,7 +48,7 @@ export function NewsDetailView({ item }: NewsDetailViewProps) {
                 rel="noreferrer noopener"
                 className="group inline-flex items-center gap-2 rounded-full border border-ink/15 px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-plum hover:text-plum"
               >
-                원문 보기
+                관련 링크
                 <ArrowUpRight
                   size={16}
                   className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -69,7 +71,6 @@ export function NewsDetailView({ item }: NewsDetailViewProps) {
             </Link>
           </div>
         </div>
-      </Container>
-    </PageShell>
+    </Container>
   );
 }
