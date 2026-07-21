@@ -39,10 +39,10 @@ export default async function AdminNoticePage() {
       </Suspense>
 
       <AdminPageHeader
-        title="NOTICE"
+        title="NOTICES"
         description={`총 ${notices.length}개`}
         action={
-          <AdminLinkButton href="/admin/notice/new" variant="solid">
+          <AdminLinkButton href="/admin/notices/new" variant="solid">
             <Plus size={16} />새 소식
           </AdminLinkButton>
         }
@@ -105,7 +105,7 @@ export default async function AdminNoticePage() {
                   <td className="px-5 py-4">
                     <div className="flex justify-center gap-1">
                       <AdminLinkButton
-                        href={`/admin/notice/${item.ref}`}
+                        href={`/admin/notices/${item.ref}`}
                         variant="ghost"
                       >
                         편집

@@ -13,7 +13,6 @@ create table public.contents (
     id uuid primary key default gen_random_uuid(),
     slug text unique,                      -- 선택 커스텀 URL (없으면 id 로 접근)
     category text not null,                -- content_categories.name
-    author_id uuid references public.profiles (id) on delete set null,
     title text not null,
     year text not null default '',         -- 방영·제작일자 표기
     thumbnail_url text,                    -- 이미지 Storage 경로 또는 유튜브 id

@@ -219,7 +219,7 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin/notice" />
+      <AdminFormActions cancelHref="/admin/notices" />
     </form>
   );
 }

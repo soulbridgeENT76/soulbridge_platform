@@ -26,7 +26,7 @@ const NAV = [
   { label: "ABOUT", href: "/admin/about", icon: Building2 },
   { label: "CONTENTS", href: "/admin/contents", icon: Film },
   { label: "ARTISTS", href: "/admin/artists", icon: Users },
-  { label: "NOTICE", href: "/admin/notice", icon: Newspaper },
+  { label: "NOTICES", href: "/admin/notices", icon: Newspaper },
   { label: "CONTACT", href: "/admin/contact", icon: MapPin },
   { label: "FOOTER", href: "/admin/footer", icon: PanelBottom },
 ] as const;
