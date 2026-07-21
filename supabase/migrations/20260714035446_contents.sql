@@ -1,5 +1,9 @@
 -- ## content 관련 테이블
--- (profiles 및 public.handle_updated_at() 은 이전 마이그레이션에서 생성됨)
+-- 카테고리는 content_categories 로 관리하고, contents.category 는 그 이름을 텍스트로
+-- 담는다(FK 없음 — 앱이 카테고리를 문자열로 다룬다). slug 는 선택값이다: 지정하면
+-- 커스텀 URL, 비우면 id(uuid)로 접근한다. thumbnail_type 0=이미지 / 1=유튜브.
+-- (public.handle_updated_at() 은 news 마이그레이션에서 생성됨)
+
 create table public.content_categories (
     id bigint generated always as identity primary key,
     name text not null unique
@@ -7,18 +11,19 @@ create table public.content_categories (
 
 create table public.contents (
     id uuid primary key default gen_random_uuid(),
-    category_id bigint not null references public.content_categories (id) on delete restrict,
+    slug text unique,                      -- 선택 커스텀 URL (없으면 id 로 접근)
+    category text not null,                -- content_categories.name
     author_id uuid references public.profiles (id) on delete set null,
     title text not null,
-    thumbnail_url text,
-    tuhmbnail_type smallint not null, -- 0: image, 1: youtube link
-    description text, -- 제목 하단 상세
-    content text not null, -- 내용
+    year text not null default '',         -- 방영·제작일자 표기
+    thumbnail_url text,                    -- 이미지 Storage 경로 또는 유튜브 id
+    thumbnail_type smallint not null,      -- 0: image, 1: youtube
+    description text,                      -- 제목 하단 노트
+    content text not null,                 -- 상세 본문
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
 
--- updated_at 자동 갱신
 create or replace function public.handle_updated_at()
 returns trigger language plpgsql as $$
 begin
@@ -31,9 +36,9 @@ create trigger contents_set_updated_at
     before update on public.contents
     for each row execute function public.handle_updated_at();
 
--- #### RLS
--- 조회는 누구나(비로그인 anon 포함), 생성/수정/삭제는 로그인 관리자만.
--- anon도 읽으려면 테이블 GRANT와 RLS 정책 양쪽에 anon이 포함돼야 한다.
+create index contents_created_at_idx on public.contents (created_at);
+
+-- ## RLS — 조회는 anon 포함 전체, 쓰기는 로그인 관리자.
 grant select on public.content_categories to anon;
 grant select on public.contents to anon;
 grant select, insert, update, delete on public.content_categories to authenticated;
@@ -42,16 +47,11 @@ grant select, insert, update, delete on public.contents to authenticated;
 alter table public.content_categories enable row level security;
 alter table public.contents enable row level security;
 
--- 카테고리: 로그인 유저 전체 접근
 create policy "authenticated full access"
     on public.content_categories for all to authenticated
     using (true)
     with check (true);
 
--- 조회(공개): 비로그인도 전체 조회 가능. 콘텐츠에는 뉴스의 is_active/published_at 같은
--- 공개 게이트가 없으므로, 등록되는 즉시 공개된다.
--- (authenticated의 조회는 위 "authenticated full access"가 이미 커버하므로 여기선 anon만
---  지정한다. anon, authenticated를 함께 쓰면 SELECT 정책이 중복 평가된다.)
 create policy "public can read content_categories"
     on public.content_categories for select to anon
     using (true);
@@ -60,12 +60,10 @@ create policy "public can read contents"
     on public.contents for select to anon
     using (true);
 
--- 조회: 로그인 유저 모두
 create policy "authenticated can read contents"
     on public.contents for select to authenticated
     using (true);
 
--- 생성/수정/삭제: 로그인 관리자면 누구나
 create policy "authenticated can insert contents"
     on public.contents for insert to authenticated
     with check (true);
@@ -78,3 +76,84 @@ create policy "authenticated can update contents"
 create policy "authenticated can delete contents"
     on public.contents for delete to authenticated
     using (true);
+
+-- ## 씨드 — 카테고리 목록 + 콘텐츠 7개 (id/created_at 순서 = 표시 순서)
+insert into public.content_categories (name)
+values ('YOUTUBE'), ('DRAMA · OTT'), ('WEBTOON'), ('WEBNOVEL');
+
+insert into public.contents (slug, category, title, year, description, content, thumbnail_type, created_at)
+values
+    ('bridge-people-s1', 'YOUTUBE', '다리를 놓는 사람들 : 시즌 1', '2026', '인터뷰 다큐', '세상 어딘가에서 조용히 사람과 사람을 잇고 있는 이들을 찾아 나선 인터뷰 다큐멘터리입니다.
+화려한 성공담이 아니라, 흔들리면서도 끝내 손을 내미는 순간에 카메라를 둡니다.
+매 회차 한 사람의 진심을 온전히 담아, 지친 하루 끝의 시청자에게 다시 걸어갈 이유를 건넵니다.
+
+매주 수요일 저녁, 소울브릿지ENT 공식 유튜브 채널에서 공개됩니다.
+
+기획·제작 소울브릿지ENT
+연출 김도현
+촬영 이준서, 박민재
+편집 정하늘
+음악 소울브릿지 사운드
+내레이션 손정은
+제작총괄 손정은', 1, timestamptz '2026-07-21 00:00:01+00'),
+    ('temperature-of-sincerity', 'YOUTUBE', '진심의 온도', '2026', '교양 시리즈', '우리는 하루에도 수없이 마음을 주고받지만, 그 온도를 들여다볼 틈은 좀처럼 없습니다.
+「진심의 온도」는 평범한 일상 속 작은 진심이 사람을 어떻게 바꾸는지 차분히 따라가는 교양 시리즈입니다.
+빠르게 소비되는 콘텐츠 사이에서, 오래 남을 온기를 이야기합니다.
+
+기획·제작 소울브릿지ENT
+연출 오세진
+구성 한가람
+촬영 박민재
+편집 정하늘
+음악 소울브릿지 사운드', 1, timestamptz '2026-07-21 00:00:02+00'),
+    ('bridge-talk', 'YOUTUBE', '브릿지 토크', '2026', '인터뷰 예능', '편안한 자리, 솔직한 대화.
+「브릿지 토크」는 화제의 인물을 무대가 아닌 눈높이에서 마주하는 인터뷰 예능입니다.
+준비된 답변 대신 예상 밖의 진심이 터져 나오는 순간을 포착해, 보는 이에게 웃음과 여운을 동시에 남깁니다.
+
+기획·제작 소울브릿지ENT
+연출 김도현
+작가 유서연, 한가람
+촬영 이준서
+편집 조은별
+음악 소울브릿지 사운드
+진행 손정은', 1, timestamptz '2026-07-21 00:00:03+00'),
+    ('soulbridge-drama', 'DRAMA · OTT', '소울브릿지 (가제)', '2027', '공동 기획', '독점 원천 IP를 바탕으로 개발 중인 오리지널 드라마입니다.
+서로 다른 세계에 속한 두 사람이 하나의 사건으로 연결되며 벌어지는 이야기를 그립니다.
+소울브릿지ENT가 지향하는 ''메시지 중심 서사''를 고품질 영상 언어로 구현하는 첫 대형 프로젝트입니다.
+
+2027년 방영을 목표로 프리프로덕션이 진행 중입니다.
+
+기획 소울브릿지ENT
+극본 개발 중
+연출 캐스팅 예정
+원작 IP 소울브릿지ENT
+공동제작 소울브릿지ENT · 파트너 스튜디오
+제작총괄 손정은', 0, timestamptz '2026-07-21 00:00:04+00'),
+    ('art-of-connection', 'DRAMA · OTT', '연결의 기술', '2028', '글로벌 유통', '단절의 시대에 ''연결''은 기술일까, 마음일까.
+글로벌 OTT 유통을 목표로 기획 중인 웰메이드 콘텐츠로, 문화와 언어를 넘어 공감을 만들어내는 이야기를 지향합니다.
+원천 IP의 힘을 국제 무대에서 증명할 소울브릿지ENT의 글로벌 도전작입니다.
+
+기획 소울브릿지ENT
+극본 개발 중
+원작 IP 소울브릿지ENT
+공동제작 글로벌 파트너 협의 중
+배급 글로벌 OTT (협의 중)
+제작총괄 손정은', 0, timestamptz '2026-07-21 00:00:05+00'),
+    ('second-season', 'WEBTOON', '두 번째 계절', '2027', '로크미디어 제휴', '로크미디어와 함께 선보이는 오리지널 웹툰입니다.
+끝난 줄 알았던 계절이 다시 찾아오듯, 놓쳐버린 인연과 다시 마주하게 된 사람들의 이야기를 섬세한 감성으로 그립니다.
+드라마·애니메이션으로 확장될 트랜스미디어 원형 IP입니다.
+
+글 제휴 작가
+그림 제휴 작가
+기획 소울브릿지ENT
+제공 로크미디어 · 소울브릿지ENT
+IP 매니지먼트 소울브릿지ENT', 0, timestamptz '2026-07-21 00:00:06+00'),
+    ('night-interview', 'WEBNOVEL', '밤의 인터뷰', '2027', '원천 IP', '모두가 잠든 시각, 한 통의 인터뷰 요청으로 시작되는 미스터리 웹소설입니다.
+진실에 다가갈수록 드러나는 인물들의 내면을 촘촘한 심리 묘사로 파고듭니다.
+영상화를 염두에 두고 설계된 독점 원천 IP로, 강력한 서사 확장 가능성을 지녔습니다.
+
+글 제휴 작가
+기획 소울브릿지ENT
+편집 소울브릿지ENT 콘텐츠팀
+원천 IP 소울브릿지ENT', 0, timestamptz '2026-07-21 00:00:07+00')
+on conflict (slug) do nothing;
