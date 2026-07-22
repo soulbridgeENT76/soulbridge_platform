@@ -38,7 +38,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
         {isYoutube ? (
           /* Video content: player first, description below */
           <div className="mx-auto mt-10 max-w-5xl">
-            <div className="aspect-video w-full overflow-hidden rounded-2xl bg-ink">
+            <div className="aspect-video w-full overflow-hidden rounded-md bg-ink shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
               {content.youtubeId ? (
                 <iframe
                   className="h-full w-full"
@@ -76,7 +76,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
         ) : (
           /* Non-video IP: image at its natural ratio + description stacked */
           <>
-            <div className="mx-auto mt-10 max-w-5xl">
+            <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-md shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
               {content.thumbnail ? (
                 // Plain img so the detail shows the image at its true ratio: the
                 // stored master is native-ratio WebP (capped), and the list card
