@@ -50,7 +50,7 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
   const previewId = parseYoutubeId(youtubeUrl);
 
   const [state, formAction] = useActionState(saveContent, { ok: true });
-  const { errors, clearError, guardAction } = useFieldErrors();
+  const { errors, clearError, guardSubmit } = useFieldErrors();
 
   const validate = (formData: FormData): Record<string, string> => {
     const errs: Record<string, string> = {};
@@ -73,14 +73,14 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
     return errs;
   };
 
-  const clientAction = guardAction(
+  const clientSubmit = guardSubmit(
     validate,
     ["category", "title", "slug", "youtubeUrl"],
     formAction
   );
 
   return (
-    <form action={clientAction}>
+    <form onSubmit={clientSubmit}>
       {/* Empty on create — the action reads this to tell insert from update. */}
       <input type="hidden" name="id" value={initial?.id ?? ""} />
       <input type="hidden" name="mediaType" value={mediaType} />
@@ -247,6 +247,21 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
             defaultValue={initial?.synopsis}
             className="min-h-48"
             placeholder="작품 소개, 크레딧 등을 자유롭게 작성"
+          />
+        </AdminField>
+
+        {/* Related link */}
+        <AdminField
+          label="관련 링크 (선택)"
+          htmlFor="referenceUrl"
+          hint="입력하면 상세 페이지에 '관련 링크' 버튼으로 표시됩니다."
+        >
+          <AdminInput
+            id="referenceUrl"
+            name="referenceUrl"
+            type="url"
+            defaultValue={initial?.referenceUrl}
+            placeholder="https://... (선택)"
           />
         </AdminField>
       </div>

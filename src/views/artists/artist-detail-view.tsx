@@ -21,7 +21,7 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
           {/* Profile: image left, intro right */}
           {/* Image column matches the About → Leadership profile (18rem). */}
           <div className="grid gap-8 sm:grid-cols-[minmax(0,18rem)_1fr] sm:gap-12">
-            <div className="self-start overflow-hidden rounded-md">
+            <div className="self-start overflow-hidden rounded-md shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
               {artist.photo ? (
                 <Image
                   src={artist.photo}

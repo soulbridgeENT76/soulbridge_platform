@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 /**
  * Client-side field validation shared by the admin forms.
@@ -48,16 +48,23 @@ export function useFieldErrors() {
   };
 
   /**
-   * Wraps a FormData action: validate first, and on any error flash the
-   * messages, focus the first invalid field, and skip the submit.
+   * onSubmit handler: validate first, and on any error flash the messages,
+   * focus the first invalid field, and skip the submit.
+   *
+   * Bound to `onSubmit` (not `<form action>`) on purpose: React 19 auto-resets
+   * a form after its `action` runs — even when the action bails early on a
+   * validation error — which wipes what the operator typed. Calling
+   * preventDefault and dispatching the action ourselves keeps the fields intact.
    */
-  const guardAction =
+  const guardSubmit =
     (
       validate: (formData: FormData) => Record<string, string>,
       order: readonly string[],
       action: (formData: FormData) => void
     ) =>
-    (formData: FormData) => {
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const formData = new FormData(event.currentTarget);
       const errs = validate(formData);
       if (Object.keys(errs).length > 0) {
         flashErrors(errs);
@@ -67,7 +74,20 @@ export function useFieldErrors() {
       action(formData);
     };
 
-  return { errors, clearError, flashErrors, focusFirst, guardAction };
+  return { errors, clearError, flashErrors, focusFirst, guardSubmit };
+}
+
+/**
+ * onSubmit handler for forms with no client validation. Same reason as
+ * guardSubmit: preventDefault stops React 19 from auto-resetting the form
+ * (which would discard the operator's input) after the action runs — relevant
+ * when the server action returns an error and the form stays on screen.
+ */
+export function submitAction(action: (formData: FormData) => void) {
+  return (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    action(new FormData(event.currentTarget));
+  };
 }
 
 /** Trimmed string value of a FormData field. */

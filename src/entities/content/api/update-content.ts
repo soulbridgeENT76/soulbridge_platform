@@ -21,6 +21,8 @@ export type ContentInput = {
   year: string;
   note: string;
   synopsis: string;
+  /** Optional related link. */
+  referenceUrl: string | null;
   /** 0 = image, 1 = youtube. */
   thumbnailType: 0 | 1;
   thumbnailUrl: string | null;
@@ -34,6 +36,7 @@ function columns(input: ContentInput) {
     year: input.year,
     description: input.note,
     content: input.synopsis,
+    reference_url: input.referenceUrl,
     thumbnail_type: input.thumbnailType,
     thumbnail_url: input.thumbnailUrl,
   };

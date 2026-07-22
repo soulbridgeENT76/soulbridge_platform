@@ -33,7 +33,7 @@ type ContactEditorProps = {
 export function ContactEditor({ initial, socialsSummary }: ContactEditorProps) {
   const [state, formAction, pending] = useActionState(saveContact, { ok: true });
   useSaveToast(state, pending);
-  const { errors, clearError, guardAction } = useFieldErrors();
+  const { errors, clearError, guardSubmit } = useFieldErrors();
 
   // Phone and email have a format rule; the rest are free text. Both optional,
   // so a blank one is fine — only a filled one is checked.
@@ -50,12 +50,12 @@ export function ContactEditor({ initial, socialsSummary }: ContactEditorProps) {
     return errs;
   };
 
-  const clientAction = guardAction(validate, ["tel", "email"], formAction);
+  const clientSubmit = guardSubmit(validate, ["tel", "email"], formAction);
 
   return (
     // noValidate turns off the browser's native tooltips (type="email") so the
     // email error shows inline like every other field, not as a popup.
-    <form action={clientAction} noValidate className="flex flex-col gap-5">
+    <form onSubmit={clientSubmit} noValidate className="flex flex-col gap-5">
       {/* Heading copy */}
       <Card title="페이지 문구" caption="CONTACT 상단에 표시되는 제목·부제목입니다.">
         <AdminField label="제목" htmlFor="title">

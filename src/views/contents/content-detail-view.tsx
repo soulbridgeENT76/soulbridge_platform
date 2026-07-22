@@ -40,7 +40,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
         {isYoutube ? (
           /* Video content: player first, description below */
           <div className="mx-auto mt-10 max-w-5xl">
-            <div className="aspect-video w-full overflow-hidden rounded-md bg-ink">
+            <div className="aspect-video w-full overflow-hidden rounded-md bg-ink shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
               {content.youtubeId ? (
                 <iframe
                   className="h-full w-full"
@@ -78,7 +78,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
         ) : (
           /* Non-video IP: 16:9 image + description stacked */
           <>
-            <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-md">
+            <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-md shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
               {content.thumbnail ? (
                 <Image
                   src={content.thumbnail}
@@ -101,6 +101,24 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
               {content.synopsis || content.note}
             </p>
           </>
+        )}
+
+        {/* Related link — shown regardless of media type when set. */}
+        {content.referenceUrl && (
+          <div className="mt-8">
+            <a
+              href={content.referenceUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="group inline-flex items-center gap-2 rounded-full border border-ink/15 px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-plum hover:text-plum"
+            >
+              관련 링크
+              <ArrowUpRight
+                size={16}
+                className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            </a>
+          </div>
         )}
 
         {/* Back-to-list CTA */}

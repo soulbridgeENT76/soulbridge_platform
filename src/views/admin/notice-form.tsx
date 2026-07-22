@@ -33,7 +33,7 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
   const external = linkType === "external";
 
   const [state, formAction] = useActionState(saveNotice, { ok: true });
-  const { errors, clearError, guardAction } = useFieldErrors();
+  const { errors, clearError, guardSubmit } = useFieldErrors();
 
   const validate = (formData: FormData): Record<string, string> => {
     const errs: Record<string, string> = {};
@@ -50,14 +50,14 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
     return errs;
   };
 
-  const clientAction = guardAction(
+  const clientSubmit = guardSubmit(
     validate,
     ["title", "date", "externalUrl", "slug"],
     formAction
   );
 
   return (
-    <form action={clientAction}>
+    <form onSubmit={clientSubmit}>
       {/* Empty on create — the action reads this to tell insert from update. */}
       <input type="hidden" name="id" value={initial?.id ?? ""} />
 

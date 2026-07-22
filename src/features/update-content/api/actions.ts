@@ -126,6 +126,7 @@ export async function saveContent(
     year: text(formData.get("airDate")),
     note: text(formData.get("subtitle")),
     synopsis: String(formData.get("body") ?? ""),
+    referenceUrl: text(formData.get("referenceUrl")) || null,
     thumbnailType,
     thumbnailUrl,
   };
