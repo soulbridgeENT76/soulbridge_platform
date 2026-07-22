@@ -215,14 +215,14 @@ export function AboutEditor({
 
         <AdminField
           label="프로필 이미지"
-          hint="세로형 3:4로 자동 조정 · 권장 1200 × 1600"
+          hint="화면에서는 세로 3:4로 잘려 표시 · 원본 비율 저장 · 권장 1200 × 1600"
         >
           <AdminImageUpload
             ratio={PORTRAIT_RATIO}
             name="leaderPhoto"
             initialUrl={leader.photo}
             recommendedSize={UPLOAD_SIZE.portrait}
-            output={{ ...UPLOAD_SIZE.portrait, fit: "cover" }}
+            output={{ maxWidth: UPLOAD_SIZE.portrait.width }}
             outputQuality={WEBP_QUALITY_PHOTO}
             className="w-52"
           />
