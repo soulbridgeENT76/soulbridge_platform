@@ -14,7 +14,7 @@ type ContentCardProps = {
 export function ContentCard({ content }: ContentCardProps) {
   return (
     <Link href={`/contents/${content.ref}`} className="group block">
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-md">
         {/* Placeholder stays the fallback for a content with no media set. */}
         {content.preview ? (
           <Image

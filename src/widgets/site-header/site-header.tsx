@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { CONTACT, type NavItem } from "@shared/config/site";
+import { type NavItem } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 import { cn } from "@shared/lib/cn";
 import type { SiteBrand, SiteLogo } from "@entities/brand";
@@ -26,6 +25,8 @@ type SiteHeaderProps = {
    * cached, off the client.
    */
   nav: NavItem[];
+  /** Contact email from the CMS (site_settings.contact), shown in the drawer. */
+  email: string;
 };
 
 export function SiteHeader({
@@ -33,6 +34,7 @@ export function SiteHeader({
   logo,
   brand,
   nav,
+  email,
 }: SiteHeaderProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -82,18 +84,23 @@ export function SiteHeader({
             onClick={() => setMenuOpen(false)}
             aria-label={brand.name}
           >
-            <Image
+            {/* Plain img: the logo is a vector SVG (or the bundled PNG
+                fallback), which needs no optimization and renders sharp at any
+                size. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={logo.src}
               alt={brand.name}
               width={logo.width}
               height={logo.height}
-              priority
               className="h-11 w-auto md:h-12"
             />
           </Link>
 
-          {/* Center nav (desktop) */}
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 md:flex lg:gap-14">
+          {/* Center nav — from lg only: at md the five centered tabs collide
+              with the logo, since the nav is absolutely centered and the logo
+              sits in flow. Below lg the circular menu button takes over. */}
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 lg:flex lg:gap-14">
             {visibleNav.map((item) => {
               const active = pathname.startsWith(item.href);
               return (
@@ -195,27 +202,29 @@ export function SiteHeader({
         </nav>
 
         {/* Brand mark sits in the footer block rather than the header slot, so
-            the "MENU" label keeps doing its job up top. Socials + email sit
-            beside it; the email truncates rather than pushing the row wide. */}
-        <div className="mt-auto flex items-center gap-4 border-t border-ink/10 px-7 py-7">
-          <Image
-            src={logo.src}
-            alt={brand.name}
-            width={logo.width}
-            height={logo.height}
-            className="h-10 w-auto shrink-0"
-          />
-          <div className="min-w-0 flex-1">
-            <SocialLinks
-              items={brand.socials}
-              size={18}
-              className="justify-end gap-4"
-              itemClassName="text-ink/50 hover:text-ink"
+            the "MENU" label keeps doing its job up top. The email sits under the
+            logo (as in the site footer); socials align to the right. The email
+            truncates rather than pushing the row wide. */}
+        <div className="mt-auto flex items-end justify-between gap-4 border-t border-ink/10 px-7 py-7">
+          <div className="min-w-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={logo.src}
+              alt={brand.name}
+              width={logo.width}
+              height={logo.height}
+              className="h-10 w-auto"
             />
-            <p className="mt-2.5 truncate text-right text-[12px] tracking-wide text-ink/45">
-              {CONTACT.email}
+            <p className="mt-2.5 truncate text-[12px] tracking-wide text-ink/45">
+              {email}
             </p>
           </div>
+          <SocialLinks
+            items={brand.socials}
+            size={18}
+            className="shrink-0 gap-4"
+            itemClassName="text-ink/50 hover:text-ink"
+          />
         </div>
       </aside>
     </>
