@@ -27,7 +27,7 @@ export default async function AdminDashboardPage() {
     },
     {
       label: "뉴스",
-      href: "/admin/notice",
+      href: "/admin/notices",
       count: news.length,
       icon: Newspaper,
     },

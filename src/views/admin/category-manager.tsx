@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Check, Plus, X } from "lucide-react";
-import { AdminButton, AdminInput } from "@widgets/admin-shell";
+import { AdminButton, AdminInput, ConfirmDialog } from "@widgets/admin-shell";
 import { showToast } from "@shared/ui/toast";
 import { cn } from "@shared/lib/cn";
 import type { ContentCategoryRow } from "@entities/content";
@@ -33,6 +33,7 @@ export function CategoryManager({
   const [value, setValue] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [removing, setRemoving] = useState<ContentCategoryRow | null>(null);
   const [pending, startTransition] = useTransition();
 
   const add = () => {
@@ -72,11 +73,17 @@ export function CategoryManager({
     });
   };
 
-  const remove = (id: number) => {
+  const confirmRemove = () => {
+    if (!removing) return;
+    const { id } = removing;
     startTransition(async () => {
       const res = await onRemove(id);
-      if (res.ok) showToast("카테고리를 삭제했습니다");
-      else showToast(res.error ?? "삭제에 실패했습니다.", "error");
+      if (res.ok) {
+        setRemoving(null);
+        showToast("카테고리를 삭제했습니다");
+      } else {
+        showToast(res.error ?? "삭제에 실패했습니다.", "error");
+      }
     });
   };
 
@@ -156,7 +163,7 @@ export function CategoryManager({
               <button
                 type="button"
                 aria-label={`${c.name} 삭제`}
-                onClick={() => remove(c.id)}
+                onClick={() => setRemoving(c)}
                 className="flex h-5 w-5 items-center justify-center rounded-full text-ink/40 transition-colors hover:bg-red-500/10 hover:text-red-600"
               >
                 <X size={13} />
@@ -194,6 +201,19 @@ export function CategoryManager({
           </span>
         )}
       </div>
+
+      <ConfirmDialog
+        open={removing !== null}
+        message={
+          <>
+            <span className="font-medium text-ink">{removing?.name}</span>{" "}
+            카테고리를 삭제합니다. 이 작업은 되돌릴 수 없습니다.
+          </>
+        }
+        pending={pending}
+        onConfirm={confirmRemove}
+        onCancel={() => setRemoving(null)}
+      />
     </div>
   );
 }

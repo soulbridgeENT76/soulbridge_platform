@@ -16,6 +16,7 @@ import {
   getContentCategoriesAdmin,
   CONTENT_THUMB_RATIO,
 } from "@entities/content";
+import { getPageCopy } from "@entities/page-content";
 import {
   removeContent,
   addCategory,
@@ -27,9 +28,10 @@ import { PAGE_COPY } from "@shared/config/page-copy";
 export default async function AdminContentsPage() {
   // Authed and uncached: the list is the operator's view of the truth, so it
   // must not lag a save by however long the public cache entry lives.
-  const [contents, categories] = await Promise.all([
+  const [contents, categories, copy] = await Promise.all([
     getContentsAdmin(),
     getContentCategoriesAdmin(),
+    getPageCopy("contents"),
   ]);
 
   return (
@@ -54,7 +56,13 @@ export default async function AdminContentsPage() {
       </div>
 
       <div className="mt-6 flex flex-col gap-4">
-        <PageCopyEditor initial={PAGE_COPY.contents} />
+        <PageCopyEditor
+          slug="contents"
+          initial={{
+            title: copy?.title ?? PAGE_COPY.contents.title,
+            description: copy?.description ?? PAGE_COPY.contents.description,
+          }}
+        />
         <CategoryManager
           categories={categories}
           onAdd={addCategory}

@@ -11,11 +11,15 @@ import { PageCopyEditor, ArtistTable } from "@views/admin";
 import { RedirectToast } from "@shared/ui/redirect-toast";
 import { PAGE_COPY } from "@shared/config/page-copy";
 import { getArtistsAdmin } from "@entities/artist";
+import { getPageCopy } from "@entities/page-content";
 
 export default async function AdminArtistsPage() {
   // Authed and uncached: the list is the operator's view of the truth, so it
   // must not lag a save by however long the public cache entry lives.
-  const artists = await getArtistsAdmin();
+  const [artists, copy] = await Promise.all([
+    getArtistsAdmin(),
+    getPageCopy("artists"),
+  ]);
 
   return (
     <div>
@@ -41,7 +45,11 @@ export default async function AdminArtistsPage() {
 
       <div className="mt-6">
         <PageCopyEditor
-          initial={PAGE_COPY.artists}
+          slug="artists"
+          initial={{
+            title: copy?.title ?? PAGE_COPY.artists.title,
+            description: copy?.description ?? PAGE_COPY.artists.description,
+          }}
           caption="아티스트 페이지 상단에 표시되는 제목·소제목입니다."
         />
       </div>
