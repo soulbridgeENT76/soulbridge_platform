@@ -15,6 +15,7 @@ import {
   getNoticeCategoriesAdmin,
   formatNoticeDate,
 } from "@entities/notices";
+import { getPageCopy } from "@entities/page-content";
 import {
   removeNotice,
   toggleNoticeActive,
@@ -26,9 +27,10 @@ import {
 export default async function AdminNoticePage() {
   // Authed and uncached: the list is the operator's view of the truth (drafts
   // and scheduled items included).
-  const [notices, categories] = await Promise.all([
+  const [notices, categories, copy] = await Promise.all([
     getNoticesAdmin(),
     getNoticeCategoriesAdmin(),
+    getPageCopy("notice"),
   ]);
 
   return (
@@ -54,7 +56,11 @@ export default async function AdminNoticePage() {
 
       <div className="mt-6 flex flex-col gap-4">
         <PageCopyEditor
-          initial={PAGE_COPY.news}
+          slug="notice"
+          initial={{
+            title: copy?.title ?? PAGE_COPY.news.title,
+            description: copy?.description ?? PAGE_COPY.news.description,
+          }}
           caption="공지 페이지 상단에 표시되는 제목·소제목입니다."
         />
         <CategoryManager
@@ -92,6 +98,8 @@ export default async function AdminNoticePage() {
                         initial={item.active === true}
                         itemName={item.title}
                         action={toggleNoticeActive.bind(null, item.id)}
+                        onMessage="공개되었습니다"
+                        offMessage="비공개로 전환했습니다"
                       />
                     </div>
                   </td>

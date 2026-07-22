@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { CONTACT, SITE } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 import type { SiteBrand, SiteLogo } from "@entities/brand";
@@ -41,7 +42,26 @@ export async function SiteFooter({
             {CONTACT.email}
           </p>
 
-          <p className="mt-5 font-display text-[11px] uppercase tracking-[0.14em] text-paper/40">
+          {/* Legal — privacy policy is emphasised per convention. */}
+          <div className="mt-5 flex items-center gap-3 text-xs">
+            <Link
+              href="/privacy"
+              className="font-semibold text-paper/75 transition-colors hover:text-paper"
+            >
+              개인정보 처리방침
+            </Link>
+            <span aria-hidden className="text-paper/25">
+              |
+            </span>
+            <Link
+              href="/terms"
+              className="text-paper/55 transition-colors hover:text-paper"
+            >
+              이용약관
+            </Link>
+          </div>
+
+          <p className="mt-4 font-display text-[11px] uppercase tracking-[0.14em] text-paper/40">
             © {year} {SITE.copyright}
           </p>
         </div>

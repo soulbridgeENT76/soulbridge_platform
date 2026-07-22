@@ -86,7 +86,7 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
       <input type="hidden" name="mediaType" value={mediaType} />
 
       <AdminPageHeader
-        title={editing ? "콘텐츠 편집" : "새 콘텐츠"}
+        title={editing ? "EDIT CONTENT" : "NEW CONTENT"}
         description={editing ? initial?.title : "새 콘텐츠를 등록합니다."}
       />
 

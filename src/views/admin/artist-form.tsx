@@ -71,7 +71,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
           rather than as indexed input names. */}
       <input type="hidden" name="works" value={JSON.stringify(works)} />
       <AdminPageHeader
-        title={editing ? "아티스트 편집" : "새 아티스트"}
+        title={editing ? "EDIT ARTIST" : "NEW ARTIST"}
         description={editing ? initial?.nameKo : "새 아티스트를 등록합니다."}
       />
 
