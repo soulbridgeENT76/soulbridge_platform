@@ -36,7 +36,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
   const socialHref = (key: SocialKey) =>
     initial?.socials.find((s) => s.key === key)?.href ?? "";
 
-  const { errors, clearError, guardAction } = useFieldErrors();
+  const { errors, clearError, guardSubmit } = useFieldErrors();
 
   // Fields top-to-bottom, so the first invalid one is the one that takes focus.
   const validate = (formData: FormData): Record<string, string> => {
@@ -57,14 +57,14 @@ export function ArtistForm({ initial }: ArtistFormProps) {
     return errs;
   };
 
-  const clientAction = guardAction(
+  const clientSubmit = guardSubmit(
     validate,
     ["nameKo", "nameEn", "role"],
     formAction
   );
 
   return (
-    <form action={clientAction}>
+    <form onSubmit={clientSubmit}>
       {/* Empty on create — the action reads this to tell insert from update. */}
       <input type="hidden" name="id" value={initial?.id ?? ""} />
       {/* The career list is variable-length, so it travels as one JSON field

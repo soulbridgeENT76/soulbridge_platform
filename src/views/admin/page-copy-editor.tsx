@@ -8,6 +8,7 @@ import {
   AdminButton,
 } from "@widgets/admin-shell";
 import { useSaveToast } from "@shared/ui/use-save-toast";
+import { submitAction } from "@shared/lib/use-field-errors";
 import { savePageCopy } from "@features/update-page-copy";
 
 type PageCopyEditorProps = {
@@ -33,7 +34,7 @@ export function PageCopyEditor({
   useSaveToast(state, pending);
 
   return (
-    <form action={action} className="rounded-2xl border border-ink/10 bg-white p-5">
+    <form onSubmit={submitAction(action)} className="rounded-2xl border border-ink/10 bg-white p-5">
       <input type="hidden" name="slug" value={slug} />
 
       <div className="flex items-center justify-between">

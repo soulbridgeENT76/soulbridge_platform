@@ -4,7 +4,7 @@ import type { Content } from "./types";
 
 /** Columns every content reader selects, shared so they can never disagree. */
 export const CONTENT_SELECT =
-  "id, slug, category, title, year, description, content, thumbnail_url, thumbnail_type, created_at" as const;
+  "id, slug, category, title, year, description, content, reference_url, thumbnail_url, thumbnail_type, created_at" as const;
 
 export type ContentRow = {
   id: string;
@@ -14,6 +14,7 @@ export type ContentRow = {
   year: string;
   description: string | null;
   content: string;
+  reference_url: string | null;
   thumbnail_url: string | null;
   /** 0 = image, 1 = youtube. */
   thumbnail_type: number;
@@ -35,6 +36,7 @@ export function toContent(row: ContentRow): Content {
     year: row.year,
     note: row.description ?? "",
     synopsis: row.content ?? "",
+    referenceUrl: row.reference_url || undefined,
     mediaType: isYoutube ? "youtube" : "image",
     thumbnail,
     youtubeId,
