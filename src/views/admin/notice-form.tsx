@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FileText, Link2, TriangleAlert } from "lucide-react";
 import {
   AdminField,
@@ -14,6 +15,7 @@ import {
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
+import { useSaveAction } from "@shared/ui/use-save-action";
 import type { Notice, NoticeLinkType } from "@entities/notices/model/types";
 import { saveNotice } from "@features/update-notices";
 
@@ -32,7 +34,11 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
   );
   const external = linkType === "external";
 
-  const [state, formAction] = useActionState(saveNotice, { ok: true });
+  const router = useRouter();
+  const { state, run } = useSaveAction(saveNotice, { ok: true }, {
+    tone: editing ? "edit" : "save",
+    onSuccess: () => router.push("/admin/notices"),
+  });
   const { errors, clearError, guardSubmit } = useFieldErrors();
 
   const validate = (formData: FormData): Record<string, string> => {
@@ -53,7 +59,7 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
   const clientSubmit = guardSubmit(
     validate,
     ["title", "date", "externalUrl", "slug"],
-    formAction
+    run
   );
 
   return (

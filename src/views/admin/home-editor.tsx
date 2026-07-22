@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { TriangleAlert } from "lucide-react";
 import {
   AdminField,
@@ -13,7 +13,7 @@ import {
 import { LANDSCAPE_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import { cn } from "@shared/lib/cn";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
-import { useSaveToast } from "@shared/ui/use-save-toast";
+import { useSaveAction } from "@shared/ui/use-save-action";
 import { submitAction } from "@shared/lib/use-field-errors";
 import type { HomeSlide } from "@entities/page-content";
 import { saveHomeSlide } from "@features/update-home-slide";
@@ -36,12 +36,11 @@ export function HomeEditor({
 }) {
   const [active, setActive] = useState(0);
   const slide = slides[active];
-  const [state, formAction, isPending] = useActionState(saveHomeSlide, {
-    ok: true,
-  });
   // Each slide saves on its own, and the page does not navigate afterwards —
-  // without this the operator gets no sign the write landed.
-  useSaveToast(state, isPending);
+  // the toast is the only sign the write landed.
+  const { state, run } = useSaveAction(saveHomeSlide, { ok: true }, {
+    tone: "edit",
+  });
 
   if (!slide) {
     return (
@@ -77,7 +76,7 @@ export function HomeEditor({
       {/* Active slide only. `key` resets the inputs when switching slides. */}
       {/* `key` resets the inputs when switching slides; the hidden slug tells
           the action which row to write, since only one slide is submitted. */}
-      <form key={slide.id} onSubmit={submitAction(formAction)} className="mt-5">
+      <form key={slide.id} onSubmit={submitAction(run)} className="mt-5">
         <input type="hidden" name="slug" value={slide.slug} />
         <section className="rounded-2xl border border-ink/10 bg-white p-5">
           <div className="flex items-center gap-3">

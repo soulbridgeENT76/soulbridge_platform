@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { TriangleAlert } from "lucide-react";
-import { useSaveToast } from "@shared/ui/use-save-toast";
+import { useSaveAction } from "@shared/ui/use-save-action";
 import { submitAction } from "@shared/lib/use-field-errors";
 import {
   AdminField,
@@ -24,11 +24,10 @@ interface BrandEditorProps {
 export function BrandEditor({ initial }: BrandEditorProps) {
   const [brandName, setBrandName] = useState(initial.brand.name);
   const [brandInfo, setBrandInfo] = useState(initial.brand.intro);
-  const [state, formAction, isPending] = useActionState(saveBrand, { ok: true });
-  useSaveToast(state, isPending);
+  const { state, run } = useSaveAction(saveBrand, { ok: true }, { tone: "edit" });
 
   return (
-    <form onSubmit={submitAction(formAction)} className="flex flex-col gap-5">
+    <form onSubmit={submitAction(run)} className="flex flex-col gap-5">
       <section className="rounded-2xl border border-ink/10 bg-white p-5">
         <p className="text-sm font-semibold text-ink">로고</p>
         <p className="mt-0.5 text-xs text-ink/50">

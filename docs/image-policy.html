@@ -1,0 +1,631 @@
+<title>이미지 업로드 · 불러오기 정책</title>
+<style>
+  :root {
+    --paper: #f3f2f7;
+    --surface: #ffffff;
+    --surface-2: #faf9fc;
+    --ink: #1b1a22;
+    --ink-2: #43414f;
+    --muted: #77738a;
+    --line: #e4e1ec;
+    --line-strong: #d3cfe0;
+    --plum: #6b4b96;
+    --plum-soft: #8a68b8;
+    --plum-wash: #efe9f6;
+    --good: #2f8f6b;
+    --good-wash: #e2f1ea;
+    --warn: #a8792a;
+    --warn-wash: #f6eeda;
+    --stop: #c0483c;
+    --stop-wash: #f7e4e1;
+    --font-sans: "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic",
+      -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "SF Mono", "JetBrains Mono", "Cascadia Code", ui-monospace,
+      "Consolas", monospace;
+    --shadow: 0 1px 2px rgba(27, 26, 34, 0.04),
+      0 8px 24px -12px rgba(27, 26, 34, 0.14);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #131218;
+      --surface: #1c1a24;
+      --surface-2: #201e29;
+      --ink: #ecebf3;
+      --ink-2: #c3c0d0;
+      --muted: #918da3;
+      --line: #2c2937;
+      --line-strong: #3a3648;
+      --plum: #b193dd;
+      --plum-soft: #c4abe8;
+      --plum-wash: #251d33;
+      --good: #5fc59b;
+      --good-wash: #16261f;
+      --warn: #d8ab5a;
+      --warn-wash: #2a2213;
+      --stop: #e2796c;
+      --stop-wash: #2c1815;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -14px rgba(0, 0, 0, 0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #131218;
+    --surface: #1c1a24;
+    --surface-2: #201e29;
+    --ink: #ecebf3;
+    --ink-2: #c3c0d0;
+    --muted: #918da3;
+    --line: #2c2937;
+    --line-strong: #3a3648;
+    --plum: #b193dd;
+    --plum-soft: #c4abe8;
+    --plum-wash: #251d33;
+    --good: #5fc59b;
+    --good-wash: #16261f;
+    --warn: #d8ab5a;
+    --warn-wash: #2a2213;
+    --stop: #e2796c;
+    --stop-wash: #2c1815;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -14px rgba(0, 0, 0, 0.6);
+  }
+  :root[data-theme="light"] {
+    --paper: #f3f2f7;
+    --surface: #ffffff;
+    --surface-2: #faf9fc;
+    --ink: #1b1a22;
+    --ink-2: #43414f;
+    --muted: #77738a;
+    --line: #e4e1ec;
+    --line-strong: #d3cfe0;
+    --plum: #6b4b96;
+    --plum-soft: #8a68b8;
+    --plum-wash: #efe9f6;
+    --good: #2f8f6b;
+    --good-wash: #e2f1ea;
+    --warn: #a8792a;
+    --warn-wash: #f6eeda;
+    --stop: #c0483c;
+    --stop-wash: #f7e4e1;
+    --shadow: 0 1px 2px rgba(27, 26, 34, 0.04),
+      0 8px 24px -12px rgba(27, 26, 34, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.003em;
+  }
+
+  .wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 4rem) clamp(1.1rem, 4vw, 2.5rem) 5rem;
+  }
+
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  /* ---- Masthead ---- */
+  .mast { border-bottom: 1px solid var(--line); padding-bottom: 2rem; }
+  .eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--plum);
+    margin: 0 0 0.9rem;
+  }
+  h1 {
+    font-size: clamp(1.8rem, 4.5vw, 2.7rem);
+    line-height: 1.12;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .lede {
+    margin: 1rem 0 0;
+    max-width: 60ch;
+    color: var(--ink-2);
+    font-size: 1.02rem;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.4rem;
+    margin-top: 1.4rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .meta b { color: var(--ink-2); font-weight: 600; }
+
+  /* ---- Section ---- */
+  section { margin-top: 3.2rem; }
+  .sec-head { display: flex; align-items: baseline; gap: 0.8rem; margin-bottom: 1.2rem; }
+  .sec-num {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--plum);
+    padding-top: 0.15rem;
+  }
+  h2 {
+    font-size: 1.28rem;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .sec-sub { color: var(--muted); font-size: 0.9rem; margin: 0.15rem 0 0; }
+
+  /* ---- Pipeline ---- */
+  .pipe {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    align-items: stretch;
+  }
+  .step {
+    flex: 1 1 150px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0.95rem 1rem 1.05rem;
+    position: relative;
+    box-shadow: var(--shadow);
+  }
+  .step .n {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--plum);
+    letter-spacing: 0.05em;
+  }
+  .step h3 { margin: 0.35rem 0 0.3rem; font-size: 0.98rem; font-weight: 700; }
+  .step p { margin: 0; font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+  /* ---- Cards / grid ---- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 0.9rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+    box-shadow: var(--shadow);
+  }
+  .card h3 {
+    margin: 0 0 0.55rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .card li { font-size: 0.86rem; color: var(--ink-2); padding-left: 1rem; position: relative; }
+  .card li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0.6em;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--plum-soft);
+  }
+
+  /* ---- Table ---- */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; min-width: 720px; background: var(--surface); font-size: 0.85rem; }
+  thead th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    white-space: nowrap;
+  }
+  tbody td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface-2); }
+  td .subject { font-weight: 700; color: var(--ink); white-space: nowrap; }
+  td small { display: block; color: var(--muted); font-size: 0.76rem; margin-top: 0.15rem; }
+
+  /* ---- Chips ---- */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.71rem;
+    font-weight: 650;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .chip.good { background: var(--good-wash); color: var(--good); }
+  .chip.warn { background: var(--warn-wash); color: var(--warn); }
+  .chip.stop { background: var(--stop-wash); color: var(--stop); }
+  .chip.plum { background: var(--plum-wash); color: var(--plum); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .dot.good { background: var(--good); }
+  .dot.warn { background: var(--warn); }
+  .dot.stop { background: var(--stop); }
+
+  kbd, .k {
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    background: var(--plum-wash);
+    color: var(--plum);
+    padding: 0.08em 0.42em;
+    border-radius: 5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .note {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    background: var(--warn-wash);
+    border: 1px solid color-mix(in srgb, var(--warn) 30%, transparent);
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    font-size: 0.85rem;
+    color: var(--ink-2);
+  }
+  .note b { color: var(--ink); }
+  .note .bar { width: 3px; border-radius: 3px; background: var(--warn); flex: none; }
+
+  .principles { counter-reset: p; display: flex; flex-direction: column; gap: 0.6rem; }
+  .principles .card { display: flex; gap: 0.9rem; align-items: flex-start; }
+  .principles .card::before {
+    counter-increment: p;
+    content: counter(p, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--plum);
+    background: var(--plum-wash);
+    border-radius: 8px;
+    padding: 0.35rem 0.55rem;
+    flex: none;
+  }
+  .principles .card div { font-size: 0.9rem; }
+  .principles .card strong { color: var(--ink); display: block; margin-bottom: 0.15rem; font-size: 0.92rem; }
+  .principles .card span { color: var(--ink-2); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; margin-top: 1rem; font-size: 0.8rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+  footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: 0.78rem; color: var(--muted); }
+
+  a { color: var(--plum); }
+  :focus-visible { outline: 2px solid var(--plum-soft); outline-offset: 2px; border-radius: 4px; }
+  @media (prefers-reduced-motion: no-preference) {
+    tbody tr td { transition: background 0.15s ease; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <p class="eyebrow">SoulBridge CMS · 엔지니어링 레퍼런스</p>
+    <h1>이미지 업로드 · 불러오기 정책</h1>
+    <p class="lede">
+      관리자 CMS가 이미지를 받고, 처리하고, 저장하고, 사이트에 표시하기까지의 규칙입니다.
+      대상별로 다르게 적용되는 크롭·리사이즈·검증 기준을 한곳에 정리했습니다.
+    </p>
+    <div class="meta">
+      <span><b>저장</b> Supabase Storage · 버킷 <code>images</code></span>
+      <span><b>표준 포맷</b> WebP <span style="opacity:.6">(로고 SVG 예외)</span></span>
+      <span><b>렌더</b> next/image + plain &lt;img&gt;</span>
+    </div>
+  </header>
+
+  <!-- 1. Pipeline -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <div>
+        <h2>공통 파이프라인</h2>
+        <p class="sec-sub">모든 이미지가 거치는 다섯 단계</p>
+      </div>
+    </div>
+    <div class="pipe">
+      <div class="step">
+        <span class="n">01 · 선택</span>
+        <h3>관리자 업로드</h3>
+        <p>공용 <code>AdminImageUpload</code>로 파일 선택. 대상별 허용 포맷 제한.</p>
+      </div>
+      <div class="step">
+        <span class="n">02 · 처리</span>
+        <h3>브라우저 변환 (선택 즉시)</h3>
+        <p>파일 선택 순간 <b>크롭·리사이즈·여백 트림·WebP</b>를 클라이언트에서 수행하고 미리보기에 결과를 바로 반영. SVG 로고만 원본 통과.</p>
+      </div>
+      <div class="step">
+        <span class="n">03 · 업로드</span>
+        <h3>Storage 저장</h3>
+        <p>서버는 <b>처리된 파일을 업로드만</b> — 이미지 가공은 하지 않음. 버킷 <code>images/…</code>, 쓰기 인증 필요.</p>
+      </div>
+      <div class="step">
+        <span class="n">04 · 기록</span>
+        <h3>DB엔 경로만</h3>
+        <p>전체 URL이 아닌 <b>상대 경로</b> 저장 (예: <code>content/…​.webp</code>).</p>
+      </div>
+      <div class="step">
+        <span class="n">05 · 표시</span>
+        <h3>렌더 시 조립</h3>
+        <p><code>mediaUrl()</code>로 URL 생성 → next/image 또는 plain img.</p>
+      </div>
+    </div>
+    <div class="note">
+      <span class="bar" aria-hidden="true"></span>
+      <div>
+        업로드 시 폼은 파일과 함께 <span class="k">&lt;name&gt;_width</span>
+        <span class="k">&lt;name&gt;_height</span> <span class="k">&lt;name&gt;_cleared</span> 를
+        함께 제출합니다 — 인코딩된 치수와 "삭제됨/미변경" 구분을 서버에 전달하기 위함입니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Common constraints -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <div>
+        <h2>공통 제약</h2>
+        <p class="sec-sub">대상과 무관하게 항상 적용</p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3><span class="dot warn" aria-hidden="true"></span> 용량 · 포맷</h3>
+        <ul>
+          <li>최대 파일 용량 <b>30MB</b> (클라이언트 사전 검사)</li>
+          <li>저장 포맷은 <b>WebP</b> 로 통일 — 로고 SVG만 예외</li>
+          <li>SVG는 로고에서만 허용, 그 외 대상은 차단</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot good" aria-hidden="true"></span> 스토리지 버킷 <code>images</code></h3>
+        <ul>
+          <li>허용 MIME <code>image/webp</code> · <code>image/svg+xml</code></li>
+          <li>파일 크기 상한 <b>50MB</b>, 공개 읽기 / 인증 쓰기</li>
+          <li>폴더: content · artist · home · logo · about</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot good" aria-hidden="true"></span> 저장값 규약</h3>
+        <ul>
+          <li>DB엔 <b>상대 경로</b>만 (URL·호스트 미포함)</li>
+          <li>렌더 시 <code>mediaUrl(path)</code>로 절대 URL 조립</li>
+          <li>YouTube는 경로 대신 <b>영상 id</b> 저장</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Per-target policy -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <div>
+        <h2>대상별 정책</h2>
+        <p class="sec-sub">업로드 시 처리와 크롭 시점이 대상마다 다름</p>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>대상</th>
+            <th>입력 포맷</th>
+            <th>업로드 처리</th>
+            <th>크롭 시점</th>
+            <th>권장 · 제약</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="subject">콘텐츠 이미지</span><small>목록 카드 · 상세</small></td>
+            <td>PNG · JPG · WebP</td>
+            <td>WebP + 폭 <b>≤2560 축소만</b><small>크롭·업스케일 없음</small></td>
+            <td><span class="chip plum">렌더</span><small>카드 16:9 / 상세 원본비율</small></td>
+            <td>권장 <code>2560×1440</code></td>
+          </tr>
+          <tr>
+            <td><span class="subject">아티스트 프로필</span></td>
+            <td>PNG · JPG · WebP</td>
+            <td>WebP + 폭 <b>≤1200 축소만</b><small>크롭·업스케일 없음</small></td>
+            <td><span class="chip plum">렌더</span><small>3:4 유지</small></td>
+            <td>세로 3:4 · 권장 <code>1200×1600</code></td>
+          </tr>
+          <tr>
+            <td><span class="subject">ABOUT 리더십</span></td>
+            <td>PNG · JPG · WebP</td>
+            <td>WebP + 폭 <b>≤1200 축소만</b><small>크롭·업스케일 없음</small></td>
+            <td><span class="chip plum">렌더</span><small>3:4 유지</small></td>
+            <td>세로 3:4 · 권장 <code>1200×1600</code></td>
+          </tr>
+          <tr>
+            <td><span class="subject">홈 배너 · 데스크톱</span></td>
+            <td>PNG · JPG · WebP</td>
+            <td>WebP + <code>2560×1440</code> cover</td>
+            <td><span class="chip warn">업로드</span></td>
+            <td>가로 16:9</td>
+          </tr>
+          <tr>
+            <td><span class="subject">홈 배너 · 모바일</span><small>데스크톱과 별도 파일</small></td>
+            <td>PNG · JPG · WebP</td>
+            <td>WebP + <code>1440×2560</code> cover</td>
+            <td><span class="chip warn">업로드</span></td>
+            <td>세로 9:16</td>
+          </tr>
+          <tr>
+            <td><span class="subject">로고</span><small>헤더·푸터·사이드바·히어로</small></td>
+            <td>SVG · PNG</td>
+            <td>SVG 원본 그대로 / PNG는 WebP·높이 <code>512</code>·여백 자동 트림</td>
+            <td><span class="chip plum">—</span><small>높이 기준 스케일</small></td>
+            <td>투명 필수 · 단색(검정) · PNG 세로 512px 권장</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <span class="bar" aria-hidden="true"></span>
+      <div>
+        <b>콘텐츠 · 아티스트 · ABOUT</b>은 "크롭은 렌더에서" 정책을 씁니다 — 업로드는 원본 비율 그대로
+        저장(폭 상한만)하고, 표시할 때 <code>object-cover</code>로 각자의 비율(콘텐츠 카드 16:9,
+        아티스트·ABOUT 3:4)로 자릅니다. 콘텐츠 상세만 크롭 없이 원본 비율로 보여줍니다.
+        <b>배너</b>는 데스크톱·모바일이 서로 다른 크롭이라 업로드 시점 크롭을 유지합니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Rendering -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <div>
+        <h2>불러오기 · 렌더 정책</h2>
+        <p class="sec-sub">해상도는 next/image가, 비율은 CSS가 담당</p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>next/image (최적화)</h3>
+        <ul>
+          <li><code>sizes</code>로 뷰포트·DPR별 <b>해상도 자동 제공</b></li>
+          <li>목록 카드는 <code>object-cover</code>로 16:9 크롭</li>
+          <li>아티스트·배너·ABOUT 등 대부분 이 경로</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>plain &lt;img&gt; (비최적화)</h3>
+        <ul>
+          <li><b>콘텐츠 상세</b>: 원본 비율 표시 (마스터 로드)</li>
+          <li><b>로고</b>: 벡터라 최적화 불필요 · SVG XSS 안전</li>
+          <li>로고 높이 기준 <code>h-9</code>~<code>h-12</code>, 히어로 360→480px</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>YouTube 썸네일</h3>
+        <ul>
+          <li><code>img.youtube.com/vi/&lt;id&gt;/mqdefault.jpg</code></li>
+          <li>저장은 영상 id, 카드엔 재생 아이콘 오버레이</li>
+          <li>상세는 썸네일 대신 임베드 재생</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>허용 호스트 · 폴백</h3>
+        <ul>
+          <li>원격 허용: Supabase 호스트 · <code>img.youtube.com/vi/**</code></li>
+          <li>이미지 없음 → <b>PlaceholderImage</b> (CSS)</li>
+          <li>로고 없음 → 번들 <code>/logo.png</code></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Validation -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <div>
+        <h2>검증 규칙</h2>
+        <p class="sec-sub">모두 클라이언트에서 확인 후 즉시 메시지 표시</p>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>콘텐츠 · 아티스트 · 배너 · ABOUT</h3>
+        <ul>
+          <li><span class="chip good">허용</span> 어떤 크기든 업로드 가능</li>
+          <li><span class="chip plum">권장</span> 표시 해상도만 안내, 강제 없음</li>
+          <li><span class="chip stop">반려</span> 30MB 초과 파일</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>로고 · PNG</h3>
+        <ul>
+          <li><span class="chip stop">반려</span> 불투명 배경 · 전체 투명</li>
+          <li><span class="chip good">자동</span> 주변 투명 여백 트림 (반려 아님)</li>
+          <li><span class="chip plum">권장</span> 세로 512px 이상</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>로고 · SVG</h3>
+        <ul>
+          <li><span class="chip good">허용</span> 원본 그대로 저장, 크기 제한 없음</li>
+          <li><span class="chip stop">반려</span> viewBox·크기를 읽을 수 없는 파일</li>
+          <li>비율은 viewBox에서 추출해 저장</li>
+        </ul>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="dot good"></span> 자동 · 허용</span>
+      <span><span class="dot warn"></span> 업로드 시 크롭</span>
+      <span><span class="dot stop"></span> 반려</span>
+    </div>
+  </section>
+
+  <!-- 6. Principles -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <div>
+        <h2>핵심 원칙</h2>
+        <p class="sec-sub">정책이 서로 어긋나지 않게 하는 기준</p>
+      </div>
+    </div>
+    <div class="principles">
+      <div class="card">
+        <div>
+          <strong>저장은 WebP, DB엔 경로만</strong>
+          <span>포맷과 호스트를 한곳에서 통제. 로고 SVG만 벡터 특성상 예외.</span>
+        </div>
+      </div>
+      <div class="card">
+        <div>
+          <strong>크롭과 해상도는 분리해서 생각</strong>
+          <span>비율(크롭)은 CSS <code>object-cover</code>, 해상도는 next/image의 <code>sizes</code>가 담당. 콘텐츠·아티스트·ABOUT는 이 원칙을 그대로 따라 업로드 크롭을 뺐다.</span>
+        </div>
+      </div>
+      <div class="card">
+        <div>
+          <strong>작은 이미지를 억지로 키우지 않는다</strong>
+          <span>콘텐츠·아티스트·ABOUT는 업스케일 없이 원본 비율을 유지(폭 상한만) — 흐려짐 방지.</span>
+        </div>
+      </div>
+      <div class="card">
+        <div>
+          <strong>가공은 전부 클라이언트, 서버는 저장만</strong>
+          <span>크롭·리사이즈·여백 트림·WebP 변환은 <b>파일 선택 시점의 브라우저</b>에서 끝나고 미리보기에 즉시 반영된다. 서버 액션은 처리된 파일을 스토리지에 올릴 뿐 이미지 디코더가 없다.</span>
+        </div>
+      </div>
+      <div class="card">
+        <div>
+          <strong>업로드 검증은 UX, 최종 방어는 서버</strong>
+          <span>클라이언트 검증은 즉시 피드백용. 서버 액션이 같은 규칙을 다시 확인한다.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    SoulBridge ENT · 관리자 CMS 이미지 정책 요약. 실제 값은
+    <code>src/shared/config/media.ts</code> · <code>storage.ts</code> ·
+    <code>image-to-webp.ts</code> · <code>admin-image-upload.tsx</code> 를 단일 출처로 참조.
+  </footer>
+</div>

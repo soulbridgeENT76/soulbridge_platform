@@ -53,7 +53,7 @@ export function AdminStatusToggle({
     startTransition(async () => {
       const result = await action(next);
       if (result.ok) {
-        showToast(next ? onMessage : offMessage);
+        showToast(next ? onMessage : offMessage, "edit");
       } else {
         setActive(!next); // revert
         showToast(result.error ?? "저장에 실패했습니다.", "error");

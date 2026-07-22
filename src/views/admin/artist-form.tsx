@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Trash2, TriangleAlert } from "lucide-react";
 import {
   AdminField,
@@ -15,6 +16,7 @@ import {
 import { PORTRAIT_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
+import { useSaveAction } from "@shared/ui/use-save-action";
 import type { SocialKey } from "@shared/config/socials";
 import type { Artist, ArtistWork } from "@entities/artist";
 import { saveArtist } from "@features/update-artist";
@@ -28,7 +30,11 @@ type ArtistFormProps = {
 export function ArtistForm({ initial }: ArtistFormProps) {
   const editing = Boolean(initial);
   const [works, setWorks] = useState<ArtistWork[]>(initial?.works ?? []);
-  const [state, formAction] = useActionState(saveArtist, { ok: true });
+  const router = useRouter();
+  const { state, run } = useSaveAction(saveArtist, { ok: true }, {
+    tone: editing ? "edit" : "save",
+    onSuccess: () => router.push("/admin/artists"),
+  });
 
   // Prefill each fixed social field from the existing socials list. Keyed by
   // SocialKey, the same registry the public icons resolve through, so a field
@@ -60,7 +66,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
   const clientSubmit = guardSubmit(
     validate,
     ["nameKo", "nameEn", "role"],
-    formAction
+    run
   );
 
   return (

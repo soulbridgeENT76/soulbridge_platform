@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -92,7 +91,8 @@ export async function saveNotice(
   }
 
   revalidate();
-  redirect("/admin/notices?saved=1");
+  // The form toasts and navigates to the list itself.
+  return { ok: true };
 }
 
 /** Deletes a notice. */

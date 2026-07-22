@@ -66,7 +66,7 @@ export function CategoryManager({
       const res = await onRename(id, name);
       if (res.ok) {
         setEditingId(null);
-        showToast("카테고리를 수정했습니다");
+        showToast("카테고리를 수정했습니다", "edit");
       } else {
         showToast(res.error ?? "수정에 실패했습니다.", "error");
       }
@@ -80,7 +80,7 @@ export function CategoryManager({
       const res = await onRemove(id);
       if (res.ok) {
         setRemoving(null);
-        showToast("카테고리를 삭제했습니다");
+        showToast("카테고리를 삭제했습니다", "delete");
       } else {
         showToast(res.error ?? "삭제에 실패했습니다.", "error");
       }
