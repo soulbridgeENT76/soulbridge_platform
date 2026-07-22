@@ -45,18 +45,21 @@ export function ArtistCard({ artist, index }: ArtistCardProps) {
           className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/5"
         />
       </div>
-      <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-ink/10 pt-4">
-        <div>
+      <div className="mt-4 border-t border-ink/10 pt-4">
+        {/* Korean name and role share the top line; the English name gets its
+            own full-width line below so it does not wrap while space sits unused
+            beside the role. */}
+        <div className="flex items-baseline justify-between gap-3">
           <h3 className="text-lg font-bold text-ink">
             <span className="inline-block origin-left transition-transform duration-300 group-hover:scale-[1.06]">
               {artist.nameKo}
             </span>
           </h3>
-          <p className="font-display text-xs font-medium uppercase tracking-[0.18em] text-ink/45">
-            {artist.nameEn}
-          </p>
+          <span className="shrink-0 text-sm text-plum">{artist.role}</span>
         </div>
-        <span className="shrink-0 text-sm text-plum">{artist.role}</span>
+        <p className="mt-0.5 font-display text-xs font-medium uppercase tracking-[0.18em] text-ink/45">
+          {artist.nameEn}
+        </p>
       </div>
     </Link>
   );

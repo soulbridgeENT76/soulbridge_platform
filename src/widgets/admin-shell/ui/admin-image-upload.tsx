@@ -66,9 +66,9 @@ type AdminImageUploadProps = {
   className?: string;
 };
 
-/** Upload cap. Well above a quality JPG at our largest spec (~2MB), but low
- *  enough to catch an accidental huge export before it hits the server. */
-const MAX_FILE_MB = 12;
+/** Client-side upload cap — stays under the 50MB storage bucket limit while
+ *  catching an accidental huge export before it hits the server. */
+const MAX_FILE_MB = 30;
 
 /** Downscale once and read the pixels — used by the alpha + padding checks. */
 function samplePixels(

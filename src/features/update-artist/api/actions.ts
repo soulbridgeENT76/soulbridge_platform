@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { uploadMedia, removeMedia } from "@/lib/supabase/storage";
@@ -65,11 +64,9 @@ function readSocials(formData: FormData) {
 }
 
 /**
- * Creates or updates an artist. `id` empty means create.
- *
- * On success this redirects to the list, so it never returns — the form shows
- * errors inline and lets the redirect be the success signal, which also avoids
- * leaving a stale edit form pointing at a slug that just changed.
+ * Creates or updates an artist. `id` empty means create. On success returns
+ * `{ ok: true }`; the form toasts and navigates to the list. Errors are shown
+ * inline so the operator keeps their edits.
  */
 export async function saveArtist(
   _prev: ArtistFormState,
@@ -153,9 +150,8 @@ export async function saveArtist(
   revalidatePath("/artists");
   revalidatePath("/admin/artists");
 
-  // The form's page is gone after this redirect, so it cannot toast the way the
-  // stay-put editors do — the flag lets the list page confirm the save instead.
-  redirect("/admin/artists?saved=1");
+  // The form toasts and navigates to the list itself, like the stay-put editors.
+  return { ok: true };
 }
 
 /**

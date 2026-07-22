@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { Plus } from "lucide-react";
 import {
   AdminPageHeader,
@@ -6,9 +5,6 @@ import {
 } from "@widgets/admin-shell";
 import { SectionVisibilityToggle } from "@widgets/admin-shell/ui/section-visibility-toggle";
 import { PageCopyEditor, ArtistTable } from "@views/admin";
-// Imported by path, not from the @shared/ui barrel: that barrel is pulled into
-// server components and deliberately keeps client-only toast modules out.
-import { RedirectToast } from "@shared/ui/redirect-toast";
 import { PAGE_COPY } from "@shared/config/page-copy";
 import { getArtistsAdmin } from "@entities/artist";
 import { getPageCopy } from "@entities/page-content";
@@ -23,11 +19,6 @@ export default async function AdminArtistsPage() {
 
   return (
     <div>
-      {/* Confirms a save that redirected here from the form. useSearchParams
-          needs a Suspense boundary under cacheComponents. */}
-      <Suspense>
-        <RedirectToast param="saved" />
-      </Suspense>
 
       <AdminPageHeader
         title="ARTISTS"

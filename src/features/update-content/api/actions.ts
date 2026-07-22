@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { uploadMedia, removeMedia } from "@/lib/supabase/storage";
@@ -145,7 +144,9 @@ export async function saveContent(
   revalidatePath("/contents");
   revalidatePath("/admin/contents");
 
-  redirect("/admin/contents?saved=1");
+  // The form toasts and navigates to the list itself — a server redirect here
+  // would skip the imperative toast and depend on a fragile ?saved=1 hop.
+  return { ok: true };
 }
 
 /** Deletes a content and its uploaded image (if any). */

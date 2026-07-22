@@ -24,7 +24,7 @@ export function DeleteButton({ itemName, action }: DeleteButtonProps) {
       const result = await action();
       if (result.ok) {
         setOpen(false);
-        showToast("삭제되었습니다");
+        showToast("삭제되었습니다", "delete");
       } else {
         showToast(result.error ?? "삭제에 실패했습니다.", "error");
       }

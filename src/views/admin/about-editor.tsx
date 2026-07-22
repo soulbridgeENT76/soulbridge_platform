@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Plus, Trash2, TriangleAlert } from "lucide-react";
 import {
   AdminField,
@@ -19,7 +19,7 @@ import {
   STRATEGY_PILLARS,
 } from "@entities/about";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
-import { useSaveToast } from "@shared/ui/use-save-toast";
+import { useSaveAction } from "@shared/ui/use-save-action";
 import { submitAction } from "@shared/lib/use-field-errors";
 import type {
   PageCopy,
@@ -71,17 +71,18 @@ export function AboutEditor({
   leadership,
   sections: storedSections,
 }: AboutEditorProps) {
-  const [copyState, copyAction, copyPending] = useActionState(savePageCopy, {
-    ok: true,
-  });
-  const [aboutState, aboutAction, aboutPending] = useActionState(saveAbout, {
-    ok: true,
-  });
-
   // Two independent forms on one screen — each announces its own save, so the
   // operator can tell which half of the page was written.
-  useSaveToast(copyState, copyPending, "상단 문구가 저장되었습니다");
-  useSaveToast(aboutState, aboutPending);
+  const { state: copyState, run: copyRun } = useSaveAction(
+    savePageCopy,
+    { ok: true },
+    { message: "상단 문구가 저장되었습니다", tone: "edit" }
+  );
+  const { state: aboutState, run: aboutRun } = useSaveAction(
+    saveAbout,
+    { ok: true },
+    { tone: "edit" }
+  );
 
   // Until the page is saved once the row holds no leadership or sections, so
   // the bundled constants seed the form — the same content the page renders.
@@ -150,7 +151,7 @@ export function AboutEditor({
     <div className="flex flex-col gap-5">
       {/* Hero copy saves on its own — a separate <form> because forms cannot
           nest, and because the sections below are not persisted yet. */}
-      <form onSubmit={submitAction(copyAction)} className="flex flex-col gap-5">
+      <form onSubmit={submitAction(copyRun)} className="flex flex-col gap-5">
         <input type="hidden" name="slug" value="about" />
         <Card
           title="페이지 문구"
@@ -187,7 +188,7 @@ export function AboutEditor({
         </Card>
       </form>
 
-      <form onSubmit={submitAction(aboutAction)} className="flex flex-col gap-5">
+      <form onSubmit={submitAction(aboutRun)} className="flex flex-col gap-5">
         {/* Variable-length tree: serialized to one field rather than inventing
             indexed form names. The action re-validates the shape. */}
         <input

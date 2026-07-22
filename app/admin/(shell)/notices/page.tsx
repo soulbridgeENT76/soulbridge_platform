@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { Plus } from "lucide-react";
 import {
   AdminPageHeader,
@@ -8,7 +7,6 @@ import {
 } from "@widgets/admin-shell";
 import { SectionVisibilityToggle } from "@widgets/admin-shell/ui/section-visibility-toggle";
 import { CategoryManager, PageCopyEditor } from "@views/admin";
-import { RedirectToast } from "@shared/ui/redirect-toast";
 import { PAGE_COPY } from "@shared/config/page-copy";
 import {
   getNoticesAdmin,
@@ -35,10 +33,6 @@ export default async function AdminNoticePage() {
 
   return (
     <div>
-      {/* Confirms a save that redirected here from the form. */}
-      <Suspense>
-        <RedirectToast param="saved" />
-      </Suspense>
 
       <AdminPageHeader
         title="NOTICES"

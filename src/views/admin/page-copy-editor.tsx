@@ -1,13 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
 import {
   AdminField,
   AdminInput,
   AdminTextarea,
   AdminButton,
 } from "@widgets/admin-shell";
-import { useSaveToast } from "@shared/ui/use-save-toast";
+import { useSaveAction } from "@shared/ui/use-save-action";
 import { submitAction } from "@shared/lib/use-field-errors";
 import { savePageCopy } from "@features/update-page-copy";
 
@@ -30,11 +29,12 @@ export function PageCopyEditor({
   initial,
   caption = "페이지 상단에 표시되는 제목·소제목입니다.",
 }: PageCopyEditorProps) {
-  const [state, action, pending] = useActionState(savePageCopy, { ok: false });
-  useSaveToast(state, pending);
+  const { state, pending, run } = useSaveAction(savePageCopy, { ok: false }, {
+    tone: "edit",
+  });
 
   return (
-    <form onSubmit={submitAction(action)} className="rounded-2xl border border-ink/10 bg-white p-5">
+    <form onSubmit={submitAction(run)} className="rounded-2xl border border-ink/10 bg-white p-5">
       <input type="hidden" name="slug" value={slug} />
 
       <div className="flex items-center justify-between">

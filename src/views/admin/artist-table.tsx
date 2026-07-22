@@ -71,7 +71,7 @@ export function ArtistTable({ artists }: { artists: Artist[] }) {
     startTransition(async () => {
       const result = await reorderArtists(nextIds);
       if (result.ok) {
-        showToast("순서를 변경했습니다");
+        showToast("순서를 변경했습니다", "edit");
       } else {
         showToast(result.error ?? "순서 변경에 실패했습니다.", "error");
         setItems(artists); // revert to the server order

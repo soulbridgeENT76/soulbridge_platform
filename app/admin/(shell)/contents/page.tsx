@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Suspense } from "react";
 import { Plus } from "lucide-react";
 import { FaYoutube } from "react-icons/fa";
 import {
@@ -10,7 +9,6 @@ import {
 import { SectionVisibilityToggle } from "@widgets/admin-shell/ui/section-visibility-toggle";
 import { CategoryManager, PageCopyEditor } from "@views/admin";
 import { PlaceholderImage } from "@shared/ui";
-import { RedirectToast } from "@shared/ui/redirect-toast";
 import {
   getContentsAdmin,
   getContentCategoriesAdmin,
@@ -36,10 +34,6 @@ export default async function AdminContentsPage() {
 
   return (
     <div>
-      {/* Confirms a save that redirected here from the form. */}
-      <Suspense>
-        <RedirectToast param="saved" />
-      </Suspense>
 
       <AdminPageHeader
         title="CONTENTS"
