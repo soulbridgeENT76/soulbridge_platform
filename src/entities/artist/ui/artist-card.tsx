@@ -14,7 +14,7 @@ type ArtistCardProps = {
 export function ArtistCard({ artist, index }: ArtistCardProps) {
   return (
     <Link href={`/artists/${artist.slug}`} className="group block">
-      <div className="relative overflow-hidden rounded-md">
+      <div className="relative overflow-hidden rounded-md shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
         {/* The placeholder stays the fallback: a roster can hold an artist
             whose profile cut has not been supplied yet. */}
         {artist.photo ? (
