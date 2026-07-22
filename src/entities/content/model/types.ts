@@ -24,6 +24,8 @@ export type Content = {
   note: string;
   /** Detail-page body copy. */
   synopsis: string;
+  /** Optional related link, shown as a button on the detail page. */
+  referenceUrl?: string;
   mediaType: ContentMediaType;
   /** Resolved image URL when mediaType is "image", else null. */
   thumbnail: string | null;

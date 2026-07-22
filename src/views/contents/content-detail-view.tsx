@@ -103,6 +103,24 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
           </>
         )}
 
+        {/* Related link — shown regardless of media type when set. */}
+        {content.referenceUrl && (
+          <div className="mt-8">
+            <a
+              href={content.referenceUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="group inline-flex items-center gap-2 rounded-full border border-ink/15 px-5 py-3 text-sm font-semibold text-ink transition-colors hover:border-plum hover:text-plum"
+            >
+              관련 링크
+              <ArrowUpRight
+                size={16}
+                className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            </a>
+          </div>
+        )}
+
         {/* Back-to-list CTA */}
         <div className="mt-16 flex justify-center border-t border-ink/10 pt-14">
           <Link

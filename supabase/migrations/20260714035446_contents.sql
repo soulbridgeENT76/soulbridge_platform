@@ -19,6 +19,7 @@ create table public.contents (
     thumbnail_type smallint not null,      -- 0: image, 1: youtube
     description text,                      -- 제목 하단 노트
     content text not null,                 -- 상세 본문
+    reference_url text,                    -- 관련 링크 (선택) — 상세 페이지 버튼
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );

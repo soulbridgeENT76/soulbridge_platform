@@ -20,6 +20,7 @@ import {
 } from "@entities/about";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
 import { useSaveToast } from "@shared/ui/use-save-toast";
+import { submitAction } from "@shared/lib/use-field-errors";
 import type {
   PageCopy,
   AboutLeadership,
@@ -149,7 +150,7 @@ export function AboutEditor({
     <div className="flex flex-col gap-5">
       {/* Hero copy saves on its own — a separate <form> because forms cannot
           nest, and because the sections below are not persisted yet. */}
-      <form action={copyAction} className="flex flex-col gap-5">
+      <form onSubmit={submitAction(copyAction)} className="flex flex-col gap-5">
         <input type="hidden" name="slug" value="about" />
         <Card
           title="페이지 문구"
@@ -186,7 +187,7 @@ export function AboutEditor({
         </Card>
       </form>
 
-      <form action={aboutAction} className="flex flex-col gap-5">
+      <form onSubmit={submitAction(aboutAction)} className="flex flex-col gap-5">
         {/* Variable-length tree: serialized to one field rather than inventing
             indexed form names. The action re-validates the shape. */}
         <input

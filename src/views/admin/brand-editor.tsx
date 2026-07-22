@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { TriangleAlert } from "lucide-react";
 import { useSaveToast } from "@shared/ui/use-save-toast";
+import { submitAction } from "@shared/lib/use-field-errors";
 import {
   AdminField,
   AdminInput,
@@ -27,7 +28,7 @@ export function BrandEditor({ initial }: BrandEditorProps) {
   useSaveToast(state, isPending);
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form onSubmit={submitAction(formAction)} className="flex flex-col gap-5">
       <section className="rounded-2xl border border-ink/10 bg-white p-5">
         <p className="text-sm font-semibold text-ink">로고</p>
         <p className="mt-0.5 text-xs text-ink/50">
