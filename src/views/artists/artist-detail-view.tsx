@@ -21,22 +21,24 @@ export function ArtistDetailView({ artist }: ArtistDetailViewProps) {
           {/* Profile: image left, intro right */}
           {/* Image column matches the About → Leadership profile (18rem). */}
           <div className="grid gap-8 sm:grid-cols-[minmax(0,18rem)_1fr] sm:gap-12">
-            {artist.photo ? (
-              <Image
-                src={artist.photo}
-                alt={`${artist.nameKo} · 프로필`}
-                width={UPLOAD_SIZE.portrait.width}
-                height={UPLOAD_SIZE.portrait.height}
-                sizes="(min-width: 640px) 18rem, 100vw"
-                priority
-                className="h-auto w-full rounded-lg object-cover"
-              />
-            ) : (
-              <PlaceholderImage
-                label={`${artist.nameKo} · 프로필`}
-                ratio={PORTRAIT_RATIO}
-              />
-            )}
+            <div className="self-start overflow-hidden rounded-md">
+              {artist.photo ? (
+                <Image
+                  src={artist.photo}
+                  alt={`${artist.nameKo} · 프로필`}
+                  width={UPLOAD_SIZE.portrait.width}
+                  height={UPLOAD_SIZE.portrait.height}
+                  sizes="(min-width: 640px) 18rem, 100vw"
+                  priority
+                  className="h-auto w-full object-cover"
+                />
+              ) : (
+                <PlaceholderImage
+                  label={`${artist.nameKo} · 프로필`}
+                  ratio={PORTRAIT_RATIO}
+                />
+              )}
+            </div>
 
             <div>
               <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-plum">
