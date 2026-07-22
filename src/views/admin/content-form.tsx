@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import NextImage from "next/image";
 import { Image as ImageIcon, TriangleAlert, Video } from "lucide-react";
 import {
@@ -14,6 +15,7 @@ import {
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
+import { useSaveAction } from "@shared/ui/use-save-action";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
 import { parseYoutubeId, youtubeThumbnail } from "@shared/lib/youtube";
 import { LANDSCAPE_RATIO, UPLOAD_SIZE, formatSize } from "@shared/config/media";
@@ -49,7 +51,11 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
   const [youtubeUrl, setYoutubeUrl] = useState(initial?.youtubeId ?? "");
   const previewId = parseYoutubeId(youtubeUrl);
 
-  const [state, formAction] = useActionState(saveContent, { ok: true });
+  const router = useRouter();
+  const { state, run } = useSaveAction(saveContent, { ok: true }, {
+    tone: editing ? "edit" : "save",
+    onSuccess: () => router.push("/admin/contents"),
+  });
   const { errors, clearError, guardSubmit } = useFieldErrors();
 
   const validate = (formData: FormData): Record<string, string> => {
@@ -76,7 +82,7 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
   const clientSubmit = guardSubmit(
     validate,
     ["category", "title", "slug", "youtubeUrl"],
-    formAction
+    run
   );
 
   return (

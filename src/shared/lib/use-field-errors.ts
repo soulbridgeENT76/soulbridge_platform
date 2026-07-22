@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  startTransition,
+  type FormEvent,
+} from "react";
 
 /**
  * Client-side field validation shared by the admin forms.
@@ -71,7 +77,10 @@ export function useFieldErrors() {
         focusFirst(errs, order);
         return;
       }
-      action(formData);
+      // A useActionState dispatch (or a useSaveAction run) must be invoked
+      // inside a transition — React 19 warns otherwise and isPending stops
+      // tracking. onSubmit hands us a plain event, so we open one here.
+      startTransition(() => action(formData));
     };
 
   return { errors, clearError, flashErrors, focusFirst, guardSubmit };
@@ -86,7 +95,9 @@ export function useFieldErrors() {
 export function submitAction(action: (formData: FormData) => void) {
   return (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    action(new FormData(event.currentTarget));
+    const formData = new FormData(event.currentTarget);
+    // See guardSubmit: the dispatch has to run inside a transition.
+    startTransition(() => action(formData));
   };
 }
 

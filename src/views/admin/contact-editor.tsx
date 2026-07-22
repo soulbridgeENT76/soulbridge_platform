@@ -1,6 +1,5 @@
 "use client";
 
-import { useActionState } from "react";
 import { TriangleAlert } from "lucide-react";
 import {
   AdminField,
@@ -10,7 +9,7 @@ import {
   AdminFormActions,
   AdminReferenceCard,
 } from "@widgets/admin-shell";
-import { useSaveToast } from "@shared/ui/use-save-toast";
+import { useSaveAction } from "@shared/ui/use-save-action";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
 import type { ContactContent } from "@entities/page-content";
 import { saveContact } from "@features/update-contact";
@@ -31,8 +30,9 @@ type ContactEditorProps = {
  * SNS links are managed on the Brand page.
  */
 export function ContactEditor({ initial, socialsSummary }: ContactEditorProps) {
-  const [state, formAction, pending] = useActionState(saveContact, { ok: true });
-  useSaveToast(state, pending);
+  const { state, run } = useSaveAction(saveContact, { ok: true }, {
+    tone: "edit",
+  });
   const { errors, clearError, guardSubmit } = useFieldErrors();
 
   // Phone and email have a format rule; the rest are free text. Both optional,
@@ -50,7 +50,7 @@ export function ContactEditor({ initial, socialsSummary }: ContactEditorProps) {
     return errs;
   };
 
-  const clientSubmit = guardSubmit(validate, ["tel", "email"], formAction);
+  const clientSubmit = guardSubmit(validate, ["tel", "email"], run);
 
   return (
     // noValidate turns off the browser's native tooltips (type="email") so the
