@@ -40,7 +40,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
         {isYoutube ? (
           /* Video content: player first, description below */
           <div className="mx-auto mt-10 max-w-5xl">
-            <div className="aspect-video w-full overflow-hidden rounded-2xl bg-ink">
+            <div className="aspect-video w-full overflow-hidden rounded-md bg-ink">
               {content.youtubeId ? (
                 <iframe
                   className="h-full w-full"
@@ -78,7 +78,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
         ) : (
           /* Non-video IP: 16:9 image + description stacked */
           <>
-            <div className="mx-auto mt-10 max-w-5xl">
+            <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-md">
               {content.thumbnail ? (
                 <Image
                   src={content.thumbnail}
@@ -87,7 +87,7 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
                   height={UPLOAD_SIZE.landscape.height}
                   sizes="(min-width: 1024px) 64rem, 100vw"
                   priority
-                  className="w-full rounded-2xl object-cover"
+                  className="w-full object-cover"
                   style={{ aspectRatio: CONTENT_THUMB_RATIO }}
                 />
               ) : (
