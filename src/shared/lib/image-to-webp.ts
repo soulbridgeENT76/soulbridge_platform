@@ -4,21 +4,27 @@ export const WEBP_QUALITY_LOGO = 1;
 export const WEBP_QUALITY_PHOTO = 0.85;
 
 /**
- * Output size. Give both dimensions for a fixed box — `contain` fits the whole
- * image inside and centres it (transparent letterbox), `cover` fills the box
- * and crops the overflow. Give `height` alone to scale by height with the width
- * following the source ratio, which stores no padding at all — right for a
- * wordmark, which must neither be cropped nor gain empty margins.
+ * How to re-encode the source to WebP.
  *
- * `trim` first crops the source to the bounding box of its non-transparent
- * pixels, so a logo exported with empty margins around it still fills the frame.
+ * Fixed-box form: give both dimensions — `contain` fits the whole image inside
+ * and centres it (transparent letterbox), `cover` fills the box and crops the
+ * overflow. Give `height` alone to scale by height with the width following the
+ * source ratio (no padding stored — right for a wordmark). `trim` first crops
+ * to the bounding box of the non-transparent pixels.
+ *
+ * Downscale form (`maxWidth`): keep the source ratio untouched — no crop, no
+ * upscale — only shrinking it to fit within maxWidth. For photos where the crop
+ * and resolution are decided at render (next/image + object-cover), so the
+ * stored master stays sharp at its native size and just has an upper bound.
  */
-export type WebpTarget = {
-  width?: number;
-  height: number;
-  fit?: "contain" | "cover";
-  trim?: boolean;
-};
+export type WebpTarget =
+  | {
+      width?: number;
+      height: number;
+      fit?: "contain" | "cover";
+      trim?: boolean;
+    }
+  | { maxWidth: number };
 
 /** Where to draw the source so it fills the target per `fit`, keeping ratio. */
 function placeInBox(
@@ -93,6 +99,23 @@ export async function imageToWebp(
   });
 
   try {
+    // Downscale-only mode: keep the source ratio, never upscale, never crop —
+    // the render layer (next/image + object-cover) decides display size & crop.
+    if (target && "maxWidth" in target) {
+      const scale = Math.min(1, target.maxWidth / bitmap.width);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(bitmap.width * scale);
+      canvas.height = Math.round(bitmap.height * scale);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("이미지를 변환할 수 없습니다.");
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/webp", quality),
+      );
+      if (!blob) throw new Error("이미지를 WebP로 변환하지 못했습니다.");
+      return { blob, width: canvas.width, height: canvas.height };
+    }
+
     // Source rectangle to read from — the whole bitmap, or just its artwork
     // when trimming away transparent margins.
     let sx = 0;
