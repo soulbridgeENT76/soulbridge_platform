@@ -20,6 +20,13 @@ type AdminStatusToggleProps = {
    * waiting for a form submit. Mutually exclusive with `name`.
    */
   action?: (active: boolean) => Promise<{ ok: boolean; error?: string }>;
+  /**
+   * Success-toast copy for the on/off transitions when saved via `action`.
+   * Defaults to menu-visibility wording; publish toggles pass their own so the
+   * message matches what actually changed.
+   */
+  onMessage?: string;
+  offMessage?: string;
 };
 
 /**
@@ -32,6 +39,8 @@ export function AdminStatusToggle({
   itemName,
   name,
   action,
+  onMessage = "메뉴에 노출됩니다",
+  offMessage = "메뉴에서 숨겨집니다",
 }: AdminStatusToggleProps) {
   const [active, setActive] = useState(initial);
   const [pending, startTransition] = useTransition();
@@ -44,7 +53,7 @@ export function AdminStatusToggle({
     startTransition(async () => {
       const result = await action(next);
       if (result.ok) {
-        showToast(next ? "메뉴에 노출됩니다" : "메뉴에서 숨겨집니다");
+        showToast(next ? onMessage : offMessage);
       } else {
         setActive(!next); // revert
         showToast(result.error ?? "저장에 실패했습니다.", "error");

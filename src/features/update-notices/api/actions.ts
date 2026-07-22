@@ -34,7 +34,7 @@ async function assertAuthed(): Promise<NoticeFormState | null> {
 function revalidate() {
   updateTag(NOTICE_TAG);
   revalidatePath("/notice");
-  revalidatePath("/admin/notice");
+  revalidatePath("/admin/notices");
   revalidatePath("/");
 }
 
@@ -92,7 +92,7 @@ export async function saveNotice(
   }
 
   revalidate();
-  redirect("/admin/notice?saved=1");
+  redirect("/admin/notices?saved=1");
 }
 
 /** Deletes a notice. */

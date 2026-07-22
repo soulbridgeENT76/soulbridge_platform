@@ -62,7 +62,7 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
       <input type="hidden" name="id" value={initial?.id ?? ""} />
 
       <AdminPageHeader
-        title={editing ? "뉴스 편집" : "새 뉴스"}
+        title={editing ? "EDIT NOTICE" : "NEW NOTICE"}
         description={editing ? initial?.title : "새 소식을 등록합니다."}
       />
 
@@ -219,7 +219,7 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin/notice" />
+      <AdminFormActions cancelHref="/admin/notices" />
     </form>
   );
 }

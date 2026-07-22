@@ -1,14 +1,16 @@
 import { PageShell } from "@widgets/page-shell";
 import { Container, PageHeading } from "@shared/ui";
 import { PAGE_COPY } from "@shared/config/page-copy";
-import { getSectionEyebrow } from "@entities/page-content";
+import { getPageCopy, getSectionEyebrow } from "@entities/page-content";
 import { getPublishedNotices, getNoticeCategories } from "@entities/notices";
 import { NoticeFilter } from "@features/notice-filter";
 
 export async function NoticesView() {
-  const copy = PAGE_COPY.news;
-  // The English label mirrors the home banner's CTA button for this section.
-  const [eyebrow, notices, categories] = await Promise.all([
+  const fallback = PAGE_COPY.news;
+  // Title/description come from the CMS (page_contents slug "notice"); the
+  // English eyebrow mirrors the home banner's CTA button (single source).
+  const [copy, eyebrow, notices, categories] = await Promise.all([
+    getPageCopy("notice"),
     getSectionEyebrow("/notice"),
     getPublishedNotices(),
     getNoticeCategories(),
@@ -16,9 +18,9 @@ export async function NoticesView() {
   return (
     <PageShell>
       <PageHeading
-        eyebrow={eyebrow ?? copy.eyebrow}
-        title={copy.title}
-        description={copy.description}
+        eyebrow={eyebrow ?? fallback.eyebrow}
+        title={copy?.title ?? fallback.title}
+        description={copy?.description ?? fallback.description}
       />
       <Container className="py-16 md:py-24">
         <NoticeFilter notices={notices} categories={categories} />
