@@ -9,7 +9,7 @@ type NoticeRowProps = {
 };
 
 const ROW_CLASS =
-  "group flex items-center gap-6 border-t border-ink/10 py-6 transition-colors hover:bg-ink/3 md:gap-10";
+  "group flex items-center gap-6 border-t border-ink/10 px-4 py-6 transition-colors hover:bg-ink/3 md:gap-10 md:px-6";
 
 /**
  * A single row in the notice list. "article" items link to the in-site detail

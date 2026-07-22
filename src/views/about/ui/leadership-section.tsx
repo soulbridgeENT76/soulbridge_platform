@@ -8,18 +8,23 @@ export function LeadershipSection({ leader }: { leader: AboutLeadership }) {
   return (
     <AboutSection index="01" eyebrow={leader.label}>
       <div className="grid max-w-5xl gap-8 sm:grid-cols-[minmax(0,18rem)_1fr] sm:gap-12">
-        {leader.photo ? (
-          <Image
-            src={leader.photo}
-            alt={leader.name}
-            width={UPLOAD_SIZE.portrait.width}
-            height={UPLOAD_SIZE.portrait.height}
-            sizes="(min-width: 640px) 18rem, 100vw"
-            className="h-auto w-full rounded-lg object-cover"
-          />
-        ) : (
-          <PlaceholderImage label="대표 프로필 이미지" ratio={PORTRAIT_RATIO} />
-        )}
+        <div className="self-start overflow-hidden rounded-md shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
+          {leader.photo ? (
+            <Image
+              src={leader.photo}
+              alt={leader.name}
+              width={UPLOAD_SIZE.portrait.width}
+              height={UPLOAD_SIZE.portrait.height}
+              sizes="(min-width: 640px) 18rem, 100vw"
+              className="h-auto w-full object-cover"
+            />
+          ) : (
+            <PlaceholderImage
+              label="대표 프로필 이미지"
+              ratio={PORTRAIT_RATIO}
+            />
+          )}
+        </div>
         <div>
           <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-plum">
             {leader.role}
