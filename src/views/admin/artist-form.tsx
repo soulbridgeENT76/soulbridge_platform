@@ -78,13 +78,13 @@ export function ArtistForm({ initial }: ArtistFormProps) {
       <div className="mt-8 flex flex-col gap-6">
         <AdminField
           label="프로필 이미지"
-          hint="세로형 3:4"
+          hint="세로형 3:4로 자동 조정 · 권장 1200 × 1600"
         >
           <AdminImageUpload
             ratio={PORTRAIT_RATIO}
             name="profile"
             initialUrl={initial?.photo}
-            requiredSize={UPLOAD_SIZE.portrait}
+            recommendedSize={UPLOAD_SIZE.portrait}
             output={{ ...UPLOAD_SIZE.portrait, fit: "cover" }}
             outputQuality={WEBP_QUALITY_PHOTO}
             className="w-60"

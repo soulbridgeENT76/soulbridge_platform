@@ -5,12 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import { uploadMedia, removeMedia } from "@/lib/supabase/storage";
 import { updateBrand, getBrand, BRAND_TAG, type BrandLogo } from "@entities/brand";
 import { MEDIA_FOLDER } from "@shared/config/storage";
-import { LOGO_OUTPUT_HEIGHT } from "@shared/config/media";
 
 export type BrandFormState = { ok: boolean; error?: string };
 
-/** Sanity bound on the client-reported width — a logo is never this wide. */
-const MAX_LOGO_WIDTH = 8192;
+/** Sanity bound on a client-reported dimension — a logo is never this large. */
+const MAX_LOGO_DIM = 8192;
 
 /**
  * An untouched file input still submits a File — empty, named "" — so `size` is
@@ -22,10 +21,10 @@ function pickedFile(value: FormDataEntryValue | null): File | null {
   return value.type.startsWith("image/") ? value : null;
 }
 
-/** The encoded width, measured in the browser (see AdminImageUpload). */
-function parseWidth(value: FormDataEntryValue | null): number | null {
+/** An intrinsic dimension read from the SVG in the browser (see AdminImageUpload). */
+function parseDim(value: FormDataEntryValue | null): number | null {
   const n = Number(value);
-  return Number.isInteger(n) && n > 0 && n <= MAX_LOGO_WIDTH ? n : null;
+  return Number.isInteger(n) && n > 0 && n <= MAX_LOGO_DIM ? n : null;
 }
 
 export async function saveBrand(
@@ -51,20 +50,30 @@ export async function saveBrand(
   } else {
     const file = pickedFile(formData.get("logo"));
     if (file) {
-      const width = parseWidth(formData.get("logo_width"));
-      // A logo with no width would break the hero mask's aspect ratio, so
-      // refuse rather than store something half-formed.
-      if (!width) {
-        return { ok: false, error: "이미지 크기를 읽지 못했습니다. 다시 선택해주세요." };
+      // The uploader submits either a raw SVG (stored untouched) or a WebP it
+      // re-encoded a PNG into. Anything else means a tampered payload.
+      const isSvg = file.type === "image/svg+xml";
+      if (!isSvg && file.type !== "image/webp") {
+        return { ok: false, error: "지원하지 않는 로고 형식입니다. 다시 선택해주세요." };
+      }
+      // width/height carry the artwork's intrinsic ratio, which drives the hero
+      // mask. Missing either would break that ratio, so refuse a half-formed one.
+      const width = parseDim(formData.get("logo_width"));
+      const height = parseDim(formData.get("logo_height"));
+      if (!width || !height) {
+        return { ok: false, error: "로고 크기를 읽지 못했습니다. 다시 선택해주세요." };
       }
 
       try {
         // Upload before touching the database: a failure here leaves nothing
-        // half-applied, so the operator can simply retry.
-        const path = await uploadMedia(MEDIA_FOLDER.logo, file);
-        // Height comes from the constant, not the client — the uploader encodes
-        // to exactly this and it is not the browser's call to say otherwise.
-        logo = { path, width, height: LOGO_OUTPUT_HEIGHT };
+        // half-applied, so the operator can simply retry. The SVG is stored
+        // as-is; the WebP takes uploadMedia's defaults.
+        const path = await uploadMedia(
+          MEDIA_FOLDER.logo,
+          file,
+          isSvg ? { ext: "svg", contentType: "image/svg+xml" } : undefined,
+        );
+        logo = { path, width, height };
         stale = current.brand.logo?.path ?? null;
       } catch {
         return {

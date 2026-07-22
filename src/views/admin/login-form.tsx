@@ -1,7 +1,6 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { TriangleAlert } from "lucide-react";
 import { AdminField, AdminInput, AdminButton } from "@widgets/admin-shell";
@@ -63,12 +62,12 @@ export function LoginForm({ logo }: { logo: SiteLogo }) {
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="flex flex-col items-center">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={logo.src}
             alt={SITE.name}
             width={logo.width}
             height={logo.height}
-            priority
             className="h-12 w-auto"
           />
           <p className="mt-4 font-display text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">

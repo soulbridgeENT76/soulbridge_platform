@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
-import { CONTACT, SITE } from "@shared/config/site";
+import { SITE } from "@shared/config/site";
 import { Container, SocialLinks } from "@shared/ui";
 import type { SiteBrand, SiteLogo } from "@entities/brand";
+import type { ContactContent } from "@entities/page-content";
 
 // Cache Component: reading the current time is allowed inside `"use cache"`,
 // so the copyright year prerenders cleanly (updates on each build/deploy).
@@ -14,9 +14,11 @@ async function getCurrentYear() {
 export async function SiteFooter({
   logo,
   brand,
+  contact,
 }: {
   logo: SiteLogo;
   brand: SiteBrand;
+  contact: ContactContent;
 }) {
   const year = await getCurrentYear();
   return (
@@ -25,7 +27,8 @@ export async function SiteFooter({
         {/* Left: brand + legal */}
         <div>
           {/* Same black wordmark, flipped to white for the dark footer. */}
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={logo.src}
             alt={brand.name}
             width={logo.width}
@@ -35,11 +38,11 @@ export async function SiteFooter({
 
           {/* Company intro sits where the duplicated name line used to be. */}
           <p className="mt-6 text-sm text-paper/50">{brand.intro}</p>
-          <p className="mt-2 text-sm text-paper/50">{CONTACT.address}</p>
+          <p className="mt-2 text-sm text-paper/50">{contact.address}</p>
           <p className="mt-1 text-sm text-paper/50">
-            TEL {CONTACT.tel}
+            TEL {contact.tel}
             <span className="mx-2 text-paper/25">|</span>
-            {CONTACT.email}
+            {contact.email}
           </p>
 
           {/* Legal — privacy policy is emphasised per convention. */}

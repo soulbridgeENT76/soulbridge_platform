@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -38,7 +37,8 @@ export function AdminSidebar({ logo }: { logo: SiteLogo }) {
     <aside className="flex w-60 shrink-0 flex-col bg-ink text-paper">
       {/* Wordmark — black artwork flipped to white for the dark sidebar. */}
       <Link href="/admin" className="block px-6 py-7" aria-label={SITE.name}>
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={logo.src}
           alt={SITE.name}
           width={logo.width}

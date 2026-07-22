@@ -16,7 +16,7 @@ import { cn } from "@shared/lib/cn";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
 import { parseYoutubeId, youtubeThumbnail } from "@shared/lib/youtube";
-import { LANDSCAPE_RATIO, UPLOAD_SIZE } from "@shared/config/media";
+import { LANDSCAPE_RATIO, UPLOAD_SIZE, formatSize } from "@shared/config/media";
 // Type from the model, not the entity barrel: this is a client component and
 // the barrel also exports the server-only readers.
 import type { Content } from "@entities/content/model/types";
@@ -191,11 +191,14 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
                   ratio={LANDSCAPE_RATIO}
                   name="image"
                   initialUrl={initial?.mediaType === "image" ? initial.thumbnail : null}
-                  requiredSize={UPLOAD_SIZE.landscape}
+                  recommendedSize={UPLOAD_SIZE.landscape}
                   output={{ ...UPLOAD_SIZE.landscape, fit: "cover" }}
                   outputQuality={WEBP_QUALITY_PHOTO}
                 />
-                <p className="mt-2 text-xs text-ink/45">가로형 16:9</p>
+                <p className="mt-2 text-xs text-ink/45">
+                  가로형 16:9로 자동 조정됩니다. 어떤 크기든 업로드할 수 있으며,
+                  권장 해상도는 {formatSize(UPLOAD_SIZE.landscape)}입니다.
+                </p>
               </div>
             ) : (
               <div>

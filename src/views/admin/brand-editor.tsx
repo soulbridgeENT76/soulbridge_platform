@@ -34,43 +34,39 @@ export function BrandEditor({ initial }: BrandEditorProps) {
           헤더·푸터·메뉴에 사용됩니다. 제거하면 기본 로고로 돌아갑니다.
         </p>
 
-        {/* Padding is THE cause of an undersized logo — call it out loudest. */}
+        {/* Padding used to be rejected; PNG is now auto-trimmed on upload. */}
         <div className="mt-3 flex items-start gap-2 rounded-lg border border-brand/30 bg-brand/[0.06] px-3 py-2.5">
           <TriangleAlert size={15} className="mt-0.5 shrink-0 text-brand" />
           <div>
             <p className="text-xs font-bold text-ink">
-              로고 주변 여백(빈 공간)을 꼭 없애 주세요
+              여백은 자동으로 정리됩니다
             </p>
             <p className="mt-0.5 text-xs leading-relaxed text-ink/60">
-              로고가{" "}
-              <b className="font-semibold text-ink/80">
-                캔버스 상·하·좌·우 끝에 딱 닿도록
-              </b>{" "}
-              꽉 차게 잘라 주세요. 위아래에 투명 여백이 있으면 그만큼 사이트에서{" "}
-              <b className="font-semibold text-ink/80">작게 표시됩니다.</b>
+              <b className="font-semibold text-ink/80">PNG</b>는 업로드 시 주변
+              투명 여백을 자동으로 잘라냅니다.{" "}
+              <b className="font-semibold text-ink/80">SVG</b>는 여백 없이 만들어
+              주세요 — 여백이 있으면 그만큼 사이트에서 작게 표시됩니다.
             </p>
           </div>
         </div>
 
         <ul className="mt-3 flex flex-col gap-1 text-xs text-ink/55">
           <li>
-            · <b className="font-semibold text-ink/75">PNG 파일</b>로 올려주세요
-            (SVG는 등록되지 않습니다)
+            · <b className="font-semibold text-ink/75">SVG 또는 PNG</b>로
+            올려주세요 (JPG는 등록되지 않습니다)
           </li>
           <li>
-            ·{" "}
-            <b className="font-semibold text-ink/75">
-              세로 {LOGO_MIN_HEIGHT}px 이상
-            </b>{" "}
-            — 작으면 고화질 화면에서 흐려집니다
+            · <b className="font-semibold text-ink/75">SVG</b>는 모든 화면에서
+            선명합니다. <b className="font-semibold text-ink/75">PNG</b>는 세로{" "}
+            {LOGO_MIN_HEIGHT}px 이상 권장 — 작으면 고화질 화면에서 흐려집니다
           </li>
           <li>
-            · <b className="font-semibold text-ink/75">배경이 투명</b>해야
-            합니다 — 배경이 있으면 헤더에 사각형이 그대로 보입니다
+            · <b className="font-semibold text-ink/75">배경 없이(투명)</b>{" "}
+            만들어 주세요 — 배경이 있으면 헤더에 사각형이 그대로 보입니다
           </li>
           <li>
             · <b className="font-semibold text-ink/75">단색(검정)</b>으로
-            올려주세요 — 어두운 배경에서는 흰색으로 자동 변환됩니다
+            만들어 주세요 — 어두운 배경에서는 흰색으로 자동 변환됩니다
           </li>
         </ul>
 
@@ -83,9 +79,10 @@ export function BrandEditor({ initial }: BrandEditorProps) {
             fit="contain"
             name="logo"
             initialUrl={mediaUrl(initial.brand.logo?.path)}
-            minHeight={LOGO_MIN_HEIGHT}
+            allowSvg
+            recommendedMinHeight={LOGO_MIN_HEIGHT}
             requireTransparent
-            output={{ height: LOGO_OUTPUT_HEIGHT }}
+            output={{ height: LOGO_OUTPUT_HEIGHT, trim: true }}
             outputQuality={WEBP_QUALITY_LOGO}
             className="max-w-xs"
           />

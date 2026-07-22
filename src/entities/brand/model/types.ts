@@ -1,14 +1,15 @@
 import type { SocialKey, SocialLink } from "@shared/config/socials";
 
 /**
- * An uploaded logo. `path` is the Storage path inside MEDIA_BUCKET
- * ("logo/<uuid>.webp"), NOT a URL — wrap it with mediaUrl() at render time so
- * the bucket and host stay in one place.
+ * An uploaded logo — an SVG stored as-is, or a WebP re-encoded from a PNG.
+ * `path` is the Storage path inside MEDIA_BUCKET ("logo/<uuid>.svg|.webp"), NOT
+ * a URL — wrap it with mediaUrl() at render time so the bucket and host stay in
+ * one place.
  *
  * The dimensions travel with the path rather than living in a sibling field:
- * next/image and the hero's CSS mask both need them, and splitting them off
- * would let a logo exist without a size. `height` is always LOGO_OUTPUT_HEIGHT;
- * `width` follows the source ratio, so it differs per file.
+ * the header <img> and the hero's CSS mask both need them, and splitting them
+ * off would let a logo exist without a size. They carry the artwork's intrinsic
+ * ratio (SVG viewBox, or the encoded WebP's pixels).
  */
 export type BrandLogo = {
   path: string;

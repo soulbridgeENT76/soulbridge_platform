@@ -4,14 +4,14 @@
 -- public = true 인 이유: 헤더·푸터 로고는 비로그인 방문자에게도 보여야 한다.
 -- 서명 URL로 바꾸면 렌더마다 서버 왕복이 생겨 CDN 캐시가 무의미해진다.
 --
--- webp만 허용: 업로더(admin-image-upload.tsx)가 모든 원본을 webp로 재인코딩하고
--- lib/supabase/storage.ts 의 uploadMedia 가 확장자와 contentType을 webp로 고정한다.
--- 다른 타입이 올라올 경로가 없으므로 좁혀둔다.
+-- 사진류는 webp만: 업로더(admin-image-upload.tsx)가 모든 원본을 webp로 재인코딩한다.
+-- 로고만 예외로 svg 원본을 그대로 저장한다(벡터라 재인코딩하면 오히려 손해). 그 외
+-- 타입이 올라올 경로가 없으므로 두 종류로 좁혀둔다.
 --
 -- on conflict: supabase start 가 config.toml 을 보고 이미 만들어둔 버킷과 충돌하지
 -- 않도록. 마이그레이션을 몇 번 돌려도 같은 상태로 수렴한다.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('images', 'images', true, 52428800, array['image/webp'])
+values ('images', 'images', true, 52428800, array['image/webp', 'image/svg+xml'])
 on conflict (id) do update
     set public             = excluded.public,
         file_size_limit    = excluded.file_size_limit,
