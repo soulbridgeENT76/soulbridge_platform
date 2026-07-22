@@ -55,12 +55,12 @@ export function LegalDocument({
         <p className="mt-4 text-sm text-ink/45">{effectiveDate}</p>
 
         {intro && (
-          <p className="mt-8 max-w-3xl whitespace-pre-line text-base leading-relaxed text-ink/70">
+          <p className="mt-8 whitespace-pre-line text-base leading-relaxed text-ink/70">
             {intro}
           </p>
         )}
 
-        <div className="mt-12 flex max-w-3xl flex-col gap-10">
+        <div className="mt-12 flex flex-col gap-10">
           {sections.map((section, i) => (
             <section key={i}>
               <h2 className="text-lg font-semibold text-ink md:text-xl">
