@@ -192,12 +192,13 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
                   name="image"
                   initialUrl={initial?.mediaType === "image" ? initial.thumbnail : null}
                   recommendedSize={UPLOAD_SIZE.landscape}
-                  output={{ ...UPLOAD_SIZE.landscape, fit: "cover" }}
+                  output={{ maxWidth: UPLOAD_SIZE.landscape.width }}
                   outputQuality={WEBP_QUALITY_PHOTO}
                 />
                 <p className="mt-2 text-xs text-ink/45">
-                  가로형 16:9로 자동 조정됩니다. 어떤 크기든 업로드할 수 있으며,
-                  권장 해상도는 {formatSize(UPLOAD_SIZE.landscape)}입니다.
+                  화면에서는 가로형 16:9 영역으로 잘려 표시됩니다. 어떤 크기든
+                  업로드할 수 있으며(원본 비율 유지), 권장 해상도는{" "}
+                  {formatSize(UPLOAD_SIZE.landscape)}입니다.
                 </p>
               </div>
             ) : (
