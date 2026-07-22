@@ -44,7 +44,10 @@ export function HeroWordmark({ logo }: { logo: SiteLogo }) {
       className="pointer-events-none absolute inset-y-0 right-0 hidden select-none items-center pr-16 md:flex lg:pr-28"
     >
       <div
-        className="relative w-200 lg:w-264"
+        // Sized by height like every other logo use, so an arbitrary-ratio
+        // upload (square, tall) can never overflow the banner vertically — the
+        // width follows the ratio and is clipped by the section's overflow.
+        className="relative h-90 lg:h-120"
         style={{
           aspectRatio: `${logo.width} / ${logo.height}`,
           filter: "drop-shadow(0 9px 11px rgba(74, 54, 99, 0.2))",

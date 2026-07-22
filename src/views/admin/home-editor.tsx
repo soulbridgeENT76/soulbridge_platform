@@ -95,27 +95,33 @@ export function HomeEditor({
                 same height (24rem ÷ 16:9 ≈ 7.6rem ÷ 9:16 ≈ 13.5rem). */}
             <div>
               <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-                {/* `output` at the same size the upload is pinned to: no
-                    resizing, purely a re-encode to WebP. The bucket accepts
-                    nothing else, and a 2560px photo shrinks a lot at 0.85. */}
-                <AdminField label="배너 이미지 (데스크톱)" hint="가로형 16:9">
+                {/* Any upload is cropped to the banner ratio and resized to the
+                    fixed size via `output`, then re-encoded to WebP — the only
+                    type the bucket accepts. A 2560px photo shrinks a lot at 0.85. */}
+                <AdminField
+                  label="배너 이미지 (데스크톱)"
+                  hint="가로형 16:9로 자동 조정 · 권장 2560 × 1440"
+                >
                   <AdminImageUpload
                     ratio={LANDSCAPE_RATIO}
                     name="bannerDesktop"
                     initialUrl={slide.banner.desktop}
-                    requiredSize={UPLOAD_SIZE.bannerDesktop}
+                    recommendedSize={UPLOAD_SIZE.bannerDesktop}
                     output={{ ...UPLOAD_SIZE.bannerDesktop, fit: "cover" }}
                     outputQuality={WEBP_QUALITY_PHOTO}
                     className="w-full sm:w-96"
                   />
                 </AdminField>
 
-                <AdminField label="모바일" hint="세로형 9:16">
+                <AdminField
+                  label="모바일"
+                  hint="세로형 9:16로 자동 조정 · 권장 1440 × 2560"
+                >
                   <AdminImageUpload
                     ratio="9 / 16"
                     name="bannerMobile"
                     initialUrl={slide.banner.mobile}
-                    requiredSize={UPLOAD_SIZE.bannerMobile}
+                    recommendedSize={UPLOAD_SIZE.bannerMobile}
                     output={{ ...UPLOAD_SIZE.bannerMobile, fit: "cover" }}
                     outputQuality={WEBP_QUALITY_PHOTO}
                     className="w-40 sm:w-[7.6rem]"

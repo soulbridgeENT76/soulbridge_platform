@@ -32,23 +32,13 @@ export const UPLOAD_SIZE = {
 export const formatSize = (s: UploadSize) => `${s.width} × ${s.height}`;
 
 /**
- * Minimum height accepted at upload. The logo is sized by height everywhere it
- * appears (`h-12 w-auto` in the header, footer and menu), so height — not width
- * — decides how sharp it renders: a wide but short export would clear a width
- * check and still look soft. 48px (tallest on-screen use) × 3 for dense mobile
- * ≈ 144, and 512 leaves headroom for the hero wordmark, which masks the same
- * file several hundred px wide.
- *
- * The logo must stay transparent + monochrome: the footer flips it to white
- * with a CSS filter, which breaks on an opaque or multi-colour file.
+ * The logo takes SVG (stored untouched) or PNG. For the PNG path this is the
+ * minimum height accepted: the logo is sized by height everywhere it appears
+ * (`h-12 w-auto`), so a short export looks soft. 48px (tallest use) × 3 for
+ * dense mobile ≈ 144, and 512 leaves headroom for the hero wordmark. SVG has no
+ * such floor — a vector is sharp at any size.
  */
 export const LOGO_MIN_HEIGHT = 512;
 
-/**
- * Height every stored logo is scaled to on upload; the width follows the source
- * ratio. Fitting into a fixed box instead would letterbox the wordmark onto a
- * transparent canvas, and since the site sizes the logo by height that baked-in
- * padding shrinks the artwork everywhere it appears — the very thing the
- * uploader rejects source files for.
- */
+/** Height a PNG logo is re-encoded to on upload; the width follows its ratio. */
 export const LOGO_OUTPUT_HEIGHT = 512;

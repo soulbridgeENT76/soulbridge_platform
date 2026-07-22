@@ -34,9 +34,25 @@ type AdminImageUploadProps = {
    * which the site always renders at a fixed height with an automatic width).
    */
   minHeight?: number;
+  /**
+   * Suggested pixel size shown as guidance, NOT enforced. For fields that crop
+   * any upload to a fixed ratio via `output` — the operator can upload any size
+   * and we resize; the hint just tells them what resolution stays sharp.
+   */
+  recommendedSize?: UploadSize;
+  /**
+   * Suggested minimum height shown as guidance, NOT enforced — for the PNG logo
+   * path, which is re-encoded to a fixed height. A smaller source is upscaled
+   * (softer) but still accepted; the hint just names the sharp threshold.
+   */
+  recommendedMinHeight?: number;
   /** Reject files without a transparent background (logo on a solid block). */
   requireTransparent?: boolean;
-  /** Accept SVG and skip the raster checks (vectors scale to any size). */
+  /**
+   * Also accept SVG, stored untouched — for the logo, which takes SVG or PNG.
+   * A vector skips every raster check and the WebP re-encode; its intrinsic
+   * ratio is read from the file. PNG still runs the raster checks + `output`.
+   */
   allowSvg?: boolean;
   /**
    * Fit the accepted image into this box and re-encode as WebP, replacing the
@@ -44,9 +60,7 @@ type AdminImageUploadProps = {
    */
   output?: WebpTarget;
   /**
-   * WebP quality for `output`. Flat artwork (the logo) needs lossless or its
-   * edges bruise; photographs do not, and at banner sizes the saving is large.
-   * Pass WEBP_QUALITY_LOGO or WEBP_QUALITY_PHOTO.
+   * WebP quality for `output`. Photographs compress well; pass WEBP_QUALITY_PHOTO.
    */
   outputQuality?: number;
   className?: string;
@@ -79,6 +93,56 @@ function hasTransparency(data: Uint8ClampedArray): boolean {
 }
 
 /**
+ * How much of the canvas the artwork actually fills, per axis. A tightly
+ * cropped logo fills ~1 on both; a logo exported with transparent padding
+ * around it fills much less, which would make it render small in the header.
+ */
+function artworkFill(data: Uint8ClampedArray, n = 128) {
+  let minX = n,
+    minY = n,
+    maxX = -1,
+    maxY = -1;
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      if (data[(y * n + x) * 4 + 3] > 8) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+  if (maxX < 0) return { width: 0, height: 0 }; // fully transparent
+  return { width: (maxX - minX + 1) / n, height: (maxY - minY + 1) / n };
+}
+
+/**
+ * The logo's intrinsic size, read from the SVG's viewBox (preferred) or its
+ * width/height attributes. Only the ratio matters downstream — it drives the
+ * hero mask's aspect ratio — so the numbers are rounded to integers the server
+ * can validate. Returns null for a non-SVG or an SVG with no declared size.
+ */
+async function svgIntrinsicSize(
+  file: File,
+): Promise<{ width: number; height: number } | null> {
+  const text = await file.text();
+  const doc = new DOMParser().parseFromString(text, "image/svg+xml");
+  if (doc.querySelector("parsererror")) return null;
+  const svg = doc.querySelector("svg");
+  if (!svg) return null;
+
+  const viewBox = svg.getAttribute("viewBox");
+  if (viewBox) {
+    const [, , w, h] = viewBox.split(/[\s,]+/).map(Number);
+    if (w > 0 && h > 0) return { width: Math.round(w), height: Math.round(h) };
+  }
+  const w = parseFloat(svg.getAttribute("width") ?? "");
+  const h = parseFloat(svg.getAttribute("height") ?? "");
+  if (w > 0 && h > 0) return { width: Math.round(w), height: Math.round(h) };
+  return null;
+}
+
+/**
  * Visual image picker with local preview and exact-size enforcement. Upload
  * itself is not wired — the selected file is previewed client-side only.
  * TODO(backend): send the file to storage and store the returned URL.
@@ -89,6 +153,8 @@ export function AdminImageUpload({
   fit = "cover",
   requiredSize,
   minHeight,
+  recommendedSize,
+  recommendedMinHeight,
   requireTransparent,
   allowSvg,
   output,
@@ -101,6 +167,8 @@ export function AdminImageUpload({
   const [error, setError] = useState<string | null>(null);
   /** Encoded width, submitted alongside the file — see `name` above. */
   const [width, setWidth] = useState("");
+  /** Intrinsic height, submitted for SVG so the server can keep its ratio. */
+  const [height, setHeight] = useState("");
   /** Set once the operator explicitly removes the stored image. */
   const [cleared, setCleared] = useState(false);
 
@@ -108,6 +176,7 @@ export function AdminImageUpload({
     setError(message);
     setPreview(null);
     setWidth("");
+    setHeight("");
     if (url) URL.revokeObjectURL(url);
     if (inputRef.current) inputRef.current.value = "";
   };
@@ -127,6 +196,7 @@ export function AdminImageUpload({
         );
         inputRef.current.files = dt.files;
         setWidth(String(encoded.width));
+        setHeight(String(encoded.height));
       } catch {
         reject("이미지를 변환하지 못했습니다.", url);
         return;
@@ -151,10 +221,27 @@ export function AdminImageUpload({
 
     const url = URL.createObjectURL(file);
 
-    // Vectors scale to any size and keep transparency — nothing to check.
+    // SVG: stored untouched when allowed (a vector needs no raster checks and
+    // no re-encode). Its ratio is read from the file and submitted; the raw SVG
+    // already sits in the input from the change event.
     if (file.type === "image/svg+xml") {
-      if (allowSvg) accept(file, url);
-      else reject("SVG는 등록할 수 없습니다. PNG로 올려주세요.", url);
+      if (!allowSvg) {
+        reject("SVG는 등록할 수 없습니다.", url);
+        return;
+      }
+      svgIntrinsicSize(file).then((size) => {
+        if (!size) {
+          reject(
+            "SVG 크기를 읽을 수 없습니다. viewBox 또는 width·height가 있는 파일로 올려주세요.",
+            url,
+          );
+          return;
+        }
+        setWidth(String(size.width));
+        setHeight(String(size.height));
+        setCleared(false);
+        setPreview(url);
+      });
       return;
     }
 
@@ -202,6 +289,13 @@ export function AdminImageUpload({
           );
           return;
         }
+        // Empty margins are trimmed automatically on encode (output.trim), so
+        // padding is no longer rejected — only a wholly transparent file, which
+        // has no artwork to keep, is caught here.
+        if (pixels && artworkFill(pixels).width === 0) {
+          reject("전체가 투명한 파일입니다.", url);
+          return;
+        }
       }
       accept(file, url);
     };
@@ -213,16 +307,21 @@ export function AdminImageUpload({
     setPreview(null);
     setError(null);
     setWidth("");
+    setHeight("");
     setCleared(true);
     if (inputRef.current) inputRef.current.value = "";
   };
 
   // Shown inside the drop box so the requirement sits where the eye already is.
+  // Enforced fields (requiredSize / minHeight) state the hard rule; otherwise a
+  // recommendedSize states the target ratio + a suggested resolution.
   const sizeLabel = requiredSize
     ? formatSize(requiredSize)
     : minHeight
       ? `세로 ${minHeight}px 이상`
       : null;
+  // "16 / 9" (CSS) → "16:9" (display).
+  const ratioText = ratio.replace(/\s*\/\s*/, ":");
 
   return (
     <div className={cn("w-full", className)}>
@@ -275,11 +374,25 @@ export function AdminImageUpload({
             <span className="text-xs font-semibold leading-tight text-ink/70">
               이미지 업로드
             </span>
-            {sizeLabel && (
+            {allowSvg ? (
+              <span className="rounded-md bg-ink/[0.06] px-2 py-1 font-display text-[11px] font-semibold tracking-wide text-ink/55">
+                SVG · PNG
+                {recommendedMinHeight ? ` (권장 세로 ${recommendedMinHeight}px+)` : ""}
+              </span>
+            ) : sizeLabel ? (
               <span className="rounded-md bg-ink/[0.06] px-2 py-1 font-display text-[11px] font-semibold tabular-nums tracking-wide text-ink/55">
                 {sizeLabel}
               </span>
-            )}
+            ) : recommendedSize ? (
+              <span className="flex flex-col items-center gap-1">
+                <span className="rounded-md bg-ink/[0.06] px-2 py-1 font-display text-[11px] font-semibold tracking-wide text-ink/55">
+                  {ratioText} 비율로 자동 조정
+                </span>
+                <span className="font-display text-[11px] tabular-nums text-ink/45">
+                  권장 {formatSize(recommendedSize)}
+                </span>
+              </span>
+            ) : null}
           </span>
         )}
       </button>
@@ -301,15 +414,15 @@ export function AdminImageUpload({
         </button>
       )}
 
-      {/* Explicit list keeps SVG out of the picker entirely. Transparency-
-          dependent assets (the logo) additionally rule out JPEG. */}
+      {/* The logo adds SVG to its raster list; other fields keep SVG out of the
+          picker entirely, and transparency-dependent ones rule out JPEG. */}
       <input
         ref={inputRef}
         type="file"
         name={name}
         accept={
           requireTransparent
-            ? "image/png,image/webp"
+            ? `image/png,image/webp${allowSvg ? ",image/svg+xml" : ""}`
             : "image/png,image/jpeg,image/webp"
         }
         onChange={(e) => pick(e.target.files?.[0])}
@@ -323,6 +436,7 @@ export function AdminImageUpload({
       {name && (
         <>
           <input type="hidden" name={`${name}_width`} value={width} />
+          <input type="hidden" name={`${name}_height`} value={height} />
           <input
             type="hidden"
             name={`${name}_cleared`}
