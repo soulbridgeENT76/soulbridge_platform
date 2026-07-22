@@ -187,6 +187,7 @@ export function AdminImageUpload({
    * rather than the raw upload.
    */
   const accept = async (file: File, url: string) => {
+    let previewUrl = url;
     if (output && inputRef.current) {
       try {
         const encoded = await imageToWebp(file, outputQuality, output);
@@ -197,6 +198,11 @@ export function AdminImageUpload({
         inputRef.current.files = dt.files;
         setWidth(String(encoded.width));
         setHeight(String(encoded.height));
+        // Preview the processed asset — e.g. the logo with its transparent
+        // margin already trimmed — so the operator sees exactly what gets
+        // stored the moment they pick the file, not after a save.
+        URL.revokeObjectURL(url);
+        previewUrl = URL.createObjectURL(encoded.blob);
       } catch {
         reject("이미지를 변환하지 못했습니다.", url);
         return;
@@ -204,7 +210,7 @@ export function AdminImageUpload({
     }
     // Picking a file supersedes an earlier removal.
     setCleared(false);
-    setPreview(url);
+    setPreview(previewUrl);
   };
 
   const pick = (file?: File) => {

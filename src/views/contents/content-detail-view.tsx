@@ -1,8 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Container, PlaceholderImage, Tag } from "@shared/ui";
-import { UPLOAD_SIZE } from "@shared/config/media";
 import { CONTENT_THUMB_RATIO, type Content } from "@entities/content";
 
 type ContentDetailViewProps = {
@@ -76,19 +74,20 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
             </p>
           </div>
         ) : (
-          /* Non-video IP: 16:9 image + description stacked */
+          /* Non-video IP: image at its natural ratio + description stacked */
           <>
             <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-md shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
               {content.thumbnail ? (
-                <Image
+                // Plain img so the detail shows the image at its true ratio: the
+                // stored master is native-ratio WebP (capped), and the list card
+                // keeps the 16:9 crop. Height is capped so a tall upload can't
+                // dominate the page.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                   src={content.thumbnail}
                   alt={content.title}
-                  width={UPLOAD_SIZE.landscape.width}
-                  height={UPLOAD_SIZE.landscape.height}
-                  sizes="(min-width: 1024px) 64rem, 100vw"
-                  priority
-                  className="w-full object-cover"
-                  style={{ aspectRatio: CONTENT_THUMB_RATIO }}
+                  fetchPriority="high"
+                  className="mx-auto block max-h-[85vh] w-auto max-w-full rounded-2xl"
                 />
               ) : (
                 <PlaceholderImage
