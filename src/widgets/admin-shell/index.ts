@@ -16,6 +16,7 @@ export { AdminImageUpload } from "./ui/admin-image-upload";
 export { AdminFormActions } from "./ui/admin-form-actions";
 export { DeleteButton } from "./ui/delete-button";
 export { ConfirmDialog } from "./ui/confirm-dialog";
+export { DraftRestoreModal } from "./ui/draft-restore-modal";
 export { AdminReferenceCard } from "./ui/admin-reference-card";
 export { AdminStatusToggle } from "./ui/admin-status-toggle";
 // SectionVisibilityToggle is intentionally NOT re-exported here. It is an async

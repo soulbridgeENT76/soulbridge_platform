@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import NextImage from "next/image";
 import { Image as ImageIcon, TriangleAlert, Video } from "lucide-react";
@@ -12,9 +12,11 @@ import {
   AdminImageUpload,
   AdminFormActions,
   AdminPageHeader,
+  DraftRestoreModal,
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
+import { useFormDraft } from "@shared/lib/use-form-draft";
 import { useSaveAction } from "@shared/ui/use-save-action";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
 import { parseYoutubeId, youtubeThumbnail } from "@shared/lib/youtube";
@@ -52,11 +54,97 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
   const previewId = parseYoutubeId(youtubeUrl);
 
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
+  // Bumped to remount the image upload (its preview is internal state that
+  // `form.reset()` can't reach) when the form is reset to pristine.
+  const [uploadKey, setUploadKey] = useState(0);
+  const { prompt, save: saveDraft, clear: clearDraft, dismiss } = useFormDraft(
+    `content:${initial?.id ?? "new"}`
+  );
+  // Previous values of the state-backed fields; the autosave fires only when
+  // they genuinely change, never on mount (survives StrictMode's double-invoke,
+  // which would otherwise persist a phantom draft of the blank form).
+  const lastState = useRef({ mediaType, youtubeUrl });
+
+  // Return the form to its pristine (initial) state. Necessary because a soft
+  // navigation away and back reuses this component instance (Next's Router
+  // Cache / browser history restore) rather than remounting it — so clearing
+  // the session draft alone leaves the typed-in DOM values and controlled state
+  // in place. Called on cancel / save / discard, never on a plain leave.
+  const resetForm = () => {
+    const mt: MediaType = initial?.mediaType === "youtube" ? "video" : "image";
+    const yt = initial?.youtubeId ?? "";
+    formRef.current?.reset(); // uncontrolled inputs → their defaultValue
+    lastState.current = { mediaType: mt, youtubeUrl: yt }; // keep autosave quiet
+    setMediaType(mt);
+    setYoutubeUrl(yt);
+    setUploadKey((k) => k + 1);
+  };
+
   const { state, pending, run } = useSaveAction(saveContent, { ok: true }, {
     tone: editing ? "edit" : "save",
-    onSuccess: () => router.push("/admin/contents"),
+    onSuccess: () => {
+      clearDraft();
+      resetForm();
+      router.push("/admin/contents");
+    },
   });
   const { errors, clearError, guardSubmit } = useFieldErrors();
+
+  // Snapshot the text fields (files can't be persisted) to the session draft.
+  const collectDraft = () => {
+    const out: Record<string, string> = {};
+    const form = formRef.current;
+    if (form) {
+      for (const [k, v] of new FormData(form).entries()) {
+        if (typeof v === "string") out[k] = v;
+      }
+    }
+    saveDraft(out);
+  };
+
+  // Autosave when the media tab / YouTube URL actually change; text inputs
+  // autosave via the form's onChange.
+  useEffect(() => {
+    if (
+      lastState.current.mediaType === mediaType &&
+      lastState.current.youtubeUrl === youtubeUrl
+    ) {
+      return;
+    }
+    lastState.current = { mediaType, youtubeUrl };
+    collectDraft();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mediaType, youtubeUrl]);
+
+  const restoreDraft = () => {
+    const d = prompt;
+    dismiss();
+    if (!d) return;
+    if (d.mediaType === "image" || d.mediaType === "video") setMediaType(d.mediaType);
+    if (typeof d.youtubeUrl === "string") setYoutubeUrl(d.youtubeUrl);
+    const form = formRef.current;
+    if (form) {
+      for (const [k, v] of Object.entries(d)) {
+        // youtubeUrl/mediaType are React-controlled; set via state above.
+        if (k === "youtubeUrl" || k === "mediaType") continue;
+        const el = form.elements.namedItem(k);
+        if (
+          el instanceof HTMLInputElement ||
+          el instanceof HTMLTextAreaElement ||
+          el instanceof HTMLSelectElement
+        ) {
+          if (el.type !== "file" && el.type !== "hidden") el.value = v;
+        }
+      }
+    }
+  };
+
+  const discardDraft = () => {
+    dismiss();
+    clearDraft();
+    resetForm();
+  };
 
   const validate = (formData: FormData): Record<string, string> => {
     const errs: Record<string, string> = {};
@@ -86,7 +174,12 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
   );
 
   return (
-    <form onSubmit={clientSubmit}>
+    <form ref={formRef} onChange={collectDraft} onSubmit={clientSubmit}>
+      <DraftRestoreModal
+        open={prompt !== null}
+        onContinue={restoreDraft}
+        onDiscard={discardDraft}
+      />
       {/* Empty on create — the action reads this to tell insert from update. */}
       <input type="hidden" name="id" value={initial?.id ?? ""} />
       <input type="hidden" name="mediaType" value={mediaType} />
@@ -194,6 +287,7 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
             {mediaType === "image" ? (
               <div>
                 <AdminImageUpload
+                  key={uploadKey}
                   ratio={LANDSCAPE_RATIO}
                   name="image"
                   initialUrl={initial?.mediaType === "image" ? initial.thumbnail : null}
@@ -282,7 +376,14 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin/contents" pending={pending} />
+      <AdminFormActions
+        cancelHref="/admin/contents"
+        pending={pending}
+        onCancel={() => {
+          clearDraft();
+          resetForm();
+        }}
+      />
     </form>
   );
 }
