@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { showToast, type ToastKind } from "./toast";
 
 /** The shape every admin save action resolves to. */
@@ -37,14 +37,24 @@ export function useSaveAction<S extends SaveState>(
   const { message = "저장되었습니다", tone = "save", onSuccess } = options;
   const [state, setState] = useState<S>(initial);
   const [pending, startTransition] = useTransition();
+  // Hard guard against a double-submit: a ref flips synchronously, so a second
+  // click that lands before `pending` has re-rendered the disabled button still
+  // cannot fire the action twice.
+  const running = useRef(false);
 
   const run = (formData: FormData) => {
+    if (running.current) return;
+    running.current = true;
     startTransition(async () => {
-      const result = await action(state, formData);
-      setState(result);
-      if (result.ok && !result.error) {
-        showToast(message, tone);
-        onSuccess?.();
+      try {
+        const result = await action(state, formData);
+        setState(result);
+        if (result.ok && !result.error) {
+          showToast(message, tone);
+          onSuccess?.();
+        }
+      } finally {
+        running.current = false;
       }
     });
   };
