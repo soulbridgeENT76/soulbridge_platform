@@ -53,6 +53,11 @@ export function useSaveAction<S extends SaveState>(
           showToast(message, tone);
           onSuccess?.();
         }
+      } catch (e) {
+        // A thrown action (vs a returned {ok:false}) would otherwise fail
+        // silently — no toast, no clear. Surface it instead.
+        console.error("save action threw:", e);
+        showToast("저장에 실패했습니다. 잠시 후 다시 시도해주세요.", "error");
       } finally {
         running.current = false;
       }

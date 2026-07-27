@@ -133,7 +133,8 @@ export async function saveContent(
   try {
     if (id) await updateContent(id, input);
     else await createContent(input);
-  } catch {
+  } catch (e) {
+    console.error("saveContent failed:", e);
     if (uploaded) await removeMedia(uploaded).catch(() => {});
     return { ok: false, error: "저장에 실패했습니다. 잠시 후 다시 시도해주세요." };
   }

@@ -52,10 +52,16 @@ export function ConfirmDialog({
         <h2 className="mt-4 text-lg font-bold text-ink">{title}</h2>
         <p className="mt-2 text-sm leading-relaxed text-ink/60">{message}</p>
         <div className="mt-6 flex justify-end gap-2">
-          <AdminButton variant="outline" onClick={onCancel} disabled={pending}>
+          <AdminButton
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={pending}
+          >
             취소
           </AdminButton>
           <AdminButton
+            type="button"
             variant="solid"
             className="bg-red-600 hover:bg-red-500"
             onClick={onConfirm}

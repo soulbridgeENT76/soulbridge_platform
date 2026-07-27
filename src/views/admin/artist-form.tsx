@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, TriangleAlert } from "lucide-react";
 import {
@@ -12,10 +12,12 @@ import {
   AdminFormActions,
   AdminPageHeader,
   AdminButton,
+  DraftRestoreModal,
 } from "@widgets/admin-shell";
 import { PORTRAIT_RATIO, UPLOAD_SIZE } from "@shared/config/media";
 import { WEBP_QUALITY_PHOTO } from "@shared/lib/image-to-webp";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
+import { useFormDraft } from "@shared/lib/use-form-draft";
 import { useSaveAction } from "@shared/ui/use-save-action";
 import type { SocialKey } from "@shared/config/socials";
 import type { Artist, ArtistWork } from "@entities/artist";
@@ -31,10 +33,92 @@ export function ArtistForm({ initial }: ArtistFormProps) {
   const editing = Boolean(initial);
   const [works, setWorks] = useState<ArtistWork[]>(initial?.works ?? []);
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
+  // Bumped to remount the image upload (its preview is internal state that
+  // `form.reset()` can't reach) when the form is reset to pristine.
+  const [uploadKey, setUploadKey] = useState(0);
+  const { prompt, save: saveDraft, clear: clearDraft, dismiss } = useFormDraft(
+    `artist:${initial?.id ?? "new"}`
+  );
+  // Previous career list; the autosave fires only when it actually changes, not
+  // on mount (survives StrictMode's double-invoke, which would otherwise persist
+  // a phantom draft of the blank form).
+  const lastWorks = useRef(works);
+
+  // Return the form to its pristine (initial) state. Necessary because a soft
+  // navigation away and back reuses this component instance (Next's Router
+  // Cache / browser history restore) rather than remounting it — so clearing
+  // the session draft alone leaves the typed-in DOM values and controlled state
+  // in place. Called on cancel / save / discard, never on a plain leave.
+  const resetForm = () => {
+    const w = initial?.works ?? [];
+    formRef.current?.reset(); // uncontrolled inputs → their defaultValue
+    lastWorks.current = w; // keep autosave quiet
+    setWorks(w);
+    setUploadKey((k) => k + 1);
+  };
+
   const { state, pending, run } = useSaveAction(saveArtist, { ok: true }, {
     tone: editing ? "edit" : "save",
-    onSuccess: () => router.push("/admin/artists"),
+    onSuccess: () => {
+      clearDraft();
+      resetForm();
+      router.push("/admin/artists");
+    },
   });
+
+  const collectDraft = () => {
+    const out: Record<string, string> = {};
+    const form = formRef.current;
+    if (form) {
+      for (const [k, v] of new FormData(form).entries()) {
+        if (typeof v === "string") out[k] = v;
+      }
+    }
+    saveDraft(out);
+  };
+
+  // The career list is React state (serialized to a hidden field), so autosave
+  // when it actually changes; text inputs autosave via the form's onChange.
+  useEffect(() => {
+    if (lastWorks.current === works) return;
+    lastWorks.current = works;
+    collectDraft();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [works]);
+
+  const restoreDraft = () => {
+    const d = prompt;
+    dismiss();
+    if (!d) return;
+    if (typeof d.works === "string") {
+      try {
+        setWorks(JSON.parse(d.works) as ArtistWork[]);
+      } catch {
+        /* keep current */
+      }
+    }
+    const form = formRef.current;
+    if (form) {
+      for (const [k, v] of Object.entries(d)) {
+        if (k === "works") continue; // React-controlled via setWorks above
+        const el = form.elements.namedItem(k);
+        if (
+          el instanceof HTMLInputElement ||
+          el instanceof HTMLTextAreaElement ||
+          el instanceof HTMLSelectElement
+        ) {
+          if (el.type !== "file" && el.type !== "hidden") el.value = v;
+        }
+      }
+    }
+  };
+
+  const discardDraft = () => {
+    dismiss();
+    clearDraft();
+    resetForm();
+  };
 
   // Prefill each fixed social field from the existing socials list. Keyed by
   // SocialKey, the same registry the public icons resolve through, so a field
@@ -70,7 +154,12 @@ export function ArtistForm({ initial }: ArtistFormProps) {
   );
 
   return (
-    <form onSubmit={clientSubmit}>
+    <form ref={formRef} onChange={collectDraft} onSubmit={clientSubmit}>
+      <DraftRestoreModal
+        open={prompt !== null}
+        onContinue={restoreDraft}
+        onDiscard={discardDraft}
+      />
       {/* Empty on create — the action reads this to tell insert from update. */}
       <input type="hidden" name="id" value={initial?.id ?? ""} />
       {/* The career list is variable-length, so it travels as one JSON field
@@ -87,6 +176,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
           hint="화면에서는 세로 3:4로 잘려 표시 · 원본 비율 저장 · 권장 1200 × 1600"
         >
           <AdminImageUpload
+            key={uploadKey}
             ratio={PORTRAIT_RATIO}
             name="profile"
             initialUrl={initial?.photo}
@@ -237,7 +327,14 @@ export function ArtistForm({ initial }: ArtistFormProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin/artists" pending={pending} />
+      <AdminFormActions
+        cancelHref="/admin/artists"
+        pending={pending}
+        onCancel={() => {
+          clearDraft();
+          resetForm();
+        }}
+      />
     </form>
   );
 }

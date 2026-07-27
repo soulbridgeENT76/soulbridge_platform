@@ -86,7 +86,8 @@ export async function saveNotice(
   try {
     if (id) await updateNotice(id, input);
     else await createNotice(input);
-  } catch {
+  } catch (e) {
+    console.error("saveNotice failed:", e);
     return { ok: false, error: "저장에 실패했습니다. 잠시 후 다시 시도해주세요." };
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FileText, Link2, TriangleAlert } from "lucide-react";
 import {
@@ -12,9 +12,11 @@ import {
   AdminFormActions,
   AdminPageHeader,
   AdminStatusToggle,
+  DraftRestoreModal,
 } from "@widgets/admin-shell";
 import { cn } from "@shared/lib/cn";
 import { useFieldErrors, fieldValue } from "@shared/lib/use-field-errors";
+import { useFormDraft } from "@shared/lib/use-form-draft";
 import { useSaveAction } from "@shared/ui/use-save-action";
 import type { Notice, NoticeLinkType } from "@entities/notices/model/types";
 import { saveNotice } from "@features/update-notices";
@@ -33,13 +35,103 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
     initial?.linkType ?? "article"
   );
   const external = linkType === "external";
+  // Mirror of the publish toggle's state, kept here so the draft can capture and
+  // restore it; `toggleKey` remounts the toggle to adopt a restored value.
+  const [active, setActive] = useState(initial?.active ?? false);
+  const [toggleKey, setToggleKey] = useState(0);
 
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
+  const { prompt, save: saveDraft, clear: clearDraft, dismiss } = useFormDraft(
+    `notice:${initial?.id ?? "new"}`
+  );
+  // Previous values of the tab/toggle; the autosave fires only when they
+  // actually change, not on mount (survives StrictMode's double-invoke, which
+  // would otherwise persist a phantom draft of the blank form).
+  const lastState = useRef({ linkType, active });
+
+  // Return the form to its pristine (initial) state. Necessary because a soft
+  // navigation away and back reuses this component instance (Next's Router
+  // Cache / browser history restore) rather than remounting it — so clearing
+  // the session draft alone leaves the typed-in DOM values and controlled state
+  // in place. Called on cancel / save / discard, never on a plain leave.
+  const resetForm = () => {
+    const lt: NoticeLinkType = initial?.linkType ?? "article";
+    const ac = initial?.active ?? false;
+    formRef.current?.reset(); // uncontrolled inputs → their defaultValue
+    lastState.current = { linkType: lt, active: ac }; // keep autosave quiet
+    setLinkType(lt);
+    setActive(ac);
+    setToggleKey((k) => k + 1); // remount the toggle with the reset value
+  };
+
   const { state, pending, run } = useSaveAction(saveNotice, { ok: true }, {
     tone: editing ? "edit" : "save",
-    onSuccess: () => router.push("/admin/notices"),
+    onSuccess: () => {
+      clearDraft();
+      resetForm();
+      router.push("/admin/notices");
+    },
   });
   const { errors, clearError, guardSubmit } = useFieldErrors();
+
+  const collectDraft = () => {
+    const out: Record<string, string> = {};
+    const form = formRef.current;
+    if (form) {
+      for (const [k, v] of new FormData(form).entries()) {
+        if (typeof v === "string") out[k] = v;
+      }
+    }
+    saveDraft(out);
+  };
+
+  // linkType (tab) and active (toggle) are React state; text inputs autosave via
+  // the form's onChange. Fire only on a genuine change, never on mount.
+  useEffect(() => {
+    if (
+      lastState.current.linkType === linkType &&
+      lastState.current.active === active
+    ) {
+      return;
+    }
+    lastState.current = { linkType, active };
+    collectDraft();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkType, active]);
+
+  const restoreDraft = () => {
+    const d = prompt;
+    dismiss();
+    if (!d) return;
+    if (d.linkType === "article" || d.linkType === "external") {
+      setLinkType(d.linkType);
+    }
+    if (d.active === "true" || d.active === "false") {
+      setActive(d.active === "true");
+      setToggleKey((k) => k + 1); // remount the toggle with the restored value
+    }
+    const form = formRef.current;
+    if (form) {
+      for (const [k, v] of Object.entries(d)) {
+        if (k === "linkType" || k === "active") continue; // handled via state
+        const el = form.elements.namedItem(k);
+        if (
+          el instanceof HTMLInputElement ||
+          el instanceof HTMLTextAreaElement ||
+          el instanceof HTMLSelectElement
+        ) {
+          if (el.type !== "file" && el.type !== "hidden") el.value = v;
+        }
+      }
+    }
+  };
+
+  const discardDraft = () => {
+    dismiss();
+    clearDraft();
+    resetForm();
+  };
 
   const validate = (formData: FormData): Record<string, string> => {
     const errs: Record<string, string> = {};
@@ -63,7 +155,12 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
   );
 
   return (
-    <form onSubmit={clientSubmit}>
+    <form ref={formRef} onChange={collectDraft} onSubmit={clientSubmit}>
+      <DraftRestoreModal
+        open={prompt !== null}
+        onContinue={restoreDraft}
+        onDiscard={discardDraft}
+      />
       {/* Empty on create — the action reads this to tell insert from update. */}
       <input type="hidden" name="id" value={initial?.id ?? ""} />
 
@@ -140,8 +237,10 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
               </p>
             </div>
             <AdminStatusToggle
+              key={toggleKey}
               name="active"
-              initial={initial?.active ?? false}
+              initial={active}
+              onToggle={setActive}
               itemName={initial?.title ?? "새 뉴스"}
             />
           </div>
@@ -225,7 +324,14 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin/notices" pending={pending} />
+      <AdminFormActions
+        cancelHref="/admin/notices"
+        pending={pending}
+        onCancel={() => {
+          clearDraft();
+          resetForm();
+        }}
+      />
     </form>
   );
 }

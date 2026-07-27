@@ -27,6 +27,8 @@ type AdminStatusToggleProps = {
    */
   onMessage?: string;
   offMessage?: string;
+  /** Notified with the new value after a toggle — used by forms to autosave. */
+  onToggle?: (active: boolean) => void;
 };
 
 /**
@@ -41,6 +43,7 @@ export function AdminStatusToggle({
   action,
   onMessage = "메뉴에 노출됩니다",
   offMessage = "메뉴에서 숨겨집니다",
+  onToggle,
 }: AdminStatusToggleProps) {
   const [active, setActive] = useState(initial);
   const [pending, startTransition] = useTransition();
@@ -48,6 +51,7 @@ export function AdminStatusToggle({
   const toggle = () => {
     const next = !active;
     setActive(next); // optimistic
+    onToggle?.(next);
 
     if (!action) return;
     startTransition(async () => {
