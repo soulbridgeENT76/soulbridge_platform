@@ -96,7 +96,7 @@ export default async function AdminContentsPage() {
                   <td className="px-5 py-4 text-left font-medium text-ink">
                     {/* Capped so a long title can't starve the action column
                         and wrap its buttons; the full text stays in the tooltip. */}
-                    <div className="flex max-w-[320px] items-center gap-4">
+                    <div className="flex max-w-100 items-center gap-4">
                       {/* Image upload, or the YouTube video's thumbnail. */}
                       <span className="relative block h-9 w-16 shrink-0">
                         {content.preview ? (
