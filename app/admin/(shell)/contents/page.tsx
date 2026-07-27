@@ -79,16 +79,24 @@ export default async function AdminContentsPage() {
                 <th className="py-3.5 pl-25 pr-5 text-left font-semibold">
                   제목
                 </th>
-                <th className="px-5 py-3.5 font-semibold">카테고리</th>
-                <th className="px-5 py-3.5 font-semibold">연도</th>
-                <th className="px-5 py-3.5 font-semibold">관리</th>
+                <th className="whitespace-nowrap px-5 py-3.5 font-semibold">
+                  카테고리
+                </th>
+                <th className="whitespace-nowrap px-5 py-3.5 font-semibold">
+                  연도
+                </th>
+                <th className="whitespace-nowrap px-5 py-3.5 font-semibold">
+                  관리
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-ink/[0.06]">
               {contents.map((content) => (
                 <tr key={content.id} className="hover:bg-ink/[0.015]">
                   <td className="px-5 py-4 text-left font-medium text-ink">
-                    <div className="flex items-center gap-4">
+                    {/* Capped so a long title can't starve the action column
+                        and wrap its buttons; the full text stays in the tooltip. */}
+                    <div className="flex max-w-[320px] items-center gap-4">
                       {/* Image upload, or the YouTube video's thumbnail. */}
                       <span className="relative block h-9 w-16 shrink-0">
                         {content.preview ? (
@@ -116,13 +124,19 @@ export default async function AdminContentsPage() {
                           </span>
                         )}
                       </span>
-                      <span>{content.title}</span>
+                      <span className="truncate" title={content.title}>
+                        {content.title}
+                      </span>
                     </div>
                   </td>
-                  <td className="px-5 py-4 text-ink/60">{content.category}</td>
-                  <td className="px-5 py-4 text-ink/60">{content.year}</td>
+                  <td className="whitespace-nowrap px-5 py-4 text-ink/60">
+                    {content.category}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4 text-ink/60">
+                    {content.year}
+                  </td>
                   <td className="px-5 py-4">
-                    <div className="flex justify-center gap-1">
+                    <div className="flex justify-center gap-1 whitespace-nowrap">
                       <AdminLinkButton
                         href={`/admin/contents/${content.ref}`}
                         variant="ghost"
