@@ -1,16 +1,20 @@
 import { AdminReferenceCard } from "@widgets/admin-shell";
-import { CONTACT } from "@shared/config/site";
 import { socialSummary } from "@shared/config/socials";
 import { getBrand, resolveSiteBrand } from "@entities/brand";
+import { getContactAdmin } from "@entities/page-content";
 
 /**
  * Footer editor. All footer content is shared with other pages (brand +
  * contact), so this screen only points to their single source of truth.
  */
 export async function FooterEditor() {
-  // The authed, uncached read — a preview that claims to mirror the brand page
-  // has to show what was actually saved, not a cached or bundled stand-in.
-  const brand = resolveSiteBrand(await getBrand());
+  // The authed, uncached reads — a preview that claims to mirror the brand and
+  // contact pages has to show what was actually saved, not a cached or bundled
+  // stand-in. Contact especially: the bundled defaults are placeholders.
+  const [brand, contact] = await Promise.all([
+    getBrand().then(resolveSiteBrand),
+    getContactAdmin(),
+  ]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -32,9 +36,9 @@ export async function FooterEditor() {
         href="/admin/contact"
         hrefLabel="연락처에서 편집"
         rows={[
-          { label: "주소", value: CONTACT.address },
-          { label: "번호", value: CONTACT.tel },
-          { label: "메일", value: CONTACT.email },
+          { label: "주소", value: contact.address },
+          { label: "번호", value: contact.tel },
+          { label: "메일", value: contact.email },
         ]}
       />
     </div>
