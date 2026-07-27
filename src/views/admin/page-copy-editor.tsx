@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import {
   AdminField,
   AdminInput,
@@ -43,7 +44,14 @@ export function PageCopyEditor({
           <p className="mt-0.5 text-xs text-ink/50">{caption}</p>
         </div>
         <AdminButton type="submit" variant="solid" disabled={pending}>
-          저장
+          {pending ? (
+            <>
+              <Loader2 size={15} className="animate-spin" />
+              저장 중…
+            </>
+          ) : (
+            "저장"
+          )}
         </AdminButton>
       </div>
 

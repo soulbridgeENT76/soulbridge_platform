@@ -52,7 +52,7 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
   const previewId = parseYoutubeId(youtubeUrl);
 
   const router = useRouter();
-  const { state, run } = useSaveAction(saveContent, { ok: true }, {
+  const { state, pending, run } = useSaveAction(saveContent, { ok: true }, {
     tone: editing ? "edit" : "save",
     onSuccess: () => router.push("/admin/contents"),
   });
@@ -282,7 +282,7 @@ export function ContentForm({ initial, categories }: ContentFormProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin/contents" />
+      <AdminFormActions cancelHref="/admin/contents" pending={pending} />
     </form>
   );
 }

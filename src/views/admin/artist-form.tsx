@@ -31,7 +31,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
   const editing = Boolean(initial);
   const [works, setWorks] = useState<ArtistWork[]>(initial?.works ?? []);
   const router = useRouter();
-  const { state, run } = useSaveAction(saveArtist, { ok: true }, {
+  const { state, pending, run } = useSaveAction(saveArtist, { ok: true }, {
     tone: editing ? "edit" : "save",
     onSuccess: () => router.push("/admin/artists"),
   });
@@ -237,7 +237,7 @@ export function ArtistForm({ initial }: ArtistFormProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin/artists" />
+      <AdminFormActions cancelHref="/admin/artists" pending={pending} />
     </form>
   );
 }

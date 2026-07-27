@@ -24,7 +24,9 @@ interface BrandEditorProps {
 export function BrandEditor({ initial }: BrandEditorProps) {
   const [brandName, setBrandName] = useState(initial.brand.name);
   const [brandInfo, setBrandInfo] = useState(initial.brand.intro);
-  const { state, run } = useSaveAction(saveBrand, { ok: true }, { tone: "edit" });
+  const { state, pending, run } = useSaveAction(saveBrand, { ok: true }, {
+    tone: "edit",
+  });
 
   return (
     <form onSubmit={submitAction(run)} className="flex flex-col gap-5">
@@ -157,7 +159,7 @@ export function BrandEditor({ initial }: BrandEditorProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin" />
+      <AdminFormActions cancelHref="/admin" pending={pending} />
     </form>
   );
 }

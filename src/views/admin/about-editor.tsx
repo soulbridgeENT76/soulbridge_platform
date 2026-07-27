@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Plus, Trash2, TriangleAlert } from "lucide-react";
+import { Loader2, Plus, Trash2, TriangleAlert } from "lucide-react";
 import {
   AdminField,
   AdminInput,
@@ -73,16 +73,14 @@ export function AboutEditor({
 }: AboutEditorProps) {
   // Two independent forms on one screen — each announces its own save, so the
   // operator can tell which half of the page was written.
-  const { state: copyState, run: copyRun } = useSaveAction(
-    savePageCopy,
-    { ok: true },
-    { message: "상단 문구가 저장되었습니다", tone: "edit" }
-  );
-  const { state: aboutState, run: aboutRun } = useSaveAction(
-    saveAbout,
-    { ok: true },
-    { tone: "edit" }
-  );
+  const { state: copyState, pending: copyPending, run: copyRun } =
+    useSaveAction(
+      savePageCopy,
+      { ok: true },
+      { message: "상단 문구가 저장되었습니다", tone: "edit" }
+    );
+  const { state: aboutState, pending: aboutPending, run: aboutRun } =
+    useSaveAction(saveAbout, { ok: true }, { tone: "edit" });
 
   // Until the page is saved once the row holds no leadership or sections, so
   // the bundled constants seed the form — the same content the page renders.
@@ -181,8 +179,15 @@ export function AboutEditor({
           )}
 
           <div className="flex justify-end">
-            <AdminButton type="submit" variant="solid">
-              문구 저장
+            <AdminButton type="submit" variant="solid" disabled={copyPending}>
+              {copyPending ? (
+                <>
+                  <Loader2 size={15} className="animate-spin" />
+                  저장 중…
+                </>
+              ) : (
+                "문구 저장"
+              )}
             </AdminButton>
           </div>
         </Card>
@@ -386,7 +391,7 @@ export function AboutEditor({
           </p>
         )}
 
-        <AdminFormActions cancelHref="/admin" />
+        <AdminFormActions cancelHref="/admin" pending={aboutPending} />
       </form>
     </div>
   );
