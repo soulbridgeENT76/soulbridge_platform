@@ -135,7 +135,8 @@ export async function saveArtist(
   try {
     if (id) await updateArtist(id, input);
     else await createArtist(input);
-  } catch {
+  } catch (e) {
+    console.error("saveArtist failed:", e);
     // The row still points at the old photo, so the file we just uploaded is
     // unreachable. Best-effort cleanup; an orphan is not worth failing twice.
     if (uploaded) await removeMedia(uploaded).catch(() => {});
