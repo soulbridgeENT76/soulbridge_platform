@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { showToast } from "@shared/ui/toast";
 import { AdminButton } from "./admin-button";
 import { ConfirmDialog } from "./confirm-dialog";
@@ -16,17 +16,25 @@ type DeleteButtonProps = {
 export function DeleteButton({ itemName, action }: DeleteButtonProps) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  // Same hard double-submit guard as the save buttons.
+  const running = useRef(false);
 
   const onConfirm = () => {
+    if (running.current) return;
+    running.current = true;
     // The action revalidates the list path, so the row disappears on its own —
     // the dialog only has to report a failure the operator can act on.
     startTransition(async () => {
-      const result = await action();
-      if (result.ok) {
-        setOpen(false);
-        showToast("삭제되었습니다", "delete");
-      } else {
-        showToast(result.error ?? "삭제에 실패했습니다.", "error");
+      try {
+        const result = await action();
+        if (result.ok) {
+          setOpen(false);
+          showToast("삭제되었습니다", "delete");
+        } else {
+          showToast(result.error ?? "삭제에 실패했습니다.", "error");
+        }
+      } finally {
+        running.current = false;
       }
     });
   };

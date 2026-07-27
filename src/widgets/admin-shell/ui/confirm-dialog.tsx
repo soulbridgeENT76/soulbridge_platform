@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 import { AdminButton } from "./admin-button";
 
 type ConfirmDialogProps = {
@@ -52,7 +52,7 @@ export function ConfirmDialog({
         <h2 className="mt-4 text-lg font-bold text-ink">{title}</h2>
         <p className="mt-2 text-sm leading-relaxed text-ink/60">{message}</p>
         <div className="mt-6 flex justify-end gap-2">
-          <AdminButton variant="outline" onClick={onCancel}>
+          <AdminButton variant="outline" onClick={onCancel} disabled={pending}>
             취소
           </AdminButton>
           <AdminButton
@@ -61,7 +61,14 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={pending}
           >
-            {pending ? `${confirmLabel} 중…` : confirmLabel}
+            {pending ? (
+              <>
+                <Loader2 size={15} className="animate-spin" />
+                {confirmLabel} 중…
+              </>
+            ) : (
+              confirmLabel
+            )}
           </AdminButton>
         </div>
       </div>
