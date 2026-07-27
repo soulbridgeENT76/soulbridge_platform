@@ -30,7 +30,7 @@ type ContactEditorProps = {
  * SNS links are managed on the Brand page.
  */
 export function ContactEditor({ initial, socialsSummary }: ContactEditorProps) {
-  const { state, run } = useSaveAction(saveContact, { ok: true }, {
+  const { state, pending, run } = useSaveAction(saveContact, { ok: true }, {
     tone: "edit",
   });
   const { errors, clearError, guardSubmit } = useFieldErrors();
@@ -145,7 +145,7 @@ export function ContactEditor({ initial, socialsSummary }: ContactEditorProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin" />
+      <AdminFormActions cancelHref="/admin" pending={pending} />
     </form>
   );
 }

@@ -38,7 +38,7 @@ export function HomeEditor({
   const slide = slides[active];
   // Each slide saves on its own, and the page does not navigate afterwards —
   // the toast is the only sign the write landed.
-  const { state, run } = useSaveAction(saveHomeSlide, { ok: true }, {
+  const { state, pending, run } = useSaveAction(saveHomeSlide, { ok: true }, {
     tone: "edit",
   });
 
@@ -195,6 +195,7 @@ export function HomeEditor({
         <AdminFormActions
           cancelHref="/admin"
           submitLabel={`${active + 1}화면 저장`}
+          pending={pending}
         />
       </form>
     </div>

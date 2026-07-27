@@ -35,7 +35,7 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
   const external = linkType === "external";
 
   const router = useRouter();
-  const { state, run } = useSaveAction(saveNotice, { ok: true }, {
+  const { state, pending, run } = useSaveAction(saveNotice, { ok: true }, {
     tone: editing ? "edit" : "save",
     onSuccess: () => router.push("/admin/notices"),
   });
@@ -225,7 +225,7 @@ export function NoticeForm({ initial, categories }: NoticeFormProps) {
         </p>
       )}
 
-      <AdminFormActions cancelHref="/admin/notices" />
+      <AdminFormActions cancelHref="/admin/notices" pending={pending} />
     </form>
   );
 }
