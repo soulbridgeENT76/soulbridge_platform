@@ -76,26 +76,27 @@ export function ContentDetailView({ content }: ContentDetailViewProps) {
         ) : (
           /* Non-video IP: image at its natural ratio + description stacked */
           <>
-            <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-md shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
-              {content.thumbnail ? (
-                // Plain img so the detail shows the image at its true ratio: the
-                // stored master is native-ratio WebP (capped), and the list card
-                // keeps the 16:9 crop. Height is capped so a tall upload can't
-                // dominate the page.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={content.thumbnail}
-                  alt={content.title}
-                  fetchPriority="high"
-                  className="mx-auto block max-h-[85vh] w-auto max-w-full rounded-2xl"
-                />
-              ) : (
+            {content.thumbnail ? (
+              // Plain img so the detail shows the image at its true ratio: the
+              // stored master is native-ratio WebP (capped), and the list card
+              // keeps the 16:9 crop. Height is capped so a tall upload can't
+              // dominate the page. Frame styles live on the img itself — a
+              // wrapper box would keep its full width and letterbox portraits.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={content.thumbnail}
+                alt={content.title}
+                fetchPriority="high"
+                className="mx-auto mt-10 block max-h-[80vh] w-auto max-w-full rounded-2xl shadow-[0_8px_24px_rgba(36,24,30,0.10)] md:max-w-5xl"
+              />
+            ) : (
+              <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-2xl shadow-[0_8px_24px_rgba(36,24,30,0.10)]">
                 <PlaceholderImage
                   label="콘텐츠 대표 이미지"
                   ratio={CONTENT_THUMB_RATIO}
                 />
-              )}
-            </div>
+              </div>
+            )}
             <p className="mt-10 whitespace-pre-line text-base leading-relaxed text-ink/70 md:text-lg">
               {content.synopsis || content.note}
             </p>
