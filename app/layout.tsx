@@ -17,10 +17,19 @@ export async function generateMetadata(): Promise<Metadata> {
       default: `${name} — ${SITE.tagline.en}`,
       template: `%s | ${name}`,
     },
-    openGraph: {
-      images: ["/logo.png"],
-    },
     description: SITE.description,
+    openGraph: {
+      siteName: name,
+      images: {
+        url: '/og-image.png',
+      }
+    },
+    twitter: {
+      title: name,
+      images: {
+        url: '/og-image.png',
+      }
+    }
   };
 }
 
