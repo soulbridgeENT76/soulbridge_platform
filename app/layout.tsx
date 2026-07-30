@@ -17,6 +17,9 @@ export async function generateMetadata(): Promise<Metadata> {
       default: `${name} — ${SITE.tagline.en}`,
       template: `%s | ${name}`,
     },
+    openGraph: {
+      images: ["/logo.png"],
+    },
     description: SITE.description,
   };
 }
