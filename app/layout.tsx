@@ -18,18 +18,24 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${name}`,
     },
     description: SITE.description,
+    // Both point at public/og-image.png. Set here rather than through the
+    // app/opengraph-image.png file convention: a config `images` wins over the
+    // file, so keeping both would only make the home page — the one segment the
+    // file belongs to — advertise a different URL than every other route.
     openGraph: {
       siteName: name,
       images: {
-        url: '/og-image.png',
-      }
+        url: "/og-image.png",
+      },
     },
+    // No `title` here on purpose: setting one at the root freezes it for every
+    // child route, since a page that omits `twitter` inherits this whole object.
+    // Left out, twitter:title follows the page title like og:title does.
     twitter: {
-      title: name,
       images: {
-        url: '/og-image.png',
-      }
-    }
+        url: "/og-image.png",
+      },
+    },
   };
 }
 
