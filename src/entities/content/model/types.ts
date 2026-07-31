@@ -15,6 +15,11 @@ export type Content = {
   slug: string | null;
   /** Routing identifier: the custom slug if set, else the id (uuid). */
   ref: string;
+  /**
+   * ISO date (YYYY-MM-DD) the entry was created. Not shown anywhere — the cards
+   * display `year` instead — but the RSS feed needs a real publish date.
+   */
+  date: string;
   title: string;
   /** One of CONTENT_CATEGORIES — stored as free text in the DB. */
   category: string;
