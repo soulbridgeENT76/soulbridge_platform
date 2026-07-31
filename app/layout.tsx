@@ -54,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** 네이버 서치어드바이저 > 사이트 관리 > 소유확인 에서 발급받은 코드. */
-const NAVER_SITE_VERIFICATION = "ab6cb3df7b0fba87ac57c2d4d46650094039290f";
+const NAVER_SITE_VERIFICATION = "1010207ddb7e4c02a21f5d8692b5fd78946b6d56";
 
 const archivo = Archivo({
   variable: "--font-archivo",
