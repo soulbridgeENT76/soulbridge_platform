@@ -5,10 +5,13 @@ import { SITE } from "@shared/config/site";
 import { absoluteUrl } from "@shared/config/site-url";
 
 /**
- * Served at /rss.xml, and submitted to Naver Search Advisor alongside the
- * sitemap. The sitemap lists every URL so crawlers can find them at all; this
- * carries only the freshly published ones, with their text, so new posts get
- * picked up quickly.
+ * Served at /rss — extensionless because that is the form Naver Search Advisor
+ * accepts for RSS submission. The Content-Type header is what identifies the
+ * format, so the missing .xml costs nothing.
+ *
+ * Submitted alongside the sitemap. The sitemap lists every URL so crawlers can
+ * find them at all; this carries only the freshly published ones, with their
+ * text, so new posts get picked up quickly.
  *
  * Notices and contents only — those are the two sections that gain entries over
  * time. Artists and the static pages belong in the sitemap, not in a "what's
@@ -88,7 +91,7 @@ function renderFeed(siteName: string, items: FeedItem[]) {
     <link>${escapeXml(absoluteUrl("/"))}</link>
     <description>${escapeXml(collapse(SITE.description))}</description>
     <language>ko</language>
-    <atom:link href="${escapeXml(absoluteUrl("/rss.xml"))}" rel="self" type="application/rss+xml" />
+    <atom:link href="${escapeXml(absoluteUrl("/rss"))}" rel="self" type="application/rss+xml" />
 ${lastBuild ? `    <lastBuildDate>${lastBuild}</lastBuildDate>\n` : ""}${items
     .map(renderItem)
     .join("\n")}

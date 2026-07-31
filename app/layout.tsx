@@ -36,11 +36,11 @@ export async function generateMetadata(): Promise<Metadata> {
         url: "/og-image.png",
       },
     },
-    // Advertises /rss.xml in the head so feed readers and crawlers discover it
+    // Advertises the feed in the head so readers and crawlers discover it
     // without being told the URL.
     alternates: {
       types: {
-        "application/rss+xml": [{ url: "/rss.xml", title: `${name} 새 소식` }],
+        "application/rss+xml": [{ url: "/rss", title: `${name} 새 소식` }],
       },
     },
     // 네이버 서치어드바이저 사이트 소유확인용. `<meta name="naver-site-verification">`
