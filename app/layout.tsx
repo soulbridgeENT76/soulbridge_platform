@@ -36,8 +36,18 @@ export async function generateMetadata(): Promise<Metadata> {
         url: "/og-image.png",
       },
     },
+    // 네이버 서치어드바이저 사이트 소유확인용. `<meta name="naver-site-verification">`
+    // 로 head 에 들어간다. 구글 등 다른 검색엔진을 추가할 때도 여기에 넣으면 된다.
+    verification: {
+      other: {
+        "naver-site-verification": NAVER_SITE_VERIFICATION,
+      },
+    },
   };
 }
+
+/** 네이버 서치어드바이저 > 사이트 관리 > 소유확인 에서 발급받은 코드. */
+const NAVER_SITE_VERIFICATION = "ab6cb3df7b0fba87ac57c2d4d46650094039290f";
 
 const archivo = Archivo({
   variable: "--font-archivo",
