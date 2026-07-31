@@ -18,7 +18,14 @@ export type ContentRow = {
   thumbnail_url: string | null;
   /** 0 = image, 1 = youtube. */
   thumbnail_type: number;
+  created_at: string | null;
 };
+
+/** The UTC date (YYYY-MM-DD) of a timestamp, or "" when unset. */
+function isoDate(ts: string | null): string {
+  if (!ts) return "";
+  return new Date(ts).toISOString().slice(0, 10);
+}
 
 /** Maps a row to the shape the UI renders. */
 export function toContent(row: ContentRow): Content {
@@ -31,6 +38,7 @@ export function toContent(row: ContentRow): Content {
     slug: row.slug,
     // The identifier used in URLs: a custom slug wins, else the id.
     ref: row.slug || row.id,
+    date: isoDate(row.created_at),
     title: row.title,
     category: row.category,
     year: row.year,
